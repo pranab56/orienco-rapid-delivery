@@ -1,0 +1,12 @@
+{
+  "navbar": {
+    "home": "Accueil",
+    "orders": "Commandes",
+    "history": "Historique",
+    "chat": "Messagerie",
+    "contact": "Contactez-nous",
+    "settings": "Paramètres",
+    "sign_out": "Déconnexion",
+    "select_language": "Choisir la langue"
+  }
+}
