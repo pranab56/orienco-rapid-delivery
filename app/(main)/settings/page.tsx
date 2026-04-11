@@ -6,7 +6,6 @@ import { Camera, Calendar as CalendarIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
   Popover,
@@ -127,7 +126,7 @@ export default function PersonalInformationPage() {
           <div className='w-full '>
             <label className="text-[12px] font-medium text-gray-500 mb-2 block">Date of Birth</label>
             <Popover>
-              <PopoverTrigger asChild className="w-full">
+              <PopoverTrigger className="w-full bg-transparent border-none p-0 h-auto cursor-default">
                 <div className="relative cursor-pointer group w-full">
                   <div
                     className={cn(

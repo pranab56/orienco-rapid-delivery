@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Home, Package, ListOrdered, MessageSquare, Menu } from 'lucide-react';
+import { Home, Package, ListOrdered, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
