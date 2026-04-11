@@ -6,16 +6,16 @@ import { motion } from 'framer-motion';
 export default function PrivacySecurityPage() {
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pb-20 max-w-3xl">
-      <h2 className="text-[28px] font-bold text-gray-800 mb-8 tracking-tight">Privacy Policy</h2>
+      <h2 className="text-[28px] font-medium text-gray-800 mb-8 tracking-tight">Privacy Policy</h2>
       
       <div className="text-[12px] text-[#333333] space-y-6 leading-relaxed bg-[#EBEBEB]/80 font-medium p-4 rounded-xl">
-        <h3 className="text-[#EB5500] font-bold">Orienco - B2B Order Management Platform</h3>
+        <h3 className="text-[#EB5500] font-medium">Orienco - B2B Order Management Platform</h3>
 
         <p>
-            Your privacy is important to us. This Privacy Policy explains how <span className="text-[#EB5500] font-bold">Orienco</span> (&quot;App&quot;, &quot;Platform&quot;, &quot;we&quot;, &quot;our&quot;) collects, uses, stores, and protects your information when you use our B2B application and services.
+            Your privacy is important to us. This Privacy Policy explains how <span className="text-[#EB5500] font-medium">Orienco</span> (&quot;App&quot;, &quot;Platform&quot;, &quot;we&quot;, &quot;our&quot;) collects, uses, stores, and protects your information when you use our B2B application and services.
         </p>
 
-        <p className="font-bold">
+        <p className="font-medium">
             By accessing or using the App, you agree to the collection and use of information as described in this Privacy Policy.
         </p>
 
@@ -48,7 +48,7 @@ export default function PrivacySecurityPage() {
                 <li>Payment processing is handled securely through trusted third-party gateways.</li>
             </ul>
 
-            <p className="font-bold text-[14px] pt-2 text-[#333333]">3. How We Use Your Information</p>
+            <p className="font-medium text-[14px] pt-2 text-[#333333]">3. How We Use Your Information</p>
             <p className="mb-2">We use collected information to:</p>
             
             <ul className="space-y-4 pt-2">

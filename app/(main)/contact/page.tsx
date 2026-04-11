@@ -71,12 +71,14 @@ export default function Contact() {
         <div className="bg-[#EAEAEA] min-h-screen">
             {/* Hero Section */}
             <div className="">
-                <div className="relative w-full h-[400px] md:h-[600px] rounded overflow-hidden shadow-2xl shrink-0">
+                <div className="relative w-full h-[400px] md:h-[800px] rounded overflow-hidden shadow-2xl shrink-0">
                     <Image
-                        src="https://images.unsplash.com/photo-1556740758-90de374c12ad?q=80&w=1600&auto=format&fit=crop"
+                        src="/images/contact.jpg"
                         alt="Customer Support Worker"
-                        fill
-                        className="object-cover"
+                        width={1920}
+                        height={1080}
+                        quality={100}
+                        className="w-full h-auto object-contain"
                     />
                     {/* Overlay Gradient to match image readability */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/40 to-transparent" />
@@ -86,9 +88,9 @@ export default function Contact() {
                             initial={{ y: 20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.6 }}
-                            className="text-white font-bold text-5xl md:text-[4rem] leading-[1.1] tracking-tight max-w-[900px]"
+                            className="text-white font-medium text-5xl md:text-[5rem] leading-[1.3] tracking-tight max-w-[900px]"
                         >
-                            Get in Touch with Us for Any Questions or Support.
+                            Get in Touch with Us <br /> for Any Questions or <br /> Support.
                         </motion.h1>
                     </div>
                 </div>
@@ -107,7 +109,7 @@ export default function Contact() {
 
                         {/* Headers */}
                         <div className="relative z-10 space-y-4">
-                            <h3 className="text-[#EB5500] font-bold text-[32px] tracking-tight">Contact Information</h3>
+                            <h3 className="text-[#EB5500] font-medium text-[32px] tracking-tight">Contact Information</h3>
                             <p className="text-gray-600 text-[16px] font-medium font-sans">Say something to start a live chat!</p>
                         </div>
 
@@ -150,7 +152,7 @@ export default function Contact() {
                             {/* Row 1 Text Fields */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 sm:gap-14 mb-16">
                                 <div className="relative flex flex-col group">
-                                    <label htmlFor="firstName" className="text-[12px] font-bold text-gray-500 mb-2 transition-colors group-focus-within:text-[#EB5500]">First Name</label>
+                                    <label htmlFor="firstName" className="text-[12px] font-medium text-gray-500 mb-2 transition-colors group-focus-within:text-[#EB5500]">First Name</label>
                                     <input
                                         type="text"
                                         id="firstName"
@@ -160,11 +162,11 @@ export default function Contact() {
                                         placeholder="John"
                                         className="w-full bg-transparent border-b-2 border-gray-300 py-1 text-sm font-medium text-gray-900 outline-none focus:border-[#EB5500] transition-colors placeholder:text-gray-400"
                                     />
-                                    {errors.firstName && <span className="absolute -bottom-5 left-0 text-[10px] font-bold text-red-500 tracking-wide uppercase">{errors.firstName}</span>}
+                                    {errors.firstName && <span className="absolute -bottom-5 left-0 text-[10px] font-medium text-red-500 tracking-wide uppercase">{errors.firstName}</span>}
                                 </div>
 
                                 <div className="relative flex flex-col group">
-                                    <label htmlFor="lastName" className="text-[12px] font-bold text-gray-800 mb-2 transition-colors group-focus-within:text-[#EB5500]">Last Name</label>
+                                    <label htmlFor="lastName" className="text-[12px] font-medium text-gray-800 mb-2 transition-colors group-focus-within:text-[#EB5500]">Last Name</label>
                                     <input
                                         type="text"
                                         id="lastName"
@@ -174,13 +176,13 @@ export default function Contact() {
                                         placeholder="Doe"
                                         className="w-full bg-transparent border-b-2 border-gray-300 py-1 text-sm font-semibold text-gray-900 outline-none focus:border-[#EB5500] transition-colors placeholder:text-gray-400"
                                     />
-                                    {errors.lastName && <span className="absolute -bottom-5 left-0 text-[10px] font-bold text-red-500 tracking-wide uppercase">{errors.lastName}</span>}
+                                    {errors.lastName && <span className="absolute -bottom-5 left-0 text-[10px] font-medium text-red-500 tracking-wide uppercase">{errors.lastName}</span>}
                                 </div>
                             </div>
                             {/* Row 2 Text Fields */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 sm:gap-14 mb-14">
                                 <div className="relative flex flex-col group">
-                                    <label htmlFor="email" className="text-[12px] font-bold text-gray-500 mb-2 transition-colors group-focus-within:text-[#EB5500]">Email</label>
+                                    <label htmlFor="email" className="text-[12px] font-medium text-gray-500 mb-2 transition-colors group-focus-within:text-[#EB5500]">Email</label>
                                     <input
                                         type="email"
                                         id="email"
@@ -190,11 +192,11 @@ export default function Contact() {
                                         placeholder="demo@gmail.com"
                                         className="w-full bg-transparent border-b-2 border-gray-300 py-1 text-sm font-medium text-gray-900 outline-none focus:border-[#EB5500] transition-colors placeholder:text-gray-400"
                                     />
-                                    {errors.email && <span className="absolute -bottom-5 left-0 text-[10px] font-bold text-red-500 tracking-wide uppercase">{errors.email}</span>}
+                                    {errors.email && <span className="absolute -bottom-5 left-0 text-[10px] font-medium text-red-500 tracking-wide uppercase">{errors.email}</span>}
                                 </div>
 
                                 <div className="relative flex flex-col group">
-                                    <label htmlFor="phone" className="text-[12px] font-bold text-gray-800 mb-2 transition-colors group-focus-within:text-[#EB5500]">Phone Number</label>
+                                    <label htmlFor="phone" className="text-[12px] font-medium text-gray-800 mb-2 transition-colors group-focus-within:text-[#EB5500]">Phone Number</label>
                                     <input
                                         type="tel"
                                         id="phone"
@@ -204,13 +206,13 @@ export default function Contact() {
                                         placeholder="+1 012 3456 789"
                                         className="w-full bg-transparent border-b-2 border-gray-300 py-1 text-sm font-semibold text-gray-900 outline-none focus:border-[#EB5500] transition-colors placeholder:text-gray-400"
                                     />
-                                    {errors.phone && <span className="absolute -bottom-5 left-0 text-[10px] font-bold text-red-500 tracking-wide uppercase">{errors.phone}</span>}
+                                    {errors.phone && <span className="absolute -bottom-5 left-0 text-[10px] font-medium text-red-500 tracking-wide uppercase">{errors.phone}</span>}
                                 </div>
                             </div>
 
                             {/* Checkboxes / Radios Subject Area */}
                             <div className="mb-14">
-                                <label className="text-[14px] font-bold text-gray-900 mb-4 block">Select Subject?</label>
+                                <label className="text-[14px] font-medium text-gray-900 mb-4 block">Select Subject?</label>
                                 <div className="flex flex-wrap items-center gap-x-6 lg:gap-x-8 gap-y-5">
                                     {subjects.map((subject, idx) => {
                                         const isChecked = formData.subjectIndex === idx;
@@ -227,7 +229,7 @@ export default function Contact() {
                                                     />
                                                     <div className={`w-2 h-2 rounded-full bg-[#EB5500] transition-transform duration-200 ${isChecked ? 'scale-100' : 'scale-0'}`} />
                                                 </div>
-                                                <span className="text-[12px] font-bold text-gray-600">{subject}</span>
+                                                <span className="text-[12px] font-medium text-gray-600">{subject}</span>
                                             </label>
                                         );
                                     })}
@@ -236,7 +238,7 @@ export default function Contact() {
 
                             {/* Message Block */}
                             <div className="relative flex flex-col mb-16 group">
-                                <label htmlFor="message" className="text-[12px] font-bold text-gray-500 mb-4 transition-colors group-focus-within:text-[#EB5500]">Message</label>
+                                <label htmlFor="message" className="text-[12px] font-medium text-gray-500 mb-4 transition-colors group-focus-within:text-[#EB5500]">Message</label>
                                 <input
                                     id="message"
                                     name="message"
@@ -246,7 +248,7 @@ export default function Contact() {
                                     onChange={handleChange}
                                     className="w-full bg-transparent border-b-2 border-gray-300 pb-2 text-[14px] font-medium text-gray-900 placeholder:text-gray-500 outline-none focus:border-[#EB5500] transition-colors"
                                 />
-                                {errors.message && <span className="absolute -bottom-5 left-0 text-[10px] font-bold text-red-500 tracking-wide uppercase">{errors.message}</span>}
+                                {errors.message && <span className="absolute -bottom-5 left-0 text-[10px] font-medium text-red-500 tracking-wide uppercase">{errors.message}</span>}
                             </div>
 
                             {/* Submit CTA Right aligned */}

@@ -17,7 +17,7 @@ export default function History() {
     return (
         <div className="min-h-screen pb-32 pt-32 font-sans text-[#333333]">
             <div className="container mx-auto px-4 max-w-4xl">
-                <h1 className="text-center font-bold text-2xl md:text-3xl mb-10">History</h1>
+                <h1 className="text-center font-medium text-2xl md:text-3xl mb-10">History</h1>
 
                 <div className="space-y-6">
                     {historyList.map((item, idx) => (
@@ -31,9 +31,9 @@ export default function History() {
                             {/* Top row */}
                             <div className="flex justify-between items-start mb-6">
                                 <div>
-                                    <h2 className="text-[16px] font-bold mb-4">Order ID: #{item.id}</h2>
+                                    <h2 className="text-[16px] font-medium mb-4">Order ID: #{item.id}</h2>
                                     <div className="flex gap-3">
-                                        <div className="bg-[#D1FAE5] text-[#059669] text-sm font-bold px-4 py-1.5 rounded-full">
+                                        <div className="bg-[#D1FAE5] text-[#059669] text-sm font-medium px-4 py-1.5 rounded-full">
                                             {item.price}
                                         </div>
                                         <div className="bg-[#E5E5E5] text-gray-600 flex items-center gap-1.5 text-sm font-medium px-4 py-1.5 rounded-full">
@@ -44,7 +44,7 @@ export default function History() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="bg-[#FFEDD5] text-[#EA580C] flex items-center gap-1 px-3 py-1 rounded-full text-sm font-bold">
+                                <div className="bg-[#FFEDD5] text-[#EA580C] flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium">
                                     <Star size={14} fill="currentColor" /> {item.rating}
                                 </div>
                             </div>
@@ -56,13 +56,13 @@ export default function History() {
                                 
                                 <div className="relative z-10 flex flex-col pl-4">
                                     <div className="absolute -left-1 mt-1 w-2.5 h-2.5 rounded-full bg-[#10B981]"></div>
-                                    <p className="text-[12px] text-gray-500 font-bold uppercase tracking-wide">Pickup</p>
+                                    <p className="text-[12px] text-gray-500 font-medium uppercase tracking-wide">Pickup</p>
                                     <p className="text-[14px] font-medium text-gray-800">123 Main St, Downtown</p>
                                 </div>
 
                                 <div className="relative z-10 flex flex-col pl-4">
                                     <div className="absolute -left-1 mt-1 w-2.5 h-2.5 rounded-full bg-[#EA580C]"></div>
-                                    <p className="text-[12px] text-gray-500 font-bold uppercase tracking-wide">Drop off</p>
+                                    <p className="text-[12px] text-gray-500 font-medium uppercase tracking-wide">Drop off</p>
                                     <p className="text-[14px] font-medium text-gray-800">456 Oak Ave, Uptown</p>
                                 </div>
                             </div>
@@ -86,16 +86,16 @@ export default function History() {
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 bg-gray-300 rounded-full flex-shrink-0"></div>
                                     <div>
-                                        <h3 className="font-bold text-[15px]">John Smith</h3>
+                                        <h3 className="font-medium text-[15px]">John Smith</h3>
                                         <div className="flex items-center gap-1 text-[#EAB308]">
                                             <Star size={12} fill="currentColor" />
-                                            <span className="text-gray-500 text-xs font-bold">4.9</span>
+                                            <span className="text-gray-500 text-xs font-medium">4.9</span>
                                         </div>
                                     </div>
                                 </div>
                                 <Link 
                                     href={`/history/${item.id}`}
-                                    className="text-[#EB5500] font-bold text-sm hover:underline"
+                                    className="text-[#EB5500] font-medium text-sm hover:underline"
                                 >
                                     View Details
                                 </Link>

@@ -11,11 +11,11 @@ export default function Home() {
   return (
     <main className="flex flex-col min-h-screen w-full overflow-hidden">
       <Hero />
-      <DownloadRepid />
       <HowItWork />
+      <DownloadRepid />
+      <FAQ />
       <ConnectUser />
       <GetInTouch />
-      <FAQ />
     </main>
   );
 }

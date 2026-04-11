@@ -24,7 +24,7 @@ export default function TermsPage() {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.6 }}
-              className="text-white font-bold text-4xl sm:text-5xl md:text-[4rem] leading-[1.1] tracking-normal max-w-[900px]"
+              className="text-white font-medium text-4xl sm:text-5xl md:text-[4rem] leading-[1.1] tracking-normal max-w-[900px]"
             >
               Understand Our<br className="hidden md:block" /> Terms and Conditions<br className="hidden md:block" /> Completely.
             </motion.h1>
@@ -41,7 +41,7 @@ export default function TermsPage() {
           </p>
 
           <div>
-            <h2 className="font-bold text-2xl md:text-[28px] mb-4">1. Acceptance of Terms</h2>
+            <h2 className="font-medium text-2xl md:text-[28px] mb-4">1. Acceptance of Terms</h2>
             <div className="space-y-4">
               <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
                 By creating an account and using the Tradelock, you confirm that you have read, understood, and agreed to these Terms and Conditions.
@@ -53,7 +53,7 @@ export default function TermsPage() {
           </div>
 
           <div>
-            <h2 className="font-bold text-2xl md:text-[28px] mb-4">2. User Accounts</h2>
+            <h2 className="font-medium text-2xl md:text-[28px] mb-4">2. User Accounts</h2>
             <div className="space-y-6">
               <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
                 To access certain features, you must create an account as a Client, Tradesperson, or Company.
@@ -74,7 +74,7 @@ export default function TermsPage() {
           </div>
 
           <div>
-            <h2 className="font-bold text-2xl md:text-[28px] mb-4">3. Privacy Policy</h2>
+            <h2 className="font-medium text-2xl md:text-[28px] mb-4">3. Privacy Policy</h2>
             <div className="space-y-6">
               <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
                 All job details (scope, pricing, timeline) must be agreed upon before work begins.
@@ -89,7 +89,7 @@ export default function TermsPage() {
           </div>
 
           <div>
-            <h2 className="font-bold text-2xl md:text-[28px] mb-4">4. Governing Law</h2>
+            <h2 className="font-medium text-2xl md:text-[28px] mb-4">4. Governing Law</h2>
             <div className="space-y-6">
               <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
                 Payments may be held securely in escrow until job completion is confirmed.

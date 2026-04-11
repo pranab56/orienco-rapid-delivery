@@ -7,26 +7,26 @@ import { Facebook, Instagram, Linkedin, Twitter } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="relative w-full bg-[#F5F5F5] pt-20 pb-10 h-[1000px] overflow-hidden font-sans">
+    <footer className="relative w-full bg-[#F5F5F5] pt-10 md:pt-20 pb-20 lg:pb-10 h-auto lg:h-[1000px] overflow-hidden">
       {/* Background Large Text "Orienco" */}
-      <div className="absolute bottom-[7%]  left-0 w-full select-none pointer-events-none z-0">
-        <h1 className="text-[24vw] font-black text-black/[0.10] leading-none text-center tracking-tighter [mask-image:linear-gradient(to_top,transparent_20%,black_70%)]">
+      <div className="absolute bottom-0 lg:bottom-[5%] left-0 w-full select-none pointer-events-none z-0 overflow-hidden">
+        <h1 className="text-[20vw] lg:text-[24vw] font-medium text-black/[0.10] leading-none text-center tracking-tighter [mask-image:linear-gradient(to_top,transparent_20%,black_70%)] whitespace-nowrap">
           Orienco
         </h1>
       </div>
 
-      <div className="container mx-auto px-6   z-80  relative z-10">
+      <div className="container mx-auto px-6    relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
 
           {/* Left Block - The Beige Card */}
-          <div className="lg:col-span-12 xl:col-span-4 bg-[#EAE7DF] rounded-sm p-10 md:p-10 flex flex-col justify-between shadow-sm">
-            <div className="space-y-16">
+          <div className="lg:col-span-12 xl:col-span-4 bg-[#EAE7DF] rounded-sm p-6 md:p-10 flex flex-col justify-between shadow-sm lg:min-h-0">
+            <div className="space-y-10 lg:space-y-16">
               {/* Logo & Brand Name */}
               <div className="flex items-center gap-3">
                 <div className="relative w-12 h-12">
                   <Image src="/icons/logo.png" alt="Orienco Logo" fill className="object-contain" />
                 </div>
-                <span className="text-[#EB5500] font-black text-2xl tracking-tighter">Orienco Rapid-Delivery</span>
+                <span className="text-[#EB5500] font-medium text-2xl tracking-tighter">Orienco Rapid-Delivery</span>
               </div>
             </div>
 
@@ -66,13 +66,13 @@ const Footer = () => {
           </div>
 
           {/* Right Block - The White Box with Links */}
-          <div className="lg:col-span-12 xl:col-span-8 bg-white/40 backdrop-blur-md rounded-sm p-10 md:p-10 flex flex-col justify-between border border-white/60 shadow-sm relative overflow-hidden">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8">
+          <div className="lg:col-span-12 xl:col-span-8 bg-white/40 backdrop-blur-md rounded-sm p-6 md:p-10 flex flex-col justify-between border border-white/60 shadow-sm relative overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
 
               {/* Home Column */}
-              <div className="space-y-10">
+              <div className="space-y-6 lg:space-y-10">
                 <h4 className="text-gray-900 font-medium text-xl tracking-tight">Home</h4>
-                <ul className="space-y-5">
+                <ul className="space-y-3 lg:space-y-5">
                   {['Home', 'History', 'Chat', 'Orders'].map((link) => (
                     <li key={link}>
                       <Link href="#" className="text-gray-600 hover:text-gray-900 font-medium transition-all text-base">{link}</Link>
@@ -82,9 +82,9 @@ const Footer = () => {
               </div>
 
               {/* Contact Info Column */}
-              <div className="space-y-10">
+              <div className="space-y-6 lg:space-y-10">
                 <h4 className="text-gray-900 font-medium text-xl tracking-tight">Contact Info</h4>
-                <ul className="space-y-5 flex flex-col">
+                <ul className="space-y-3 lg:space-y-5 flex flex-col">
                   {['Contact Us', 'Terms & Conditions', 'We are open 24/7'].map((link) => (
                     <li key={link}>
                       <Link href="#" className="text-gray-600 hover:text-gray-900 font-medium transition-all text-base">{link}</Link>
@@ -94,9 +94,9 @@ const Footer = () => {
               </div>
 
               {/* Business Offer Column */}
-              <div className="space-y-10">
+              <div className="space-y-6 lg:space-y-10">
                 <h4 className="text-gray-900 font-medium text-xl tracking-tight">Business Offer</h4>
-                <div className="space-y-5">
+                <div className="space-y-3 lg:space-y-5">
                   <div className="flex flex-col">
                     <Link href="tel:8473883747" className="text-gray-900 font-medium text-lg hover:text-[#EB5500] transition-all tracking-tight">(847) 388-3747</Link>
                   </div>
@@ -108,7 +108,7 @@ const Footer = () => {
             </div>
 
             {/* Copyright & Bottom Info */}
-            <div className="mt-20 pt-10 border-t border-gray-100/50 flex flex-wrap items-center gap-4">
+            <div className="mt-10 lg:mt-20 pt-6 lg:pt-10 border-t border-gray-100/50 flex flex-wrap items-center gap-4">
               <span className="text-gray-400 text-sm font-medium flex items-center gap-2">
                 <span className="text-lg">©</span> 2026 Orienco. All rights reserved.
               </span>

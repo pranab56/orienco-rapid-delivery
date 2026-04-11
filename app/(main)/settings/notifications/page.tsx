@@ -10,12 +10,12 @@ export default function NotificationsPage() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pb-20">
-      <h2 className="text-[28px] font-bold text-gray-800 mb-8 tracking-tight">Notification Preferences</h2>
+      <h2 className="text-[28px] font-medium text-gray-800 mb-8 tracking-tight">Notification Preferences</h2>
 
       <div className="bg-[#EBEBEB] border border-gray-200 shadow-sm rounded-xl p-8 max-w-2xl">
         <div className="flex items-center gap-2 mb-8">
             <Megaphone size={20} className="text-[#EB5500]" />
-            <h3 className="font-bold text-[16px] text-gray-800">Communication Channels</h3>
+            <h3 className="font-medium text-[16px] text-gray-800">Communication Channels</h3>
         </div>
 
         <div className="space-y-6">

@@ -33,7 +33,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
   const pathname = usePathname();
 
   return (
-    <div className=" bg-[#EBEBEB]/60 font-sans text-[#333333] pt-32">
+    <div className=" bg-[#DEE0E1]/60 text-[#333333] pt-32">
       <div className="container mx-auto px-4 flex flex-col md:flex-row gap-12">
         {/* Sidebar */}
         <div className="w-full md:w-64 flex-shrink-0 space-y-8">
@@ -48,7 +48,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
           </div>
 
           <div>
-            <h1 className="text-xl font-bold text-gray-800">Settings</h1>
+            <h1 className="text-xl font-medium text-gray-800">Settings</h1>
             <p className="text-[11px] text-gray-500 mt-1">Manage your account</p>
           </div>
 
@@ -61,9 +61,9 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                   key={tab.href}
                   href={tab.href}
                   className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium",
+                    "flex items-center gap-3 px-4 py-3 rounded-sm transition-all text-sm font-medium",
                     isActive 
-                      ? "text-[#333333] font-bold" 
+                      ? "text-[#333333] font-medium" 
                       : "text-gray-500 hover:text-[#333333] hover:bg-black/5"
                   )}
                 >

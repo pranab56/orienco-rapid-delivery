@@ -41,7 +41,7 @@ export function MobileBottomNav() {
               </div>
               <span 
                 className={cn(
-                  "text-[10px] font-bold tracking-wider",
+                  "text-[10px] font-medium tracking-wider",
                   isActive ? "text-[#EB5500]" : "text-gray-400"
                 )}
               >

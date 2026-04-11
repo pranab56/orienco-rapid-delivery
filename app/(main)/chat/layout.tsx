@@ -15,7 +15,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
     return (
         <div className="min-h-screen pb-32 pt-28 md:pt-32 font-sans text-[#333333]">
             <div className="container mx-auto px-4">
-                <h1 className="text-center font-bold text-2xl md:text-3xl mb-8">Chat</h1>
+                <h1 className="text-center font-medium text-2xl md:text-3xl mb-8">Chat</h1>
 
                 {/* Main Chat Container */}
                 <div className="flex flex-col md:flex-row h-[800px] border border-gray-200 rounded-xl overflow-hidden">
@@ -58,7 +58,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                                         {/* Content */}
                                         <div className="ml-4 flex-1 overflow-hidden">
                                             <div className="flex justify-between items-start mb-1">
-                                                <h3 className="font-bold text-[14px]">{chat.name}</h3>
+                                                <h3 className="font-medium text-[14px]">{chat.name}</h3>
                                                 <span className="text-[11px] text-gray-500 font-medium">{chat.time}</span>
                                             </div>
                                             <p className="text-[13px] text-gray-500 truncate">{chat.message}</p>
@@ -66,7 +66,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
                                         {/* Unread Badge */}
                                         {chat.unread > 0 && (
-                                            <div className="absolute right-5 top-10 flex items-center justify-center w-5 h-5 bg-[#EB5500] text-white text-[11px] font-bold rounded-full">
+                                            <div className="absolute right-5 top-10 flex items-center justify-center w-5 h-5 bg-[#EB5500] text-white text-[11px] font-medium rounded-full">
                                                 {chat.unread}
                                             </div>
                                         )}

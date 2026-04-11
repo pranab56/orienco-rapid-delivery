@@ -23,7 +23,7 @@ export default function Orders() {
     return (
         <div className="min-h-screen pb-32 pt-32 font-sans text-[#333333]">
             <div className="container mx-auto px-4 max-w-4xl">
-                <h1 className="text-center font-bold text-2xl md:text-3xl mb-10">Orders</h1>
+                <h1 className="text-center font-medium text-2xl md:text-3xl mb-10">Orders</h1>
 
                 <div className="space-y-8">
                     {ordersList.map((item, idx) => (
@@ -36,17 +36,17 @@ export default function Orders() {
                                 >
                                 {/* Top Badges */}
                                 <div className="md:absolute top-8 right-8 flex gap-2 md:gap-3 mb-6 md:mb-0">
-                                    <div className="bg-[#A7F3D0] text-[#065F46] text-[10px] md:text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1">
+                                    <div className="bg-[#A7F3D0] text-[#065F46] text-[10px] md:text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1">
                                         ⏱ {item.time}
                                     </div>
-                                    <div className="bg-[#FED7AA] text-[#C2410C] text-[10px] md:text-xs font-bold px-3 py-1.5 rounded-full">
+                                    <div className="bg-[#FED7AA] text-[#C2410C] text-[10px] md:text-xs font-medium px-3 py-1.5 rounded-full">
                                         {item.price}
                                     </div>
                                 </div>
 
                                 {/* ID Information */}
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Shipment Track • <span className={item.status === 'Delivered' ? 'text-green-600' : 'text-[#EB5500]'}>{item.status}</span></p>
-                                <h2 className="text-xl md:text-2xl font-bold mb-8 md:mb-10">#{item.id}</h2>
+                                <p className="text-[10px] font-medium text-gray-400 uppercase tracking-widest mb-1.5">Shipment Track • <span className={item.status === 'Delivered' ? 'text-green-600' : 'text-[#EB5500]'}>{item.status}</span></p>
+                                <h2 className="text-xl md:text-2xl font-medium mb-8 md:mb-10">#{item.id}</h2>
 
                                 {/* Timeline */}
                                 <div className="relative pl-10 md:pl-12 space-y-10 md:space-y-12 mb-8 md:mb-10">
@@ -58,7 +58,7 @@ export default function Orders() {
                                         <div className="absolute -left-10 md:-left-12 mt-1 flex items-center justify-center w-7 h-7 rounded-full bg-[#D1FAE5]">
                                             <div className="w-2.5 h-2.5 rounded-full bg-[#059669]"></div>
                                         </div>
-                                        <h3 className="font-bold text-[14px] md:text-[15px] ">Central Warehouse A</h3>
+                                        <h3 className="font-medium text-[14px] md:text-[15px] ">Central Warehouse A</h3>
                                         <p className="text-gray-500 text-xs md:text-sm font-medium">451 Industrial Way, San Francisco, CA 94107</p>
                                     </div>
 
@@ -67,7 +67,7 @@ export default function Orders() {
                                         <div className="absolute -left-10 md:-left-12 mt-1 flex items-center justify-center w-7 h-7 rounded-full bg-[#FFEDD5]">
                                             <div className="w-2.5 h-2.5 rounded-full bg-[#D97706]"></div>
                                         </div>
-                                        <h3 className="font-bold text-[14px] md:text-[15px] mb-1">Global Media HQ</h3>
+                                        <h3 className="font-medium text-[14px] md:text-[15px] mb-1">Global Media HQ</h3>
                                         <p className="text-gray-500 text-xs md:text-sm font-medium">1200 Market Street, San Francisco, CA 94103</p>
                                     </div>
                                 </div>
@@ -82,8 +82,8 @@ export default function Orders() {
                                             <Scooter />
                                         </div>
                                         <div>
-                                            <p className="text-[10px] uppercase font-bold text-gray-400">Vehicle</p>
-                                            <p className="font-bold text-xs md:text-[14px]">EV-Courier</p>
+                                            <p className="text-[10px] uppercase font-medium text-gray-400">Vehicle</p>
+                                            <p className="font-medium text-xs md:text-[14px]">EV-Courier</p>
                                         </div>
                                     </div>
 
@@ -92,8 +92,8 @@ export default function Orders() {
                                             <MapPin size={18} className="text-gray-600" />
                                         </div>
                                         <div>
-                                            <p className="text-[10px] uppercase font-bold text-gray-400">Distance</p>
-                                            <p className="font-bold text-xs md:text-[14px]">{item.distance}</p>
+                                            <p className="text-[10px] uppercase font-medium text-gray-400">Distance</p>
+                                            <p className="font-medium text-xs md:text-[14px]">{item.distance}</p>
                                         </div>
                                     </div>
                                 </div>

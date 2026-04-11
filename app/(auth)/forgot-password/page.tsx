@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
@@ -20,26 +20,9 @@ import 'swiper/css/effect-fade';
 import 'swiper/css/pagination';
 
 const slides = [
-  {
-    title: 'Discover the Pinnacle of Luxury Living',
-    subtitle: 'Join an exclusive community of property enthusiasts and professionals navigating the world’s most prestigious estates.',
-    image: '/images/auth/image1.png'
-  },
-  {
-    title: 'Modern Architecture and Elegant Design',
-    subtitle: 'Explore the finest designs from top-tier architects and discover your next dream home.',
-    image: '/images/auth/image2.png'
-  },
-  {
-    title: 'Premium Property Dashboard',
-    subtitle: 'All your real estate management tools in one integrated and intuitive platform.',
-    image: '/images/auth/image3.png'
-  },
-  {
-    title: 'Premium Property Dashboard',
-    subtitle: 'All your real estate management tools in one integrated and intuitive platform.',
-    image: '/images/auth/image4.png'
-  }
+  { image: "/images/auth/image1.jpg" },
+  { image: "/images/auth/image2.png" },
+  { image: "/images/auth/image3.png" }
 ];
 
 const emailSchema = z.object({
@@ -57,16 +40,8 @@ const passwordSchema = z.object({
 type EmailFormValues = z.infer<typeof emailSchema>;
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 
-function Logo() {
-  return (
-    <div className="flex items-center gap-2">
-      <Image src="/icons/logo.png" alt="Logo" width={1000} height={1000} className='w-full h-10' />
-    </div>
-  );
-}
-
 export default function ForgotPasswordPage() {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: New Password, 4: Success
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -116,128 +91,113 @@ export default function ForgotPasswordPage() {
 
   const onPasswordSubmit = (data: PasswordFormValues) => {
     console.log('New Password Data:', data);
-    // Final action - success message or redirect
+    setStep(4);
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 overflow-x-hidden bg-white font-sans text-neutral-1">
+    <div className="h-screen grid grid-cols-1 lg:grid-cols-2 bg-[#F8F9FA] overflow-hidden">
 
-      {/* Left Pan: Slider */}
-      <div className="relative hidden lg:block h-screen sticky top-0">
+      {/* Left Pan: Visual Slider */}
+      <div className="relative hidden lg:block h-screen bg-[#D32F2F] overflow-hidden">
         <Swiper
           modules={[Pagination, Autoplay, EffectFade]}
           effect="fade"
           autoplay={{ delay: 5000 }}
-          pagination={{ clickable: true, bulletClass: 'swiper-pagination-bullet login-bullet' }}
+          pagination={{ clickable: true, bulletClass: 'swiper-pagination-bullet auth-bullet' }}
           className="h-full w-full"
         >
           {slides.map((slide, idx) => (
             <SwiperSlide key={idx} className="relative h-full w-full">
               <Image
                 src={slide.image}
-                alt="Architecture"
+                alt={`Forgot Slide ${idx + 1}`}
                 fill
-                className="object-cover"
+                className="object-cover opacity-90"
                 priority={idx === 0}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-              <div className="absolute bottom-24 left-12 right-12 text-white space-y-6">
-                <motion.h1
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  key={`title-${idx}`}
-                  className="text-5xl font-bold leading-tight max-w-lg"
-                >
-                  {slide.title}
-                </motion.h1>
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  key={`subtitle-${idx}`}
-                  className="text-lg text-white/80 max-w-md font-medium"
-                >
-                  {slide.subtitle}
-                </motion.p>
-              </div>
+              <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/30" />
             </SwiperSlide>
           ))}
         </Swiper>
-
-        <div className="absolute top-8 left-8 z-20">
-          <Logo />
+        
+        {/* Back Button Overlay */}
+        <div className="absolute top-6 left-6 z-20">
+          <Link href="/" className="flex items-center gap-2 px-6 py-2 bg-black/10 backdrop-blur-md border border-white/20 rounded-full text-white hover:bg-white/20 transition-all group">
+            <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+            <span className="text-sm font-medium">Back to the homepage</span>
+          </Link>
         </div>
 
         <style jsx global>{`
-          .login-bullet {
-            width: 30px !important;
-            height: 4px !important;
-            border-radius: 2px !important;
-            background: rgba(255,255,255,0.4) !important;
+          .auth-bullet {
+            width: 120px !important;
+            height: 3px !important;
+            border-radius: 0px !important;
+            background: rgba(255,255,255,0.3) !important;
             opacity: 1 !important;
             margin: 0 4px !important;
             transition: all 0.3s ease;
           }
           .swiper-pagination-bullet-active {
             background: white !important;
-            width: 40px !important;
           }
           .swiper-pagination {
             bottom: 40px !important;
-            left: 48px !important;
+            left: 40px !important;
             text-align: left !important;
+            width: auto !important;
           }
         `}</style>
       </div>
 
       {/* Right Pan: Content */}
-      <div className="flex items-center justify-center p-4 sm:p-6 lg:p-12 min-h-screen overflow-y-auto bg-[#FAF9F6] lg:bg-white">
-        <div className="w-full max-w-xl py-8">
+      <div className="flex flex-col items-center justify-center p-6 sm:p-12 lg:p-20 h-screen overflow-hidden bg-[#F8F9FA] font-sans">
+        <div className="w-full max-w-md">
 
-          {/* Mobile Logo */}
-          <div className="lg:hidden flex justify-center mb-8">
-            <div className="w-48">
-              <Logo />
+          {/* Logo Section - Hidden on success step to match flow */}
+          {step !== 4 && (
+            <div className="flex flex-col items-center space-y-1 mb-10">
+              <div className="w-48 mb-4">
+                <Image src="/icons/logo.png" alt="Orienco Logo" width={200} height={80} className="w-full h-auto object-contain" />
+              </div>
             </div>
-          </div>
+          )}
 
           <AnimatePresence mode="wait">
             {step === 1 && (
               <motion.div
-                key="reset"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-8 lg:space-y-10 border border-gray-100 rounded-2xl sm:rounded-[2rem] p-6 sm:p-8 lg:p-12 bg-white shadow-xl shadow-black/[0.02]"
+                key="step-email"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.05 }}
+                className="space-y-8"
               >
-                <div className="text-center space-y-3 lg:space-y-4">
-                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-1">Reset Password</h2>
-                  <p className="text-sm sm:text-base text-neutral-2 font-medium leading-relaxed px-2 sm:px-0">
-                    Enter your email address and we&apos;ll send you a link to reset your password and regain access to your luxury property portfolio.
+                <div className="text-center space-y-2">
+                  <h2 className="text-2xl font-bold text-[#1A1A1A]">Forgot Password</h2>
+                  <p className="text-gray-500 text-sm leading-relaxed px-4">
+                    Enter your email address and we&apos;ll send you an OTP to reset your password.
                   </p>
                 </div>
 
-                <form className="space-y-6 sm:space-y-8" onSubmit={emailForm.handleSubmit(onEmailSubmit)}>
-                  <div className="space-y-2 lg:space-y-3">
-                    <Label className="text-neutral-1 font-bold text-sm lg:text-base">Email Address</Label>
+                <form className="space-y-6" onSubmit={emailForm.handleSubmit(onEmailSubmit)}>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-gray-800">Email Address</Label>
                     <Input
-                      placeholder="Enter your email address"
+                      placeholder="Enter your email"
                       {...emailForm.register('email')}
-                      className={`h-11 sm:h-14 bg-[#F2F2F2] border-none rounded-lg sm:rounded-xl px-4 sm:px-6 font-medium text-sm sm:text-base ${emailForm.formState.errors.email ? 'ring-2 ring-red-500' : ''}`}
+                      className={`h-11 bg-transparent border-gray-300 rounded-lg px-4 focus-visible:ring-1 focus-visible:ring-[#EB5500] transition-all text-sm ${emailForm.formState.errors.email ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
                     />
                     {emailForm.formState.errors.email && (
-                      <p className="text-red-500 text-xs font-bold mt-1 ml-1 animate-in fade-in slide-in-from-top-1">{emailForm.formState.errors.email.message}</p>
+                      <p className="text-red-500 text-[10px] font-medium mt-1">{emailForm.formState.errors.email.message}</p>
                     )}
                   </div>
 
-                  <Button type="submit" className="w-full h-11 sm:h-14 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg sm:rounded-xl text-base sm:text-lg flex items-center justify-center gap-2 group transition-all active:scale-95 shadow-lg shadow-primary/20">
-                    Send Reset Link
-                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                  <Button type="submit" className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm transition-all shadow-none active:scale-[0.98]">
+                    Send OTP Codes
                   </Button>
 
-                  <div className="text-center pt-2 sm:pt-4">
-                    <Link href="/login" className="text-sm sm:text-base text-neutral-1 font-extrabold hover:text-primary transition-colors underline decoration-2 underline-offset-4 decoration-primary/30 hover:decoration-primary">
+                  <div className="text-center">
+                    <Link href="/login" className="text-sm font-bold text-gray-600 hover:text-[#EB5500] transition-all underline underline-offset-4 decoration-gray-200">
                       Back to Login
                     </Link>
                   </div>
@@ -247,21 +207,21 @@ export default function ForgotPasswordPage() {
 
             {step === 2 && (
               <motion.div
-                key="verify"
+                key="step-otp"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                className="space-y-8 lg:space-y-10 border border-gray-100 rounded-2xl sm:rounded-[2rem] p-6 sm:p-8 lg:p-12 bg-white shadow-xl shadow-black/[0.02]"
+                className="space-y-8"
               >
-                <div className="text-center space-y-3 lg:space-y-4">
-                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-1">Verify account</h2>
-                  <p className="text-sm sm:text-base text-neutral-2 font-medium leading-relaxed px-2 sm:px-0">
-                    We&apos;ve sent unique 6-digit verification codes to your registered phone and email address.
+                <div className="text-center space-y-2">
+                  <h2 className="text-2xl font-bold text-[#1A1A1A]">Verify Account</h2>
+                  <p className="text-gray-500 text-sm leading-relaxed">
+                    We&apos;ve sent a unique 6-digit verification code to your email address.
                   </p>
                 </div>
 
-                <div className="space-y-4 sm:space-y-6">
-                  <div className="grid grid-cols-6 gap-2 sm:gap-3">
+                <div className="space-y-6">
+                  <div className="flex justify-center gap-3">
                     {otp.map((digit, idx) => (
                       <input
                         key={idx}
@@ -271,105 +231,113 @@ export default function ForgotPasswordPage() {
                         value={digit}
                         onChange={(e) => handleOtpChange(idx, e.target.value)}
                         onKeyDown={(e) => handleKeyDown(idx, e)}
-                        className={`w-full aspect-square text-center text-xl sm:text-3xl font-black text-neutral-1 bg-[#F2F2F2] border-none rounded-lg sm:rounded-xl focus:ring-2 focus:ring-primary focus:bg-white transition-all outline-none ${otpError ? 'ring-2 ring-red-500 bg-red-50' : ''}`}
+                        className={`w-12 h-12 text-center text-lg font-bold text-gray-800 bg-transparent border border-gray-300 rounded-lg focus:border-[#EB5500] focus:ring-1 focus:ring-[#EB5500] outline-none transition-all ${otpError ? 'border-red-500' : ''}`}
                       />
                     ))}
                   </div>
                   {otpError && (
-                    <p className="text-red-500 text-[10px] sm:text-xs font-bold text-center animate-pulse">{otpError}</p>
+                    <p className="text-red-500 text-[10px] font-medium text-center">{otpError}</p>
                   )}
                 </div>
 
-                <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-                  <span className="text-neutral-2">Didn&apos;t receive the SMS?</span>
-                  <button onClick={() => setOtp(['', '', '', '', '', ''])} className="text-neutral-1 hover:text-primary transition-colors hover:underline">Resend SMS</button>
+                <div className="flex items-center justify-between text-xs font-medium">
+                  <span className="text-gray-500">Didn&apos;t receive the code?</span>
+                  <button onClick={() => setOtp(['', '', '', '', '', ''])} className="text-[#EB5500] hover:underline font-bold">Resend OTP</button>
                 </div>
 
                 <Button
                   onClick={onVerifyOtp}
-                  className="w-full h-11 sm:h-14 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg sm:rounded-xl text-base sm:text-lg flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-primary/20 group"
+                  className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm transition-all shadow-none active:scale-[0.98]"
                 >
                   Verify & Continue
-                  <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </Button>
 
                 <div className="text-center">
-                  <button onClick={() => setStep(1)} className="text-neutral-2 font-bold hover:text-primary transition-colors text-xs sm:text-sm">Cancel and Restart</button>
+                  <button onClick={() => setStep(1)} className="text-xs font-bold text-gray-400 hover:text-gray-600">Cancel and Restart</button>
                 </div>
               </motion.div>
             )}
 
             {step === 3 && (
               <motion.div
-                key="new-password"
+                key="step-password"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                className="space-y-8 lg:space-y-10 border border-gray-100 rounded-2xl sm:rounded-[2rem] p-6 sm:p-8 lg:p-12 bg-white shadow-xl shadow-black/[0.02]"
+                className="space-y-8"
               >
-                <div className="text-center space-y-3 lg:space-y-4">
-                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-1">New Password</h2>
-                  <p className="text-sm sm:text-base text-neutral-2 font-medium leading-relaxed px-2 sm:px-0">
-                    Please enter a secure password that you haven&apos;t used before with EliteEstates.
+                <div className="text-center space-y-2">
+                  <h2 className="text-2xl font-bold text-[#1A1A1A]">New Password</h2>
+                  <p className="text-gray-500 text-sm leading-relaxed">
+                    Please create a new secure password for your account.
                   </p>
                 </div>
 
-                <form className="space-y-6 sm:space-y-8" onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}>
-                  <div className="space-y-2 sm:space-y-3 relative">
-                    <Label className="text-neutral-1 font-bold text-sm sm:text-base">Password</Label>
+                <form className="space-y-6" onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}>
+                  <div className="space-y-1.5 relative">
+                    <Label className="text-xs font-bold text-gray-800">Password</Label>
                     <div className="relative">
                       <Input
                         type={showPassword ? 'text' : 'password'}
-                        placeholder="New password"
+                        placeholder="Enter password"
                         {...passwordForm.register('password')}
-                        className={`h-11 sm:h-14 bg-[#F2F2F2] border-none rounded-lg sm:rounded-xl px-4 sm:px-6 pr-12 font-medium text-sm sm:text-base ${passwordForm.formState.errors.password ? 'ring-2 ring-red-500' : ''}`}
+                        className={`h-11 bg-transparent border-gray-300 rounded-lg px-4 pr-12 focus-visible:ring-1 focus-visible:ring-[#EB5500] transition-all text-sm ${passwordForm.formState.errors.password ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-neutral-2"
-                      >
-                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
                     </div>
                     {passwordForm.formState.errors.password && (
-                      <p className="text-red-500 text-xs font-bold mt-1 ml-1 animate-in fade-in slide-in-from-top-1">{passwordForm.formState.errors.password.message}</p>
+                      <p className="text-red-500 text-[10px] font-medium mt-1">{passwordForm.formState.errors.password.message}</p>
                     )}
                   </div>
 
-                  <div className="space-y-2 sm:space-y-3 relative">
-                    <Label className="text-neutral-1 font-bold text-sm sm:text-base">Confirm Password</Label>
+                  <div className="space-y-1.5 relative">
+                    <Label className="text-xs font-bold text-gray-800">Confirm Password</Label>
                     <div className="relative">
                       <Input
                         type={showConfirmPassword ? 'text' : 'password'}
                         placeholder="Confirm password"
                         {...passwordForm.register('confirmPassword')}
-                        className={`h-11 sm:h-14 bg-[#F2F2F2] border-none rounded-lg sm:rounded-xl px-4 sm:px-6 pr-12 font-medium text-sm sm:text-base ${passwordForm.formState.errors.confirmPassword ? 'ring-2 ring-red-500' : ''}`}
+                        className={`h-11 bg-transparent border-gray-300 rounded-lg px-4 pr-12 focus-visible:ring-1 focus-visible:ring-[#EB5500] transition-all text-sm ${passwordForm.formState.errors.confirmPassword ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-neutral-2"
-                      >
-                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                        {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
                     </div>
                     {passwordForm.formState.errors.confirmPassword && (
-                      <p className="text-red-500 text-xs font-bold mt-1 ml-1 animate-in fade-in slide-in-from-top-1">{passwordForm.formState.errors.confirmPassword.message}</p>
+                      <p className="text-red-500 text-[10px] font-medium mt-1">{passwordForm.formState.errors.confirmPassword.message}</p>
                     )}
                   </div>
 
-                  <Button type="submit" className="w-full h-11 sm:h-14 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg sm:rounded-xl text-base sm:text-lg flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-primary/20 group">
+                  <Button type="submit" className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm transition-all shadow-none active:scale-[0.98]">
                     Update Password
-                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                   </Button>
-
-                  <div className="text-center pt-2">
-                    <Link href="/login" className="text-sm sm:text-base text-neutral-1 font-extrabold hover:text-primary transition-colors underline decoration-2 underline-offset-4 decoration-primary/30 hover:decoration-primary">
-                      Return to Login
-                    </Link>
-                  </div>
                 </form>
+              </motion.div>
+            )}
+
+            {step === 4 && (
+              <motion.div
+                key="step-success"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center justify-center text-center space-y-6"
+              >
+                <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center text-green-500 border border-green-100 shadow-xl shadow-green-500/10">
+                  <CheckCircle2 size={40} strokeWidth={1.5} />
+                </div>
+                <div className="space-y-2">
+                  <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Password Changed</h2>
+                  <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
+                    Your password has been reset successfully. You can now login with your new credentials.
+                  </p>
+                </div>
+                <Link href="/login" className="w-full">
+                  <Button className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-bold rounded-lg text-sm shadow-lg shadow-orange-500/20 active:scale-95 transition-all">
+                    Go to Login
+                  </Button>
+                </Link>
               </motion.div>
             )}
           </AnimatePresence>

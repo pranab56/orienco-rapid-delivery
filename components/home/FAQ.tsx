@@ -50,7 +50,7 @@ const FAQ = () => {
 
         {/* Left Side: Title */}
         <div className="lg:col-span-5">
-          <h2 className="text-[#333333] font-black text-3xl md:text-5xl tracking-tight leading-tight text-center lg:text-left">
+          <h2 className="text-[#333333] font-medium text-3xl md:text-5xl tracking-tight leading-tight text-center lg:text-left">
             Frequently Asked
             <span className="text-[#EB5500]"> Question</span>
           </h2>
@@ -65,8 +65,8 @@ const FAQ = () => {
                 className="w-full py-5 md:py-8 flex items-center justify-between text-left group cursor-pointer"
               >
                 <div className="flex items-start md:items-center gap-4 md:gap-12">
-                  <span className="text-gray-900 font-black text-lg md:text-xl tabular-nums pt-0.5 md:pt-0 shrink-0">{item.id}</span>
-                  <span className="text-gray-800 font-bold text-base md:text-xl transition-colors group-hover:text-[#EB5500]">
+                  <span className="text-gray-900 font-medium text-lg md:text-xl tabular-nums pt-0.5 md:pt-0 shrink-0">{item.id}</span>
+                  <span className="text-gray-800 font-medium text-base md:text-xl transition-colors group-hover:text-[#EB5500]">
                     {item.question}
                   </span>
                 </div>
@@ -84,7 +84,7 @@ const FAQ = () => {
                     transition={{ duration: 0.3, ease: 'easeInOut' }}
                     className="overflow-hidden"
                   >
-                    <p className="pb-6 pl-9 md:pl-24 pr-4 md:pr-12 text-gray-500 font-bold leading-relaxed max-w-2xl text-xs sm:text-sm md:text-base">
+                    <p className="pb-6 pl-9 md:pl-24 pr-4 md:pr-12 text-gray-500 font-normal leading-relaxed max-w-2xl text-xs sm:text-sm md:text-base">
                       {item.answer}
                     </p>
                   </motion.div>

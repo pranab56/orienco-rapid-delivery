@@ -64,7 +64,7 @@ export default function SplashScreen() {
                                 initial={{ y: 30, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
-                                className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight"
+                                className="text-4xl md:text-5xl font-medium text-gray-900 tracking-tight"
                             >
                                 Orienco<span className="text-[#EB5500]">.</span>
                             </motion.h1>
@@ -73,7 +73,7 @@ export default function SplashScreen() {
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.5, duration: 0.6, ease: "easeOut" }}
-                                className="mt-3 text-xs md:text-sm font-bold text-[#EB5500] uppercase tracking-[0.3em]"
+                                className="mt-3 text-xs md:text-sm font-medium text-[#EB5500] uppercase tracking-[0.3em]"
                             >
                                 Rapid Delivery
                             </motion.p>

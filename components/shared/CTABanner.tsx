@@ -24,7 +24,7 @@ export default function CTABanner() {
             <div className="bg-primary py-10 md:py-12">
                 <div className="container mx-auto px-4 md:px-6 flex flex-col lg:flex-row items-center justify-between gap-6 md:gap-8">
                     <div className="text-white space-y-1 md:space-y-2 text-center lg:text-left">
-                        <h2 className="text-2xl md:text-3xl font-bold">{t('insights.featured_title')}</h2>
+                        <h2 className="text-2xl md:text-3xl font-medium">{t('insights.featured_title')}</h2>
                         <p className="text-sm md:text-lg opacity-90">{t('insights.featured_subtitle')}</p>
                     </div>
 

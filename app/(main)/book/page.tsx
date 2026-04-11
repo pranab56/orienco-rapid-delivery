@@ -172,7 +172,7 @@ export default function BookDeliveryPage() {
                         key={activeStepData.id}
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-white text-4xl md:text-5xl lg:text-[54px] font-bold leading-[1.1] max-w-2xl whitespace-pre-wrap tracking-tight"
+                        className="text-white text-4xl md:text-5xl lg:text-[54px] font-medium leading-[1.1] max-w-2xl whitespace-pre-wrap tracking-tight"
                     >
                         {activeStepData.title}
                     </motion.h1>
@@ -202,7 +202,7 @@ export default function BookDeliveryPage() {
                             <ChevronLeft size={18} className="text-gray-700 -ml-0.5" />
                         </button>
 
-                        <h2 className="text-[#EB5500] font-bold text-[20px]">
+                        <h2 className="text-[#EB5500] font-medium text-[20px]">
                             {currentStep === 1 && "Package Information"}
                             {currentStep === 2 && "Select Delivery Type"}
                             {currentStep === 3 && "Enter Locations"}
@@ -248,7 +248,7 @@ export default function BookDeliveryPage() {
                                     {errors.itemValue && <span className="text-red-500 text-[10px] mt-1 ml-1 block">This field is required</span>}
                                 </div>
                                 <div className="pt-8">
-                                    <button onClick={handleContinue} className="w-full bg-[#EB5500] cursor-pointer text-white py-3.5 rounded-lg font-bold shadow-md hover:bg-[#D44D00] transition-colors">
+                                    <button onClick={handleContinue} className="w-full bg-[#EB5500] cursor-pointer text-white py-3.5 rounded-lg font-medium shadow-md hover:bg-[#D44D00] transition-colors">
                                         Continue
                                     </button>
                                 </div>
@@ -263,7 +263,7 @@ export default function BookDeliveryPage() {
                                         <Zap size={18} fill="currentColor" className="text-[#EB5500]" />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-[14px]">Small Parcel</h3>
+                                        <h3 className="font-medium text-[14px]">Small Parcel</h3>
                                         <p className="text-[11px] text-gray-500 font-medium">Small & Light weight.</p>
                                     </div>
                                 </div>
@@ -272,7 +272,7 @@ export default function BookDeliveryPage() {
                                         <Clock size={18} className="text-[#EB5500]" />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-[14px]">Medium Parcel</h3>
+                                        <h3 className="font-medium text-[14px]">Medium Parcel</h3>
                                         <p className="text-[11px] text-gray-500 font-medium">Everyday items.</p>
                                     </div>
                                 </div>
@@ -281,15 +281,15 @@ export default function BookDeliveryPage() {
                                         <Package size={18} className="text-[#EB5500]" />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-[14px]">Large Parcel</h3>
+                                        <h3 className="font-medium text-[14px]">Large Parcel</h3>
                                         <p className="text-[11px] text-gray-500 font-medium">For bulky items</p>
                                     </div>
                                 </div>
 
-                                {errors.deliveryType && <span className="text-red-500 text-[10px] block mt-2 ml-1 text-center font-bold">Please select a delivery type</span>}
+                                {errors.deliveryType && <span className="text-red-500 text-[10px] block mt-2 ml-1 text-center font-medium">Please select a delivery type</span>}
 
                                 <div className="pt-4">
-                                    <button onClick={handleContinue} className="w-full bg-[#EB5500] cursor-pointer text-white py-3.5 rounded-lg font-bold shadow-md hover:bg-[#D44D00] transition-colors">
+                                    <button onClick={handleContinue} className="w-full bg-[#EB5500] cursor-pointer text-white py-3.5 rounded-lg font-medium shadow-md hover:bg-[#D44D00] transition-colors">
                                         Continue
                                     </button>
                                 </div>
@@ -302,7 +302,7 @@ export default function BookDeliveryPage() {
                                 <div className=" p-5 rounded-xl border border-gray-200">
                                     <div className="space-y-4 relative">
                                         <div>
-                                            <label className="text-[11px] font-bold text-gray-500 mb-1.5 block ml-1">Pickup Location</label>
+                                            <label className="text-[11px] font-medium text-gray-500 mb-1.5 block ml-1">Pickup Location</label>
                                             <div className="relative">
                                                 <MapPin size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                                                 <input 
@@ -316,7 +316,7 @@ export default function BookDeliveryPage() {
                                             {errors.pickupLocation && <span className="text-red-500 text-[10px] mt-1 ml-1 block">This field is required</span>}
                                         </div>
                                         <div>
-                                            <label className="text-[11px] font-bold text-gray-500 mb-1.5 block ml-1">Drop-off Location</label>
+                                            <label className="text-[11px] font-medium text-gray-500 mb-1.5 block ml-1">Drop-off Location</label>
                                             <div className="relative">
                                                 <Navigation size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                                                 <input 
@@ -336,7 +336,7 @@ export default function BookDeliveryPage() {
                                     <Image src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=800&auto=format&fit=crop" alt="map" fill className="object-cover" />
                                 </div>
 
-                                <button onClick={handleContinue} className="w-full bg-[#EB5500] cursor-pointer text-white py-3.5 rounded-lg font-bold shadow-md hover:bg-[#D44D00] transition-colors mt-2">
+                                <button onClick={handleContinue} className="w-full bg-[#EB5500] cursor-pointer text-white py-3.5 rounded-lg font-medium shadow-md hover:bg-[#D44D00] transition-colors mt-2">
                                     Continue
                                 </button>
                             </motion.div>
@@ -352,12 +352,12 @@ export default function BookDeliveryPage() {
                                             <Bike size={20} className="text-gray-700" />
                                         </div>
                                         <div>
-                                            <h3 className="font-bold text-[14px]">Motorcycle</h3>
+                                            <h3 className="font-medium text-[14px]">Motorcycle</h3>
                                             <p className="text-[11px] text-gray-500 font-medium">Small items</p>
-                                            <p className="text-[10px] text-[#EB5500] font-bold mt-0.5">15-20 min</p>
+                                            <p className="text-[10px] text-[#EB5500] font-medium mt-0.5">15-20 min</p>
                                         </div>
                                     </div>
-                                    <span className="font-bold text-[15px]">$5.99</span>
+                                    <span className="font-medium text-[15px]">$5.99</span>
                                 </div>
 
                                 {/* Tricycle */}
@@ -367,12 +367,12 @@ export default function BookDeliveryPage() {
                                             <Car size={20} className="text-gray-700" />
                                         </div>
                                         <div>
-                                            <h3 className="font-bold text-[14px]">Tricycle</h3>
+                                            <h3 className="font-medium text-[14px]">Tricycle</h3>
                                             <p className="text-[11px] text-gray-500 font-medium">Medium items</p>
-                                            <p className="text-[10px] text-[#EB5500] font-bold mt-0.5">20-30 min</p>
+                                            <p className="text-[10px] text-[#EB5500] font-medium mt-0.5">20-30 min</p>
                                         </div>
                                     </div>
-                                    <span className="font-bold text-[15px]">$12.99</span>
+                                    <span className="font-medium text-[15px]">$12.99</span>
                                 </div>
 
                                 {/* Van */}
@@ -382,18 +382,18 @@ export default function BookDeliveryPage() {
                                             <Truck size={20} className="text-gray-700" />
                                         </div>
                                         <div>
-                                            <h3 className="font-bold text-[14px]">Van</h3>
+                                            <h3 className="font-medium text-[14px]">Van</h3>
                                             <p className="text-[11px] text-gray-500 font-medium">Large items</p>
-                                            <p className="text-[10px] text-[#EB5500] font-bold mt-0.5">30-45 min</p>
+                                            <p className="text-[10px] text-[#EB5500] font-medium mt-0.5">30-45 min</p>
                                         </div>
                                     </div>
-                                    <span className="font-bold text-[15px]">$24.99</span>
+                                    <span className="font-medium text-[15px]">$24.99</span>
                                 </div>
 
-                                {errors.vehicle && <span className="text-red-500 text-[10px] block mt-2 ml-1 text-center font-bold">Please select a vehicle option</span>}
+                                {errors.vehicle && <span className="text-red-500 text-[10px] block mt-2 ml-1 text-center font-medium">Please select a vehicle option</span>}
 
                                 <div className="pt-4">
-                                    <button onClick={handleContinue} className="w-full cursor-pointer bg-[#EB5500] text-white py-3.5 rounded-lg font-bold shadow-md hover:bg-[#D44D00] transition-colors">
+                                    <button onClick={handleContinue} className="w-full cursor-pointer bg-[#EB5500] text-white py-3.5 rounded-lg font-medium shadow-md hover:bg-[#D44D00] transition-colors">
                                         Continue
                                     </button>
                                 </div>
@@ -474,7 +474,7 @@ export default function BookDeliveryPage() {
                                 </div>
 
                                 <div className="pt-4">
-                                    <button onClick={handleContinue} className="w-full bg-[#EB5500] text-white py-3.5 rounded-lg font-bold shadow-md hover:bg-[#D44D00] transition-colors cursor-pointer">
+                                    <button onClick={handleContinue} className="w-full bg-[#EB5500] text-white py-3.5 rounded-lg font-medium shadow-md hover:bg-[#D44D00] transition-colors cursor-pointer">
                                         Continue
                                     </button>
                                 </div>
@@ -499,7 +499,7 @@ export default function BookDeliveryPage() {
                                             <span>Tax</span>
                                             <span className="font-medium text-gray-800">$0.00</span>
                                         </div>
-                                        <div className="pt-4 border-t border-gray-200/50 flex justify-between items-center font-bold text-[15px]">
+                                        <div className="pt-4 border-t border-gray-200/50 flex justify-between items-center font-medium text-[15px]">
                                             <span className="text-gray-800">Total</span>
                                             <span className="text-[#EB5500]">$5.99</span>
                                         </div>
@@ -563,7 +563,7 @@ export default function BookDeliveryPage() {
                                     </div>
 
                                     <div className="pt-6">
-                                        <button onClick={handleContinue} className="w-full bg-[#EB5500] text-white py-3.5 rounded-lg font-bold shadow-md hover:bg-[#D44D00] transition-colors cursor-pointer">
+                                        <button onClick={handleContinue} className="w-full bg-[#EB5500] text-white py-3.5 rounded-lg font-medium shadow-md hover:bg-[#D44D00] transition-colors cursor-pointer">
                                             Place Order
                                         </button>
                                     </div>
@@ -600,7 +600,7 @@ export default function BookDeliveryPage() {
                                     <div className="absolute inset-2 bg-orange-100 rounded-xl opacity-50 pointer-events-none" />
                                 </div>
 
-                                <h3 className="font-bold text-[18px] text-[#EB5500] mb-2">
+                                <h3 className="font-medium text-[18px] text-[#EB5500] mb-2">
                                     {showModal === 'step5' ? 'Saved Successfully!' : 'Payment Successful!'}
                                 </h3>
                                 <p className="text-[13px] text-gray-500 mb-8 font-medium px-4">
@@ -611,7 +611,7 @@ export default function BookDeliveryPage() {
 
                                 <button
                                     onClick={handleModalConfirm}
-                                    className="w-full bg-[#EB5500] hover:bg-[#D44D00] text-white font-bold py-3.5 rounded-xl transition-colors cursor-pointer"
+                                    className="w-full bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium py-3.5 rounded-xl transition-colors cursor-pointer"
                                 >
                                     {showModal === 'step5' ? 'Continue to Payment' : 'Track Order'}
                                 </button>

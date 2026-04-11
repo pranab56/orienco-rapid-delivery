@@ -64,7 +64,7 @@ export default function BlogPage() {
 
         {/* Blog Content */}
         <div className="flex-1 space-y-10 md:space-y-16">
-          <h1 className="text-2xl md:text-3xl font-bold text-neutral-1">{t('blog.title')}</h1>
+          <h1 className="text-2xl md:text-3xl font-medium text-neutral-1">{t('blog.title')}</h1>
 
           <div className="space-y-12 md:space-y-20">
             {blogPosts.map((post, index) => (
@@ -92,7 +92,7 @@ export default function BlogPage() {
                   </div>
 
                   <Link href={`/blog/${post.id}`}>
-                    <h2 className="text-xl md:text-2xl font-bold text-neutral-1 hover:text-primary transition-colors cursor-pointer">
+                    <h2 className="text-xl md:text-2xl font-medium text-neutral-1 hover:text-primary transition-colors cursor-pointer">
                       {post.title}
                     </h2>
                   </Link>
@@ -103,7 +103,7 @@ export default function BlogPage() {
 
                   <Link
                     href={`/blog/${post.id}`}
-                    className="inline-flex items-center gap-2 text-sm md:text-base text-primary font-bold hover:gap-3 transition-all group"
+                    className="inline-flex items-center gap-2 text-sm md:text-base text-primary font-medium hover:gap-3 transition-all group"
                   >
                     {t('blog.read_more')}
                     <ArrowRight size={16} className="md:w-[18px] md:h-[18px] translate-y-[1px]" />
@@ -118,7 +118,7 @@ export default function BlogPage() {
         <aside className="lg:w-[350px] space-y-8 md:space-y-10 mt-10 md:mt-12 lg:mt-0">
           {/* Search */}
           <div className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8 space-y-4 md:space-y-6 shadow-sm shadow-black/5">
-            <h3 className="font-bold text-neutral-1">{t('blog.search_title')}</h3>
+            <h3 className="font-medium text-neutral-1">{t('blog.search_title')}</h3>
             <div className="relative">
               <Input
                 placeholder={t('blog.search_placeholder')}
@@ -130,12 +130,12 @@ export default function BlogPage() {
 
           {/* Categories */}
           <div className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8 space-y-6 md:space-y-8 shadow-sm shadow-black/5">
-            <h3 className="font-bold text-neutral-1 border-b border-gray-50 pb-3 md:pb-0">{t('blog.categories')}</h3>
+            <h3 className="font-medium text-neutral-1 border-b border-gray-50 pb-3 md:pb-0">{t('blog.categories')}</h3>
             <div className="space-y-3 md:space-y-4">
               {categories.map((cat) => (
                 <div key={cat.name} className="flex items-center justify-between group cursor-pointer">
                   <span className="text-[13px] md:text-sm font-medium text-neutral-2 group-hover:text-primary transition-colors">{cat.name}</span>
-                  <span className="text-[13px] md:text-sm font-bold text-neutral-1 opacity-60">({cat.count})</span>
+                  <span className="text-[13px] md:text-sm font-medium text-neutral-1 opacity-60">({cat.count})</span>
                 </div>
               ))}
             </div>

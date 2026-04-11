@@ -32,14 +32,14 @@ const FeatureCard = ({ icon: Icon, title, description, light = false }: FeatureC
     <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary">
       <Icon size={32} />
     </div>
-    <h3 className="text-xl font-bold text-neutral-1">{title}</h3>
+    <h3 className="text-xl font-medium text-neutral-1">{title}</h3>
     <p className="text-sm text-neutral-2 leading-relaxed">{description}</p>
   </motion.div>
 );
 
 const ProcessStep = ({ title, description }: { title: string, description: string }) => (
   <div className="p-6 md:p-8 rounded-xl border border-white/10 hover:border-primary/30 transition-colors space-y-3 md:space-y-4">
-    <h3 className="text-base md:text-lg font-bold text-white">{title}</h3>
+    <h3 className="text-base md:text-lg font-medium text-white">{title}</h3>
     <p className="text-xs md:text-sm text-white/50 leading-relaxed font-medium">{description}</p>
   </div>
 );
@@ -58,7 +58,7 @@ export default function POAPage() {
             className="space-y-6 md:space-y-8"
           >
             <h1 
-              className="text-3xl md:text-4xl font-black text-neutral-1 uppercase leading-tight tracking-tight"
+              className="text-3xl md:text-4xl font-medium text-neutral-1 uppercase leading-tight tracking-tight"
               dangerouslySetInnerHTML={{ __html: t('poa.title') }}
             />
             <p className="text-sm md:text-lg  text-neutral-2 max-w-xl font-medium leading-relaxed">
@@ -66,7 +66,7 @@ export default function POAPage() {
             </p>
             <Button
               onClick={() => document.getElementById('consultation-form')?.scrollIntoView({ behavior: 'smooth' })}
-              className="h-10 md:h-12 px-6 md:px-8 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg shadow-lg shadow-primary/20 transition-all cursor-pointer text-sm md:text-base"
+              className="h-10 md:h-12 px-6 md:px-8 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg shadow-lg shadow-primary/20 transition-all cursor-pointer text-sm md:text-base"
             >
               {t('poa.request_assistance')}
             </Button>
@@ -90,7 +90,7 @@ export default function POAPage() {
       {/* Why Use ZilaHomes POA? Section */}
       <section className="container mx-auto px-4 md:px-6 py-16 md:py-24 space-y-10 md:space-y-16">
         <div className="text-center space-y-3 md:space-y-4 max-w-3xl mx-auto font-medium">
-          <h2 className="text-2xl md:text-4xl font-bold text-neutral-1 tracking-tight">{t('poa.why_title')}</h2>
+          <h2 className="text-2xl md:text-4xl font-medium text-neutral-1 tracking-tight">{t('poa.why_title')}</h2>
           <p className="text-neutral-2">{t('poa.why_subtitle')}</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -115,7 +115,7 @@ export default function POAPage() {
       {/* 4-Step Process Section */}
       <section className="bg-[#1E2024] py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6 space-y-10 md:space-y-16">
-          <div className="text-center font-bold">
+          <div className="text-center font-medium">
             <h2 className="text-2xl md:text-4xl text-white tracking-tight">{t('poa.process.title')}</h2>
           </div>
           <motion.div
@@ -160,27 +160,27 @@ export default function POAPage() {
           </div>
           <div className="lg:w-1/2 p-10 lg:p-16 space-y-8 bg-white">
             <div className="space-y-4">
-              <h2 className="text-3xl font-bold text-neutral-1">{t('poa.consultation.title')}</h2>
+              <h2 className="text-3xl font-medium text-neutral-1">{t('poa.consultation.title')}</h2>
               <p className="text-neutral-2 font-medium">{t('poa.consultation.subtitle')}</p>
             </div>
             <form className="space-y-6">
               <div className="space-y-2">
-                <label className="text-sm font-bold text-neutral-1 ml-1">{t('poa.consultation.name')}</label>
+                <label className="text-sm font-medium text-neutral-1 ml-1">{t('poa.consultation.name')}</label>
                 <Input placeholder={t('poa.consultation.name_placeholder')} className="h-12 bg-[#F6F6F6] border-none rounded-lg px-6 font-medium" />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-bold text-neutral-1 ml-1">{t('poa.consultation.email')}</label>
+                <label className="text-sm font-medium text-neutral-1 ml-1">{t('poa.consultation.email')}</label>
                 <Input placeholder={t('poa.consultation.email_placeholder')} className="h-12 bg-[#F6F6F6] border-none rounded-lg px-6 font-medium" />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-bold text-neutral-1 ml-1">{t('poa.consultation.phone')}</label>
+                <label className="text-sm font-medium text-neutral-1 ml-1">{t('poa.consultation.phone')}</label>
                 <Input placeholder={t('poa.consultation.phone_placeholder')} className="h-12 bg-[#F6F6F6] border-none rounded-lg px-6 font-medium" />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-bold text-neutral-1 ml-1">{t('poa.consultation.message')}</label>
+                <label className="text-sm font-medium text-neutral-1 ml-1">{t('poa.consultation.message')}</label>
                 <Textarea placeholder={t('poa.consultation.message_placeholder')} className="min-h-[120px] bg-[#F6F6F6] border-none rounded-lg p-6 font-medium resize-none" />
               </div>
-              <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-transform active:scale-[0.98]">
+              <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-transform active:scale-[0.98]">
                 {t('poa.consultation.submit')}
               </Button>
             </form>
@@ -192,7 +192,7 @@ export default function POAPage() {
       <section className="bg-orange-50/20 py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6 space-y-10 md:space-y-16">
           <div className="text-center space-y-3 md:space-y-4 max-w-3xl mx-auto font-medium">
-            <h2 className="text-2xl md:text-4xl font-bold text-neutral-1 tracking-tight">{t('why.title')}</h2>
+            <h2 className="text-2xl md:text-4xl font-medium text-neutral-1 tracking-tight">{t('why.title')}</h2>
             <p className="text-neutral-2">{t('why.subtitle')}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

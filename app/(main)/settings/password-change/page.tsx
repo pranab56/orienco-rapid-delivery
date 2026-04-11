@@ -28,16 +28,16 @@ export default function PasswordChangePage() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pb-20">
-      <h2 className="text-[28px] font-bold text-gray-800 mb-8 tracking-tight">Password Change</h2>
+      <h2 className="text-[28px] font-medium text-gray-800 mb-8 tracking-tight">Password Change</h2>
 
       <div className="space-y-6 max-w-2xl">
         <div className="mb-8">
-            <h3 className="font-bold text-[16px] text-gray-800">Choose a New Password</h3>
+            <h3 className="font-medium text-[16px] text-gray-800">Choose a New Password</h3>
             <p className="text-[11px] text-gray-500 mt-1">Enter and confirm your new password to regain access</p>
         </div>
 
         <div>
-           <label className="text-[12px] font-bold text-gray-500 mb-2 block">Current Password</label>
+           <label className="text-[12px] font-medium text-gray-500 mb-2 block">Current Password</label>
            <div className="relative">
               <input 
                 type="password" 
@@ -51,11 +51,11 @@ export default function PasswordChangePage() {
               />
               <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
            </div>
-           {errors.currentPassword && <span className="text-red-500 text-[10px] mt-1 ml-1 block font-bold">Required</span>}
+           {errors.currentPassword && <span className="text-red-500 text-[10px] mt-1 ml-1 block font-medium">Required</span>}
         </div>
 
         <div>
-           <label className="text-[12px] font-bold text-gray-500 mb-2 block">New Password</label>
+           <label className="text-[12px] font-medium text-gray-500 mb-2 block">New Password</label>
            <div className="relative">
               <input 
                 type="password" 
@@ -69,11 +69,11 @@ export default function PasswordChangePage() {
               />
               <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
            </div>
-           {errors.newPassword && <span className="text-red-500 text-[10px] mt-1 ml-1 block font-bold">Please check your new password</span>}
+           {errors.newPassword && <span className="text-red-500 text-[10px] mt-1 ml-1 block font-medium">Please check your new password</span>}
         </div>
 
         <div>
-           <label className="text-[12px] font-bold text-gray-500 mb-2 block">Confirm Password</label>
+           <label className="text-[12px] font-medium text-gray-500 mb-2 block">Confirm Password</label>
            <div className="relative">
               <input 
                 type="password" 
@@ -87,7 +87,7 @@ export default function PasswordChangePage() {
               />
               <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
            </div>
-           {errors.confirmPassword && <span className="text-red-500 text-[10px] mt-1 ml-1 block font-bold">Please confirm your new password</span>}
+           {errors.confirmPassword && <span className="text-red-500 text-[10px] mt-1 ml-1 block font-medium">Please confirm your new password</span>}
         </div>
 
         <div className="pt-4 flex justify-end">

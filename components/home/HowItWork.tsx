@@ -35,7 +35,7 @@ const HowItWork = () => {
   return (
     <section className="py-24 bg-white">
       <div className="container mx-auto px-4 space-y-16">
-        <h2 className="text-[#333333] font-normal text-4xl md:text-5xl">
+        <h2 className="text-[#333333] font-medium text-4xl md:text-5xl">
           How it Works
         </h2>
 
@@ -71,10 +71,10 @@ const HowItWork = () => {
 
               {/* Text Content */}
               <div className="space-y-5 relative z-10">
-                <h3 className={`text-2xl font-black tracking-tight leading-tight transition-colors duration-500`}>
+                <h3 className={`text-2xl font-medium tracking-tight leading-tight transition-colors duration-500`}>
                   {step.title}
                 </h3>
-                <p className={`text-base font-bold leading-relaxed transition-colors duration-500 ${step.highlight ? 'text-white/80' : 'text-gray-500 group-hover:text-white/80'}`}>
+                <p className={`text-base font-medium leading-relaxed transition-colors duration-500 ${step.highlight ? 'text-white/80' : 'text-gray-500 group-hover:text-white/80'}`}>
                   {step.description}
                 </p>
               </div>

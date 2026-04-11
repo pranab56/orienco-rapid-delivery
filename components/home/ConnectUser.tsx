@@ -115,7 +115,7 @@ const ConnectUser = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-[#222222] font-black text-3xl md:text-6xl tracking-tight leading-tight"
+            className="text-[#222222] font-medium text-3xl md:text-6xl tracking-tight leading-tight"
           >
             Insight From <span className="text-[#EB5500]">Connect Users</span>
           </motion.h2>
@@ -143,7 +143,7 @@ const ConnectUser = () => {
 
                 {/* Animated Tooltip on Hover */}
                 <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 scale-95 group-hover:scale-100 origin-bottom z-50 pointer-events-none">
-                  <div className="relative bg-[#1A1A1A] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl flex items-center gap-2">
+                  <div className="relative bg-[#1A1A1A] text-white text-[11px] font-medium px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                     {user.name}
 
@@ -197,7 +197,7 @@ const ConnectUser = () => {
 
                     {/* User Info */}
                     <div className="text-center w-full">
-                      <h4 className="text-[#1A1A1A] font-black text-lg md:text-2xl mb-1 tracking-tight">{item.name}</h4>
+                      <h4 className="text-[#1A1A1A] font-medium text-lg md:text-2xl mb-1 tracking-tight">{item.name}</h4>
                       <div className="flex items-center justify-center gap-1.5 text-[#6B7280] text-xs md:text-sm font-medium mb-6 md:mb-10">
                         {item.role} <Star size={12} className="text-[#FACC15] fill-[#FACC15] ml-1" /> {item.rating}
                       </div>

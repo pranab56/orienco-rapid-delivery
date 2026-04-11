@@ -40,7 +40,7 @@ const GetInTouch = () => {
                       <Image src="https://www.vectorlogo.zone/logos/google_play/google_play-icon.svg" alt="Google Play" fill className="object-contain" />
                    </div>
                    <div className="flex flex-col text-left">
-                      <span className="text-white/50 text-[9px] font-black uppercase tracking-[0.2em] leading-none">Get it on</span>
+                      <span className="text-white/50 text-[9px] font-medium uppercase tracking-[0.2em] leading-none">Get it on</span>
                       <span className="text-white text-base font-medium tracking-tight leading-none mt-1.5">Google Play</span>
                    </div>
                 </Link>
@@ -51,7 +51,7 @@ const GetInTouch = () => {
                       <Image src="https://www.vectorlogo.zone/logos/apple/apple-icon.svg" alt="App Store" fill className="object-contain" />
                    </div>
                    <div className="flex flex-col text-left">
-                      <span className="text-white/50 text-[9px] font-black uppercase tracking-[0.2em] leading-none">Get it on</span>
+                      <span className="text-white/50 text-[9px] font-medium uppercase tracking-[0.2em] leading-none">Get it on</span>
                       <span className="text-white text-base font-medium tracking-tight leading-none mt-1.5">App Store</span>
                    </div>
                 </Link>

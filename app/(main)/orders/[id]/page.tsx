@@ -46,7 +46,7 @@ function OrderDetailContent() {
                 >
                     <ChevronLeft size={18} className="text-gray-800 md:size-20" />
                 </Link>
-                <h1 className="font-bold text-xl md:text-2xl">#{orderId}</h1>
+                <h1 className="font-medium text-xl md:text-2xl">#{orderId}</h1>
             </div>
 
             {/* Map Display Box */}
@@ -89,7 +89,7 @@ function OrderDetailContent() {
             </div>
 
             {/* Tracker Box */}
-            <h2 className="font-bold text-base mb-4">Track your order</h2>
+            <h2 className="font-medium text-base mb-4">Track your order</h2>
             <div className="bg-[#F3F3F3] rounded-2xl p-5 md:p-10 pt-8 pb-8 md:pt-12 md:pb-12 mb-8 shadow-sm border border-black/5">
                 <div className="relative pl-10 md:pl-12 space-y-10 md:space-y-12">
                     {/* Full line bg */}
@@ -112,8 +112,8 @@ function OrderDetailContent() {
                                         <CheckCircle2 className="text-gray-400 bg-white rounded-full ml-0.5" strokeWidth={1.5} size={22} />
                                     )}
                                 </div>
-                                <h3 className="font-bold text-[14px] md:text-[15px] mb-1">{step.title}</h3>
-                                <p className="text-gray-400 text-[10px] md:text-xs font-semibold">{step.date}</p>
+                                <h3 className="font-medium text-[14px] md:text-[15px] mb-1">{step.title}</h3>
+                                <p className="text-gray-400 text-[10px] md:text-xs font-normal">{step.date}</p>
                             </div>
                         );
                     })}
@@ -124,17 +124,17 @@ function OrderDetailContent() {
             <div className="bg-[#E5E5E5] rounded-2xl p-5 md:p-8 shadow-sm border border-black/5">
                 <div className="flex justify-between items-start flex-wrap gap-4 mb-6 md:mb-8">
                     <div className="flex-1">
-                        <p className="text-[10px] uppercase font-bold text-gray-400 mb-1 tracking-wider">Rider Info</p>
-                        <h3 className="text-lg md:text-2xl font-bold">Cameron Williamson</h3>
+                        <p className="text-[10px] uppercase font-medium text-gray-400 mb-1 tracking-wider">Rider Info</p>
+                        <h3 className="text-lg md:text-2xl font-medium">Cameron Williamson</h3>
                     </div>
                     <div className="flex items-center gap-1.5 bg-[#D4D4D4] px-3 md:px-4 py-1.5 md:py-2 rounded-full h-fit flex-shrink-0">
                         <Star fill="#F59E0B" className="text-[#F59E0B]" size={14} />
-                        <span className="font-bold text-xs md:text-sm text-[#EB5500]">4.9</span>
+                        <span className="font-medium text-xs md:text-sm text-[#EB5500]">4.9</span>
                     </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
-                    <button className="flex-1 bg-[#EB5500] hover:bg-[#D44D00] text-white h-12 flex justify-center items-center gap-2 font-bold rounded-xl cursor-pointer transition-all shadow-lg shadow-orange-500/20">
+                    <button className="flex-1 bg-[#EB5500] hover:bg-[#D44D00] text-white h-12 flex justify-center items-center gap-2 font-medium rounded-xl cursor-pointer transition-all shadow-lg shadow-orange-500/20">
                         <Phone size={18} />
                         Call
                     </button>
@@ -143,7 +143,7 @@ function OrderDetailContent() {
                     {!isCompleted ? (
                         <button
                             onClick={() => router.push("/chat")}
-                            className="flex-1 bg-transparent h-12 border-2 border-gray-300 hover:border-[#EB5500] text-[#EB5500] flex justify-center items-center gap-2 font-bold rounded-xl cursor-pointer transition-all"
+                            className="flex-1 bg-transparent h-12 border-2 border-gray-300 hover:border-[#EB5500] text-[#EB5500] flex justify-center items-center gap-2 font-medium rounded-xl cursor-pointer transition-all"
                         >
                             <MessageSquare size={18} />
                             Message
@@ -151,7 +151,7 @@ function OrderDetailContent() {
                     ) : (
                         <button
                             onClick={() => setShowReviewModal(true)}
-                            className="flex-1 bg-transparent h-12 border-2 border-gray-300 hover:border-[#EB5500] text-[#EB5500] flex justify-center items-center gap-2 font-bold rounded-xl cursor-pointer transition-all"
+                            className="flex-1 bg-transparent h-12 border-2 border-gray-300 hover:border-[#EB5500] text-[#EB5500] flex justify-center items-center gap-2 font-medium rounded-xl cursor-pointer transition-all"
                         >
                             Give Review
                         </button>
@@ -189,7 +189,7 @@ function OrderDetailContent() {
 
                             {/* Review Modal Form */}
                             <div className="pt-8 flex flex-col items-center text-center">
-                                <h3 className="font-bold text-[#EB5500] text-lg mb-4">How was the driver?</h3>
+                                <h3 className="font-medium text-[#EB5500] text-lg mb-4">How was the driver?</h3>
 
                                 {/* Star Selector */}
                                 <div className="flex gap-2 mb-8">
@@ -209,7 +209,7 @@ function OrderDetailContent() {
                                 </div>
 
                                 <div className="w-full text-left flex flex-col">
-                                    <label className="text-[12px] font-bold text-gray-600 mb-2">Description</label>
+                                    <label className="text-[12px] font-medium text-gray-600 mb-2">Description</label>
                                     <textarea
                                         rows={4}
                                         className="w-full bg-transparent border border-gray-300 rounded-xl p-3 text-sm focus:border-[#EB5500] outline-none resize-none placeholder:text-gray-400 focus:bg-white transition-colors"
@@ -219,7 +219,7 @@ function OrderDetailContent() {
 
                                 <button
                                     onClick={() => setShowReviewModal(false)}
-                                    className="w-full mt-8 bg-[#EB5500] cursor-pointer hover:bg-[#D44D00] text-white font-bold py-3.5 rounded-xl transition-colors"
+                                    className="w-full mt-8 bg-[#EB5500] cursor-pointer hover:bg-[#D44D00] text-white font-medium py-3.5 rounded-xl transition-colors"
                                 >
                                     Submit
                                 </button>
@@ -235,7 +235,7 @@ function OrderDetailContent() {
 export default function OrderDetail() {
     return (
         <div className="min-h-screen pb-32 pt-32 font-sans text-[#333333]">
-            <Suspense fallback={<div className="container mx-auto px-4 max-w-4xl text-center py-20 font-bold">Loading Order Details...</div>}>
+            <Suspense fallback={<div className="container mx-auto px-4 max-w-4xl text-center py-20 font-medium">Loading Order Details...</div>}>
                 <OrderDetailContent />
             </Suspense>
         </div>

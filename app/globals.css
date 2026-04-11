@@ -8,9 +8,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-sans: var(--font-inter);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-heading: var(--font-inter);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
@@ -127,7 +127,7 @@ body {
 }
 
 :root {
-  --background: #FFFFFF;
+  --background: #DEE0E1;
   --foreground: #030303;
   --card: #FFFFFF;
   --card-foreground: #030303;
@@ -236,27 +236,27 @@ body {
 @layer base {
   h1 {
     font-size: var(--font-size-h1);
-    font-weight: 700;
+    font-weight: 400;
   }
 
   h2 {
     font-size: var(--font-size-h2);
-    font-weight: 700;
+    font-weight: 400;
   }
 
   h3 {
     font-size: var(--font-size-h3);
-    font-weight: 700;
+    font-weight: 400;
   }
 
   h4 {
     font-size: var(--font-size-h4);
-    font-weight: 700;
+    font-weight: 400;
   }
 
   h5 {
     font-size: var(--font-size-h5);
-    font-weight: 700;
+    font-weight: 400;
   }
 
   body {
