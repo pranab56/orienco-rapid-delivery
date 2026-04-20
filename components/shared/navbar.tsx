@@ -54,7 +54,7 @@ export function Navbar() {
   return (
     <nav className="fixed top-5 left-0 right-0 z-[100] flex justify-center w-full px-4 md:px-0">
       <div className="container w-full flex items-center justify-between">
-        
+
         {/* Language Pill */}
         <div className="relative" ref={langRef}>
           <motion.div
@@ -64,13 +64,13 @@ export function Navbar() {
             className="flex items-center gap-2.5 h-11 px-2 border border-primary rounded-full bg-black/40 backdrop-blur-xl cursor-pointer hover:bg-black/50 transition-all group shadow-lg"
           >
             <div className="w-5 h-5 rounded-full overflow-hidden relative border border-white/20 shadow-inner">
-               <div className="absolute inset-0 bg-primary/20 animate-pulse" />
-               <Globe size={20} className="text-white/80" />
+              <div className="absolute inset-0 bg-primary/20 animate-pulse" />
+              <Globe size={20} className="text-white/80" />
             </div>
             <span className="text-white font-medium text-xs tracking-widest uppercase">{currentLang.code}</span>
-            <ChevronDown 
-              size={12} 
-              className={cn("text-white/50 transition-transform duration-300", langOpen && "rotate-180")} 
+            <ChevronDown
+              size={12}
+              className={cn("text-white/50 transition-transform duration-300", langOpen && "rotate-180")}
             />
           </motion.div>
 
@@ -89,8 +89,8 @@ export function Navbar() {
                     onClick={() => changeLanguage(lang.code)}
                     className={cn(
                       "w-full flex items-center gap-3 p-2.5 rounded-sm cursor-pointer transition-all text-sm font-medium",
-                      i18n.language === lang.code 
-                        ? "bg-primary text-white" 
+                      i18n.language === lang.code
+                        ? "bg-primary text-white"
                         : "text-black/60 hover:bg-black/10 hover:text-black"
                     )}
                   >
@@ -103,7 +103,7 @@ export function Navbar() {
         </div>
 
         {/* Center Navigation Pill */}
-        <motion.div 
+        <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           className="hidden md:flex items-center bg-black/40 backdrop-blur-2xl border border-white/10 p-1.5 rounded-lg shadow-2xl"
@@ -134,14 +134,14 @@ export function Navbar() {
 
         {/* Right Actions */}
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={() => setMobileMenuOpen(true)}
             className="md:hidden w-11 h-11 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white/90 hover:text-white transition-all shadow-lg active:scale-95"
           >
             <Menu size={20} />
           </button>
-          
-          <motion.button 
+
+          <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="hidden md:flex w-11 h-11 items-center justify-center rounded bg-black/10 backdrop-blur-xs border border-white/10 text-white/50 hover:text-white hover:border-white/20 transition-all cursor-pointer relative"
@@ -157,10 +157,10 @@ export function Navbar() {
               onClick={() => setProfileOpen(!profileOpen)}
               className="w-11 h-11 rounded-full border-2 border-white/10 overflow-hidden cursor-pointer relative hover:border-primary/50 transition-all shadow-lg ring-offset-2 ring-offset-black"
             >
-              <Image 
-                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&auto=format" 
-                alt="Avatar" 
-                fill 
+              <Image
+                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&auto=format"
+                alt="Avatar"
+                fill
                 className="object-cover"
               />
             </motion.button>
@@ -176,12 +176,12 @@ export function Navbar() {
                 >
                   <div className="flex flex-col items-center text-center">
                     <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border-2 border-primary/30 p-1 shadow-2xl">
-                      <Image 
-                        src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&auto=format" 
-                        alt="Salina Gomez" 
-                        width={80} 
-                        height={80} 
-                        className="rounded-full object-cover" 
+                      <Image
+                        src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&auto=format"
+                        alt="Salina Gomez"
+                        width={80}
+                        height={80}
+                        className="rounded-full object-cover"
                       />
                     </div>
                     <h4 className="text-black font-medium text-lg tracking-tight">Salina Gomez</h4>
@@ -212,7 +212,7 @@ export function Navbar() {
       {/* Mobile Hamburger Full Menu Overlay */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: '100%' }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
@@ -221,11 +221,11 @@ export function Navbar() {
           >
             <div className="flex justify-between items-center mb-10 pb-6 border-b border-white/10">
               <span className="text-white font-medium tracking-widest text-lg">MENU</span>
-              <button 
+              <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-red-500/20 hover:text-red-400 transition-colors"
               >
-                  <X size={20} />
+                <X size={20} />
               </button>
             </div>
             <div className="flex flex-col gap-6">
@@ -241,7 +241,7 @@ export function Navbar() {
                       isActive ? "text-primary border-primary" : "text-white/40 hover:text-white border-transparent"
                     )}
                   >
-                      {item.name}
+                    {item.name}
                   </Link>
                 );
               })}

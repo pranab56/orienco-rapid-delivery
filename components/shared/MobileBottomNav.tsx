@@ -32,14 +32,14 @@ export function MobileBottomNav() {
               <div
                 className={cn(
                   "p-2 rounded-xl transition-all",
-                  isActive 
-                    ? "bg-[#EB5500]/10 text-[#EB5500]" 
+                  isActive
+                    ? "bg-[#EB5500]/10 text-[#EB5500]"
                     : "text-gray-400 hover:bg-black/5 hover:text-gray-600"
                 )}
               >
                 <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
               </div>
-              <span 
+              <span
                 className={cn(
                   "text-[10px] font-medium tracking-wider",
                   isActive ? "text-[#EB5500]" : "text-gray-400"

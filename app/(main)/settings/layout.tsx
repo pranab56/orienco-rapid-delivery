@@ -33,10 +33,10 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
   const pathname = usePathname();
 
   return (
-    <div className=" bg-[#DEE0E1]/60 text-[#333333] pt-32">
-      <div className="container mx-auto px-4 flex flex-col md:flex-row gap-12">
+    <div className="bg-[#DEE0E1]/60 text-[#333333] pt-20 md:pt-32 min-h-screen">
+      <div className="container mx-auto px-4 flex flex-col md:flex-row gap-8 md:gap-12">
         {/* Sidebar */}
-        <div className="w-full md:w-64 flex-shrink-0 space-y-8">
+        <div className="w-full md:w-64 flex-shrink-0 space-y-6 md:space-y-8">
           <div>
             <Link 
               href="/" 
@@ -52,7 +52,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
             <p className="text-[11px] text-gray-500 mt-1">Manage your account</p>
           </div>
 
-          <nav className="flex flex-col gap-2">
+          <nav className="flex flex-col sm:flex-row md:flex-col gap-1 md:gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0 no-scrollbar">
             {SETTINGS_TABS.map((tab) => {
               const isActive = pathname === tab.href;
               const Icon = tab.icon;
@@ -61,9 +61,9 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                   key={tab.href}
                   href={tab.href}
                   className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-sm transition-all text-sm font-medium",
+                    "flex items-center gap-3 px-4 py-3 rounded-sm transition-all text-sm font-medium whitespace-nowrap md:whitespace-normal",
                     isActive 
-                      ? "text-[#333333] font-medium" 
+                      ? "text-[#333333] font-medium bg-black/5 md:bg-transparent" 
                       : "text-gray-500 hover:text-[#333333] hover:bg-black/5"
                   )}
                 >
@@ -76,7 +76,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 max-w-3xl pt-2">
+        <div className="flex-1 max-w-3xl pt-2 pb-20 md:pb-0">
           {children}
         </div>
       </div>

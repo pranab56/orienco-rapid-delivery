@@ -27,8 +27,8 @@ export default function PasswordChangePage() {
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pb-20">
-      <h2 className="text-[28px] font-medium text-gray-800 mb-8 tracking-tight">Password Change</h2>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pb-20 px-4 md:px-0">
+      <h2 className="text-2xl md:text-[28px] font-medium text-gray-800 mb-6 md:mb-8 tracking-tight">Password Change</h2>
 
       <div className="space-y-6 max-w-2xl">
         <div className="mb-8">
@@ -90,10 +90,10 @@ export default function PasswordChangePage() {
            {errors.confirmPassword && <span className="text-red-500 text-[10px] mt-1 ml-1 block font-medium">Please confirm your new password</span>}
         </div>
 
-        <div className="pt-4 flex justify-end">
+        <div className="pt-4 flex sm:justify-end">
           <button 
              onClick={handleSave}
-             className="bg-[#EB5500] hover:bg-[#D44D00] text-white px-10 py-3 rounded-sm font-medium text-sm transition-colors cursor-pointer shadow-sm"
+             className="w-full sm:w-auto bg-[#EB5500] hover:bg-[#D44D00] text-white px-10 py-3 rounded-sm font-medium text-sm transition-colors cursor-pointer shadow-sm"
           >
             Save
           </button>

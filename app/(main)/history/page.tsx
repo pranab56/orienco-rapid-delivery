@@ -53,7 +53,7 @@ export default function History() {
                             <div className="relative pl-3 space-y-6 mb-6 ml-2">
                                 {/* Dotted line */}
                                 {/* <div className="absolute left-[5px] top-[10px] bottom-[10px] border-l-2 border-dashed border-gray-300"></div> */}
-                                
+
                                 <div className="relative z-10 flex flex-col pl-4">
                                     <div className="absolute -left-1 mt-1 w-2.5 h-2.5 rounded-full bg-[#10B981]"></div>
                                     <p className="text-[12px] text-gray-500 font-medium uppercase tracking-wide">Pickup</p>
@@ -93,7 +93,7 @@ export default function History() {
                                         </div>
                                     </div>
                                 </div>
-                                <Link 
+                                <Link
                                     href={`/history/${item.id}`}
                                     className="text-[#EB5500] font-medium text-sm hover:underline"
                                 >

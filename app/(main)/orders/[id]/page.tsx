@@ -44,7 +44,7 @@ function OrderDetailContent() {
                     href="/orders"
                     className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-gray-400/50 flex flex-shrink-0 items-center justify-center hover:bg-gray-200 transition-colors"
                 >
-                    <ChevronLeft size={18} className="text-gray-800 md:size-20" />
+                    <ChevronLeft size={18} className="text-gray-800" />
                 </Link>
                 <h1 className="font-medium text-xl md:text-2xl">#{orderId}</h1>
             </div>
@@ -90,13 +90,13 @@ function OrderDetailContent() {
 
             {/* Tracker Box */}
             <h2 className="font-medium text-base mb-4">Track your order</h2>
-            <div className="bg-[#F3F3F3] rounded-2xl p-5 md:p-10 pt-8 pb-8 md:pt-12 md:pb-12 mb-8 shadow-sm border border-black/5">
-                <div className="relative pl-10 md:pl-12 space-y-10 md:space-y-12">
+            <div className="bg-[#F3F3F3] rounded-2xl p-6 md:p-10 pt-8 pb-8 md:pt-12 md:pb-12 mb-8 shadow-sm border border-black/5">
+                <div className="relative pl-9 md:pl-12 space-y-8 md:space-y-12">
                     {/* Full line bg */}
-                    <div className="absolute left-[13.5px] top-[14px] -bottom-[6px] border-l-2 border-dashed border-gray-300 z-0"></div>
+                    <div className="absolute left-[10px] top-[14px] -bottom-[6px] border-l-2 border-dashed border-gray-300 z-0"></div>
                     {/* Completed active line bg */}
                     <div
-                        className="absolute left-[13.5px] top-[14px] border-l-2 border-dashed border-[#10B981] z-0 transition-all duration-1000"
+                        className="absolute left-[10px] top-[14px] border-l-2 border-dashed border-[#10B981] z-0 transition-all duration-1000"
                         style={{ height: `${(activeStepIndex / (trackingSteps.length - 1)) * 100}%` }}
                     ></div>
 
@@ -105,14 +105,14 @@ function OrderDetailContent() {
                         const isStepCompleted = index <= activeStepIndex;
                         return (
                             <div key={step.id} className={`relative z-10 flex flex-col ${!isStepCompleted ? 'opacity-80' : ''}`}>
-                                <div className="absolute -left-10 md:-left-12 flex items-start justify-center pt-0.5">
+                                <div className="absolute -left-9 md:-left-12 flex items-start justify-center pt-0.5">
                                     {isStepCompleted ? (
-                                        <CheckCircle2 fill="white" className="text-[#10B981] bg-white rounded-full" size={26} />
+                                        <CheckCircle2 fill="white" className="text-[#10B981] bg-white rounded-full size-[22px] md:size-[26px]" />
                                     ) : (
-                                        <CheckCircle2 className="text-gray-400 bg-white rounded-full ml-0.5" strokeWidth={1.5} size={22} />
+                                        <CheckCircle2 className="text-gray-400 bg-white rounded-full ml-0.5 size-[18px] md:size-[22px]" strokeWidth={1.5} />
                                     )}
                                 </div>
-                                <h3 className="font-medium text-[14px] md:text-[15px] mb-1">{step.title}</h3>
+                                <h3 className="font-medium text-[13px] md:text-[15px] mb-1">{step.title}</h3>
                                 <p className="text-gray-400 text-[10px] md:text-xs font-normal">{step.date}</p>
                             </div>
                         );
@@ -134,7 +134,7 @@ function OrderDetailContent() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
-                    <button className="flex-1 bg-[#EB5500] hover:bg-[#D44D00] text-white h-12 flex justify-center items-center gap-2 font-medium rounded-xl cursor-pointer transition-all shadow-lg shadow-orange-500/20">
+                    <button className="flex-1 bg-[#EB5500] hover:bg-[#D44D00] text-white h-12 flex justify-center items-center gap-2 py-3 font-medium rounded-sm cursor-pointer transition-all shadow-lg shadow-orange-500/20">
                         <Phone size={18} />
                         Call
                     </button>
@@ -143,7 +143,7 @@ function OrderDetailContent() {
                     {!isCompleted ? (
                         <button
                             onClick={() => router.push("/chat")}
-                            className="flex-1 bg-transparent h-12 border-2 border-gray-300 hover:border-[#EB5500] text-[#EB5500] flex justify-center items-center gap-2 font-medium rounded-xl cursor-pointer transition-all"
+                            className="flex-1 bg-transparent h-12 border-2 border-gray-300 hover:border-[#EB5500] text-[#EB5500] py-3 flex justify-center items-center gap-2 font-medium rounded-sm cursor-pointer transition-all"
                         >
                             <MessageSquare size={18} />
                             Message
@@ -151,7 +151,7 @@ function OrderDetailContent() {
                     ) : (
                         <button
                             onClick={() => setShowReviewModal(true)}
-                            className="flex-1 bg-transparent h-12 border-2 border-gray-300 hover:border-[#EB5500] text-[#EB5500] flex justify-center items-center gap-2 font-medium rounded-xl cursor-pointer transition-all"
+                            className="flex-1 bg-transparent h-12 border-2 border-gray-300 hover:border-[#EB5500] text-[#EB5500] py-3 flex justify-center items-center gap-2 font-medium rounded-sm cursor-pointer transition-all"
                         >
                             Give Review
                         </button>
@@ -172,12 +172,12 @@ function OrderDetailContent() {
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
-                            className="bg-[#EFEFEF] w-full max-w-md rounded-[32px] p-6 md:p-10 relative mt-16 md:mt-20"
+                            className="bg-[#EFEFEF] w-full max-w-md rounded-[32px] p-6 md:p-10 relative"
                         >
                             {/* Close button */}
                             <button
                                 onClick={() => setShowReviewModal(false)}
-                                className="absolute right-4 top-4 bg-[#EF4444] text-white rounded-full p-1 hover:scale-110 transition-transform"
+                                className="absolute right-4 top-4 bg-[#EF4444] text-white rounded-full p-1 hover:scale-110 transition-transform z-10"
                             >
                                 <X size={18} strokeWidth={3} />
                             </button>
@@ -234,7 +234,7 @@ function OrderDetailContent() {
 
 export default function OrderDetail() {
     return (
-        <div className="min-h-screen pb-32 pt-32 font-sans text-[#333333]">
+        <div className="min-h-screen pb-16 pt-24 md:pb-32 md:pt-32 font-sans text-[#333333]">
             <Suspense fallback={<div className="container mx-auto px-4 max-w-4xl text-center py-20 font-medium">Loading Order Details...</div>}>
                 <OrderDetailContent />
             </Suspense>

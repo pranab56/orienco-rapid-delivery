@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Paperclip, Send } from 'lucide-react';
+import { Paperclip, Send, ChevronLeft } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { chatListMock } from '../mock-data';
 
@@ -64,7 +65,10 @@ export default function ChatWindow() {
     return (
         <div className="flex-1 flex flex-col min-w-0 h-full">
             {/* Chat Header */}
-            <div className="h-[84px] p-6 border-b border-gray-200 flex items-center gap-4">
+            <div className="h-[70px] md:h-[84px] p-4 md:p-6 border-b border-gray-200 flex items-center gap-3 md:gap-4">
+                <Link href="/chat" className="md:hidden p-1 -ml-1 text-gray-500 hover:text-[#EB5500]">
+                    <ChevronLeft size={24} />
+                </Link>
                 <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-300 flex-shrink-0 shadow-sm border border-black/5">
                     {activeUserData.avatar && (
                         <Image src={activeUserData.avatar} alt={activeUserData.name} fill className="object-cover" />
@@ -107,9 +111,9 @@ export default function ChatWindow() {
                     ></textarea>
                     
                     <div className="p-3 flex justify-between items-center bg-transparent mt-auto">
-                        <button className="flex items-center gap-2 border text-gray-700 px-4 py-2 rounded cursor-pointer text-xs font-semibold transition-colors">
+                        <button className="flex items-center gap-2 border border-gray-200 text-gray-700 px-3 md:px-4 py-2 rounded-lg cursor-pointer text-xs font-semibold transition-colors hover:bg-gray-50">
                             <Paperclip size={14} />
-                            Attach file
+                            <span className="hidden md:inline">Attach file</span>
                         </button>
                         
                         <button 

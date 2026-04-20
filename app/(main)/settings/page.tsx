@@ -53,8 +53,8 @@ export default function PersonalInformationPage() {
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pb-20">
-      <h2 className="text-[28px] font-medium text-gray-800 mb-8 tracking-tight">Personal Information</h2>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pb-20 px-4 md:px-0">
+      <h2 className="text-2xl md:text-[28px] font-medium text-gray-800 mb-6 md:mb-8 tracking-tight">Personal Information</h2>
 
       <div className="space-y-6 max-w-2xl">
         {/* Avatar Section */}
@@ -178,10 +178,10 @@ export default function PersonalInformationPage() {
           </div>
         </div>
 
-        <div className="pt-8 flex justify-end">
+        <div className="pt-8 flex sm:justify-end">
           <button
             onClick={handleSave}
-            className="bg-[#EB5500] hover:bg-[#D44D00] text-white px-12 py-3.5 rounded-sm font-medium text-base transition-all cursor-pointer shadow-lg shadow-[#EB5500]/20 active:scale-95"
+            className="w-full sm:w-auto bg-[#EB5500] hover:bg-[#D44D00] text-white px-12 py-3.5 rounded-sm font-medium text-base transition-all cursor-pointer shadow-lg shadow-[#EB5500]/20 active:scale-95"
           >
             Save Changes
           </button>
