@@ -141,14 +141,16 @@ export function Navbar() {
             <Menu size={20} />
           </button>
 
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="hidden md:flex w-11 h-11 items-center justify-center rounded bg-black/10 backdrop-blur-xs border border-white/10 text-white/50 hover:text-white hover:border-white/20 transition-all cursor-pointer relative"
-          >
-            <Bell size={26} />
-            <span className="absolute top-1.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-black animate-pulse" />
-          </motion.button>
+          <Link href="/notifications">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="hidden md:flex w-11 h-11 items-center justify-center rounded bg-black/10 backdrop-blur-xs border border-white/10 text-white/50 hover:text-white hover:border-white/20 transition-all cursor-pointer relative"
+            >
+              <Bell size={26} />
+              <span className="absolute top-1.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-black animate-pulse" />
+            </motion.button>
+          </Link>
 
           <div ref={profileRef} className="relative">
             <motion.button

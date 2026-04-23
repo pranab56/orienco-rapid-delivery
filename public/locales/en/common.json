@@ -7,7 +7,8 @@
     "contact": "Contact Us",
     "settings": "Settings",
     "sign_out": "Sign Out",
-    "select_language": "Select Language"
+    "select_language": "Select Language",
+    "notifications": "Notifications"
   },
   "hero": {
     "title": "Find Verified Homes, Hotels & <br class=\"hidden md:block\" /> Transportation in Ethiopia.",

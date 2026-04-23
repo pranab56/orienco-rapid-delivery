@@ -57,7 +57,7 @@ export default function LoginPage() {
     },
   });
 
-  const onSubmit = (_data: LoginFormValues) => {
+  const onSubmit = () => {
     if (loginMode === 'phone' && loginStep === 'input') {
       const phoneVal = getValues('phone');
       if (!phoneVal || phoneVal.length < 8) return;

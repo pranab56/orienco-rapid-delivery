@@ -4,7 +4,6 @@ import React from 'react';
 import Image from 'next/image';
 import { Star } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
@@ -46,43 +45,6 @@ const floatingUsers = [
   { id: 7, name: 'Chloe', src: 'https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=200&auto=format&fit=crop', size: 70, top: '55%', left: '80%', delay: 0.6 },
 ];
 
-const EnvelopeGraphic = ({ className, style }: { className?: string, style?: React.CSSProperties }) => (
-  <svg viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={style}>
-    <path d="M40 120 L200 20 L360 120" fill="#E8E8E8" stroke="#D5D5D5" strokeWidth="3" strokeLinejoin="round" />
-    <path d="M80 120 L80 50 C80 40 90 30 100 30 L300 30 C310 30 320 40 320 50 L320 120" fill="#F8F8F8" stroke="#D5D5D5" strokeWidth="3" />
-    <path d="M40 120 L40 270 C40 280 45 290 60 290 L340 290 C355 290 360 280 360 270 L360 120 Z" fill="#F0F0F0" stroke="#D5D5D5" strokeWidth="3" strokeLinejoin="round" />
-    <path d="M40 120 L200 230 L360 120" fill="#F4F4F4" stroke="#D5D5D5" strokeWidth="3" strokeLinejoin="round" />
-    <path d="M40 290 L200 230 L360 290" fill="none" stroke="#D5D5D5" strokeWidth="3" strokeLinejoin="round" />
-  </svg>
-);
-
-const ChatBubble = ({ orientation, className, delay = 0 }: { orientation: 'left' | 'right', className?: string, delay?: number }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      transition={{ delay, duration: 0.6, type: "spring" }}
-      className={cn("absolute hidden md:block z-30", className)}
-    >
-      <motion.div
-        className="flex flex-col bg-[#FDFDFD] rounded-[24px] p-5 w-[220px] shadow-[0_15px_30px_-5px_rgba(0,0,0,0.08)] border border-white"
-      >
-        <div className="space-y-3 pb-1">
-          <div className="h-2 w-14 bg-[#F2C9C2] rounded-full" />
-          <div className="h-2 w-full bg-[#EEEEEE] rounded-full" />
-          <div className="h-2 w-4/5 bg-[#EEEEEE] rounded-full" />
-        </div>
-        <svg
-          className={cn("absolute -bottom-4 text-[#FDFDFD] w-6 h-6", orientation === 'left' ? 'right-8 scale-x-[-1]' : 'left-8')}
-          viewBox="0 0 24 24" fill="currentColor"
-          style={{ filter: "drop-shadow(0 6px 6px rgba(0,0,0,0.04))" }}
-        >
-          <path d="M0 0H24V24C24 24 20 0 0 0Z" />
-        </svg>
-      </motion.div>
-    </motion.div>
-  );
-};
 
 const ConnectUser = () => {
   return (
@@ -122,7 +84,7 @@ const ConnectUser = () => {
         </div>
 
         {/* Floating Users Arc Wrapper - Hidden on Mobile */}
-        <div className="relative w-full container mx-auto h-[250px] -mb-16 z-20 pointer-events-none hidden md:block">
+        <div className="relative w-full container mx-auto h-[250px] -mb-28 z-20 pointer-events-none hidden md:block">
           {floatingUsers.map((user) => (
             <motion.div
               key={user.id}
@@ -155,74 +117,62 @@ const ConnectUser = () => {
             </motion.div>
           ))}
         </div>
+      </div>
 
-        {/* Main Card Section */}
-        <div className="relative max-w-[1000px] mx-auto z-30">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="bg-[#EBEBEB] rounded-[32px] md:rounded-[40px] pt-12 pb-16 md:pt-20 md:pb-32 px-4 md:px-16 overflow-hidden relative shadow-[0_20px_50px_-10px_rgba(0,0,0,0.05)] border border-white/60"
+      {/* Main Card Section */}
+      <div className="relative container mx-auto z-30 w-full">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="pt-12 pb-16 md:pt-52 md:pb-52 relative sm:bg-[length:100%_100%]  bg-center bg-no-repeat w-full"
+          style={{ backgroundImage: 'url("/images/carosel.png")' }}
+        >
+          {/* Carousel Content */}
+
+          {/* Content Swiper */}
+          <Swiper
+            modules={[Autoplay]}
+            spaceBetween={40}
+            speed={800}
+            autoplay={{ delay: 6000, disableOnInteraction: false }}
+            loop={true}
+            className="w-full relative z-40 max-w-3xl mx-auto"
           >
-            {/* Soft inner glow */}
-            <div className="absolute inset-0 bg-gradient-radial from-white/70 to-transparent opacity-80 pointer-events-none" />
+            {testimonials.map((item) => (
+              <SwiperSlide key={item.id} className="cursor-grab active:cursor-grabbing sm:px-0 px-5 pb-4 md:pb-8">
+                <div className="flex flex-col items-center">
+                  {/* Main Avatar */}
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    whileInView={{ scale: 1, opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, type: "spring" }}
+                    className="relative w-20 h-20 md:w-32 md:h-32 rounded-full overflow-hidden border-[5px] border-[#101010] shadow-[0_10px_40px_rgba(0,0,0,0.2)] mb-6 bg-black mx-auto"
+                  >
+                    <Image src={item.avatar} alt={item.name} fill className="object-cover opacity-90" />
+                  </motion.div>
 
-            {/* Static Chat Bubbles for Desktop View */}
-            <ChatBubble orientation="left" className="top-[15%] left-[5%] lg:left-[10%]" delay={0.3} />
-            <ChatBubble orientation="right" className="top-[25%] right-[5%] lg:right-[10%]" delay={0.5} />
-
-            {/* Content Swiper */}
-            <Swiper
-              modules={[Autoplay]}
-              spaceBetween={40}
-              speed={800}
-              autoplay={{ delay: 6000, disableOnInteraction: false }}
-              loop={true}
-              className="w-full relative z-40 max-w-2xl mx-auto"
-            >
-              {testimonials.map((item) => (
-                <SwiperSlide key={item.id} className="cursor-grab active:cursor-grabbing pb-4 md:pb-8">
-                  <div className="flex flex-col items-center">
-                    {/* Main Avatar */}
-                    <motion.div
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      whileInView={{ scale: 1, opacity: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.6, type: "spring" }}
-                      className="relative w-20 h-20 md:w-32 md:h-32 rounded-full overflow-hidden border-[5px] border-[#101010] shadow-[0_10px_40px_rgba(0,0,0,0.2)] mb-6 bg-black mx-auto"
-                    >
-                      <Image src={item.avatar} alt={item.name} fill className="object-cover opacity-90" />
-                    </motion.div>
-
-                    {/* User Info */}
-                    <div className="text-center w-full">
-                      <h4 className="text-[#1A1A1A] font-medium text-lg md:text-2xl mb-1 tracking-tight">{item.name}</h4>
-                      <div className="flex items-center justify-center gap-1.5 text-[#6B7280] text-xs md:text-sm font-medium mb-6 md:mb-10">
-                        {item.role} <Star size={12} className="text-[#FACC15] fill-[#FACC15] ml-1" /> {item.rating}
-                      </div>
-
-                      {/* Review Text */}
-                      <p className="text-[#374151] text-sm md:text-base leading-relaxed tracking-wide min-h-[100px] md:min-h-[120px] px-2 md:px-0 opacity-90">
-                        {item.content}
-                      </p>
+                  {/* User Info */}
+                  <div className="text-center w-full">
+                    <h4 className="text-[#1A1A1A] font-medium text-lg md:text-2xl mb-1 tracking-tight">{item.name}</h4>
+                    <div className="flex items-center justify-center gap-1.5 text-[#6B7280] text-xs md:text-sm font-medium mb-6 md:mb-10">
+                      {item.role} <Star size={12} className="text-[#FACC15] fill-[#FACC15] ml-1" /> {item.rating}
                     </div>
+
+                    {/* Review Text */}
+                    <p className="text-[#374151] text-sm md:text-base leading-relaxed tracking-wide min-h-[100px] md:min-h-[120px] px-2 md:px-0 opacity-90">
+                      {item.content}
+                    </p>
                   </div>
-                </SwiperSlide>
-              ))}
-            </Swiper>
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
 
-            {/* Envelopes Background Graphic at Bottom - Hidden on small screens */}
-            <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[120%] hidden md:flex justify-center items-end pointer-events-none z-10 opacity-80">
-              <EnvelopeGraphic className="w-[300px] h-[300px] absolute left-[5%] bottom-16 -rotate-12 opacity-50" />
-              <EnvelopeGraphic className="w-[300px] h-[300px] absolute right-[5%] bottom-16 rotate-12 opacity-50" />
-              <EnvelopeGraphic className="w-[500px] h-[500px] relative z-10 translate-y-24 opacity-80" />
-              {/* Soft Gradient Overlay to blend bottoms into the card */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#EBEBEB] via-[#EBEBEB]/80 to-transparent h-[200px] bottom-0 z-20" />
-            </div>
 
-          </motion.div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
