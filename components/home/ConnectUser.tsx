@@ -129,9 +129,7 @@ const ConnectUser = () => {
           className="pt-12 pb-16 md:pt-52 md:pb-52 relative sm:bg-[length:100%_100%]  bg-center bg-no-repeat w-full"
           style={{ backgroundImage: 'url("/images/carosel.png")' }}
         >
-          {/* Carousel Content */}
 
-          {/* Content Swiper */}
           <Swiper
             modules={[Autoplay]}
             spaceBetween={40}
@@ -170,8 +168,6 @@ const ConnectUser = () => {
               </SwiperSlide>
             ))}
           </Swiper>
-
-
         </motion.div>
       </div>
     </section>

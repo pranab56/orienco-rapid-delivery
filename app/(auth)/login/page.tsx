@@ -19,6 +19,10 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/pagination';
+import { useLoginMutation } from '@/features/auth/authApi';
+import toast from 'react-hot-toast';
+import { setCredentials } from '@/features/auth/authSlice';
+import { useDispatch } from 'react-redux';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address').optional().or(z.literal('')),
@@ -42,6 +46,10 @@ export default function LoginPage() {
   const [otp, setOtp] = useState(['', '', '', '', '']); // 5 digits as per screenshot
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
+  const [login, { isLoading }] = useLoginMutation();
+
+  const dispatch = useDispatch();
+
   const {
     register,
     handleSubmit,
@@ -57,20 +65,32 @@ export default function LoginPage() {
     },
   });
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (loginMode === 'phone' && loginStep === 'input') {
       const phoneVal = getValues('phone');
       if (!phoneVal || phoneVal.length < 8) return;
       setLoginStep('otp');
       return;
     }
+    try {
+      const response = await login({
+        email: getValues("email"),
+        password: getValues("password")
+      }).unwrap();
 
-    if (loginMode === 'email') {
-      const emailVal = getValues('email');
-      const passVal = getValues('password');
-      if (!emailVal || !passVal) return;
-      setLoginStep('success');
+      if (response.success) {
+        toast.success(response.message);
+        dispatch(setCredentials({
+          token: response.data.accessToken,
+          user: response.data.userInfo
+        }));
+        setLoginStep("success");
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message || "An error occurred while logging in");
     }
+
+
   };
 
   const handleOtpChange = (index: number, value: string) => {

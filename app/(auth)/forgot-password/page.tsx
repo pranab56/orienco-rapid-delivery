@@ -13,6 +13,12 @@ import { useForm } from 'react-hook-form';
 import { Autoplay, EffectFade, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import * as z from 'zod';
+import { 
+  useForgotEmailMutation, 
+  useVerifyOtpMutation, 
+  useResendPasswordMutation 
+} from '@/features/auth/authApi';
+import toast from 'react-hot-toast';
 
 // Swiper styles
 import 'swiper/css';
@@ -46,7 +52,13 @@ export default function ForgotPasswordPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [otpError, setOtpError] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [resetToken, setResetToken] = useState('');
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const [forgotEmail, { isLoading: isSendingEmail }] = useForgotEmailMutation();
+  const [verifyOtp, { isLoading: isVerifyingOtp }] = useVerifyOtpMutation();
+  const [resetPassword, { isLoading: isResettingPassword }] = useResendPasswordMutation();
 
   const emailForm = useForm<EmailFormValues>({
     resolver: zodResolver(emailSchema),
@@ -76,22 +88,55 @@ export default function ForgotPasswordPage() {
     }
   };
 
-  const onEmailSubmit = (data: EmailFormValues) => {
-    console.log('Reset Email:', data);
-    setStep(2);
+  const onEmailSubmit = async (data: EmailFormValues) => {
+    try {
+      const res = await forgotEmail({ email: data.email }).unwrap();
+      if (res.success) {
+        toast.success(res.message);
+        setUserEmail(data.email);
+        setStep(2);
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to send OTP');
+    }
   };
 
-  const onVerifyOtp = () => {
-    if (otp.some(digit => digit === '')) {
+  const onVerifyOtp = async () => {
+    const code = otp.join('');
+    if (code.length < 6) {
       setOtpError('Please enter the full 6-digit code');
       return;
     }
-    setStep(3);
+
+    try {
+      const res = await verifyOtp({ email: userEmail, oneTimeCode: code }).unwrap();
+      if (res.success) {
+        toast.success(res.message);
+        setResetToken(res.data.token);
+        setStep(3);
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Invalid OTP');
+    }
   };
 
-  const onPasswordSubmit = (data: PasswordFormValues) => {
-    console.log('New Password Data:', data);
-    setStep(4);
+  const onPasswordSubmit = async (data: PasswordFormValues) => {
+    try {
+      const res = await resetPassword({
+        token: resetToken,
+        data: {
+          newPassword: data.password,
+          confirmPassword: data.confirmPassword
+        }
+      }).unwrap();
+
+      if (res.success) {
+        toast.success(res.message);
+        setStep(4);
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to reset password');
+    }
   };
 
   return (
@@ -192,8 +237,12 @@ export default function ForgotPasswordPage() {
                     )}
                   </div>
 
-                  <Button type="submit" className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm transition-all shadow-none active:scale-[0.98]">
-                    Send OTP Codes
+                  <Button 
+                    type="submit" 
+                    disabled={isSendingEmail}
+                    className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm transition-all shadow-none active:scale-[0.98] disabled:opacity-70"
+                  >
+                    {isSendingEmail ? 'Sending...' : 'Send OTP Codes'}
                   </Button>
 
                   <div className="text-center">
@@ -247,9 +296,10 @@ export default function ForgotPasswordPage() {
 
                 <Button
                   onClick={onVerifyOtp}
-                  className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm transition-all shadow-none active:scale-[0.98]"
+                  disabled={isVerifyingOtp}
+                  className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm transition-all shadow-none active:scale-[0.98] disabled:opacity-70"
                 >
-                  Verify & Continue
+                  {isVerifyingOtp ? 'Verifying...' : 'Verify & Continue'}
                 </Button>
 
                 <div className="text-center">
@@ -310,8 +360,12 @@ export default function ForgotPasswordPage() {
                     )}
                   </div>
 
-                  <Button type="submit" className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm transition-all shadow-none active:scale-[0.98]">
-                    Update Password
+                  <Button 
+                    type="submit" 
+                    disabled={isResettingPassword}
+                    className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm transition-all shadow-none active:scale-[0.98] disabled:opacity-70"
+                  >
+                    {isResettingPassword ? 'Updating...' : 'Update Password'}
                   </Button>
                 </form>
               </motion.div>

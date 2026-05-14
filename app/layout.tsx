@@ -4,7 +4,8 @@ import SplashScreen from "@/components/shared/SplashScreen";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-
+import { ReduxProvider } from "@/components/providers/ReduxProvider";
+import { Toaster } from "react-hot-toast";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -26,12 +27,15 @@ export default function RootLayout({
       className={`${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white text-black selection:bg-zinc-100">
-        <I18nProvider>
-          <SplashScreen />
-          <LenisProvider>
-            {children}
-          </LenisProvider>
-        </I18nProvider>
+        <ReduxProvider>
+          <I18nProvider>
+            {/* <SplashScreen /> */}
+            <LenisProvider>
+              {children}
+              <Toaster />
+            </LenisProvider>
+          </I18nProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

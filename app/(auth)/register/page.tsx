@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, CheckCircle2, Loader } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -19,6 +19,8 @@ import * as z from 'zod';
 import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/pagination';
+import { useSignUpMutation } from '@/features/auth/authApi';
+import toast from 'react-hot-toast';
 
 const slides = [
   { image: "/images/auth/image1.jpg" },
@@ -39,12 +41,14 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [signUp, { isLoading }] = useSignUpMutation();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
+    watch,
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -56,9 +60,22 @@ export default function RegisterPage() {
     },
   });
 
-  const onSubmit = (data: RegisterFormValues) => {
-    console.log('Register Form Data:', data);
-    setIsSuccess(true);
+  const onSubmit = async (data: RegisterFormValues) => {
+    try {
+      const fromData = new FormData();
+      fromData.append("fullName", data.fullName);
+      fromData.append("email", data.email);
+      fromData.append("phone", data.phone);
+      fromData.append("password", data.password);
+      fromData.append("role", "sender");
+      const result = await signUp(fromData).unwrap();
+      if (result.success) {
+        toast.success(result.message)
+        setIsSuccess(true);
+      }
+    } catch (error: any) {
+      toast.error(error.message)
+    }
   };
 
   return (
@@ -142,7 +159,7 @@ export default function RegisterPage() {
                 </div>
 
                 <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-                   <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+                  <div className="space-y-4  overflow-y-auto p-2 pr-2 custom-scrollbar">
                     <div className="space-y-1.5">
                       <Label className="text-xs font-bold text-gray-800">Full Name</Label>
                       <Input
@@ -189,16 +206,21 @@ export default function RegisterPage() {
                       {errors.password && <p className="text-red-500 text-[10px] font-medium mt-1">{errors.password.message}</p>}
                     </div>
 
-                    <div className="flex items-center space-x-2 py-2">
-                      <Checkbox id="terms" className="h-5 w-5 rounded-sm border-gray-300 data-[state=checked]:bg-[#EB5500] data-[state=checked]:border-[#EB5500]" onCheckedChange={(checked) => setValue('terms', !!checked, { shouldValidate: true })} />
-                      <Label htmlFor="terms" className="text-[11px] font-medium text-gray-500 leading-tight cursor-pointer">
-                        Agree to the <Link href="#" className="text-[#EB5500] hover:underline">Terms & Privacy Policy</Link>
-                      </Label>
+                    <div>
+                      <div className='flex items-center space-x-2 py-2'>
+                        <Checkbox id="terms" className="h-5 w-5 rounded-sm border-gray-300 data-[state=checked]:bg-[#EB5500] data-[state=checked]:border-[#EB5500]" onCheckedChange={(checked) => setValue('terms', !!checked, { shouldValidate: true })} />
+                        <Label htmlFor="terms" className="text-[11px] font-medium text-gray-500 leading-tight cursor-pointer">
+                          Agree to the <Link href="#" className="text-[#EB5500] hover:underline">Terms & Privacy Policy</Link>
+                        </Label>
+                      </div>
+                      <div className="">
+                        {errors.terms && <p className="text-red-500 text-[10px] font-medium mt-1">{errors.terms.message}</p>}
+                      </div>
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm transition-all shadow-none active:scale-[0.98]">
-                    Sign Up
+                  <Button type="submit" disabled={isLoading} className="w-full cursor-pointer h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm transition-all shadow-none active:scale-[0.98]">
+                    {isLoading && <div className='flex justify-center items-center gap-2 animate-spin'><Loader size={16} /></div>} Sign Up
                   </Button>
                 </form>
 
@@ -224,9 +246,9 @@ export default function RegisterPage() {
                     Welcome to the Orienco family. Your account has been successfully created.
                   </p>
                 </div>
-                <Link href="/login" className="w-full">
-                  <Button className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-bold rounded-lg text-sm shadow-lg shadow-orange-500/20 active:scale-95 transition-all">
-                    Go to Login
+                <Link href={`/verify-otp?email=${watch('email')}`} className="w-full">
+                  <Button className="w-full h-12 cursor-pointer bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm shadow-lg shadow-orange-500/20 active:scale-95 transition-all">
+                    verify your email
                   </Button>
                 </Link>
               </motion.div>
