@@ -3,8 +3,11 @@
 import { cn } from '@/lib/utils';
 import { motion, useInView } from 'framer-motion';
 import { MapPin, Navigation } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useDispatch } from 'react-redux';
+import { updateBooking } from '@/features/parcel/bookingSlice';
+import { useRouter } from 'next/navigation';
 
 const SIZES = ['Quick', 'Standard', 'Large'] as const;
 type PackageSize = (typeof SIZES)[number];
@@ -13,6 +16,57 @@ export default function Hero() {
   const [packageSize, setPackageSize] = useState<PackageSize>('Quick');
   const ref = useRef(null);
   const inView = useInView(ref, { once: true });
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  const pickupRef = useRef<HTMLInputElement>(null);
+  const dropRef = useRef<HTMLInputElement>(null);
+  const [pickupData, setPickupData] = useState({ address: '', coordinates: [0, 0] });
+  const [dropData, setDropData] = useState({ address: '', coordinates: [0, 0] });
+
+  useEffect(() => {
+    if (typeof google === 'undefined') return;
+
+    const options = {
+      types: ['address'],
+      componentRestrictions: { country: 'BD' }, // Assuming Bangladesh based on user example
+    };
+
+    if (pickupRef.current) {
+      const autocomplete = new google.maps.places.Autocomplete(pickupRef.current, options);
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        if (place.geometry && place.geometry.location) {
+          setPickupData({
+            address: place.formatted_address || '',
+            coordinates: [place.geometry.location.lng(), place.geometry.location.lat()],
+          });
+        }
+      });
+    }
+
+    if (dropRef.current) {
+      const autocomplete = new google.maps.places.Autocomplete(dropRef.current, options);
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        if (place.geometry && place.geometry.location) {
+          setDropData({
+            address: place.formatted_address || '',
+            coordinates: [place.geometry.location.lng(), place.geometry.location.lat()],
+          });
+        }
+      });
+    }
+  }, []);
+
+  const handleGetStarted = () => {
+    dispatch(updateBooking({
+      pickupLocation: pickupData,
+      dropLocation: dropData,
+      vehicleType: packageSize === 'Quick' ? 'motorcycle' : packageSize === 'Standard' ? 'tricycle' : 'van',
+    }));
+    router.push('/booking');
+  };
 
   const stats = [
     { value: '95%', label: 'On-Time Delivery Rate' },
@@ -81,7 +135,10 @@ export default function Hero() {
               animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
               transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
             >
-              <button className="w-full md:w-auto bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium px-8 md:px-12 py-3 md:py-3.5 rounded-sm text-base md:text-lg transition-all cursor-pointer border-none active:scale-[0.98]">
+              <button 
+                onClick={handleGetStarted}
+                className="w-full md:w-auto bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium px-8 md:px-12 py-3 md:py-3.5 rounded-sm text-base md:text-lg transition-all cursor-pointer border-none active:scale-[0.98]"
+              >
                 Get Started
               </button>
             </motion.div>
@@ -122,20 +179,33 @@ export default function Hero() {
 
                 <div className="space-y-4">
                   <div className="relative group">
-                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#EB5500] transition-colors">
                       <MapPin size={20} />
                     </div>
-                    <input type="text" placeholder="Pickup location" className="w-full h-14 pl-14 pr-6 bg-black/[0.04] rounded-[22px] border-none outline-none focus:ring-2 focus:ring-primary/10 text-gray-900 placeholder:text-gray-400 text-sm font-normal transition-all shadow-inner" />
+                    <input 
+                      ref={pickupRef}
+                      type="text" 
+                      placeholder="Pickup location" 
+                      className="w-full h-14 pl-14 pr-6 bg-black/[0.04] rounded-[22px] border-none outline-none focus:ring-2 focus:ring-[#EB5500]/10 text-gray-900 placeholder:text-gray-400 text-sm font-normal transition-all shadow-inner" 
+                    />
                   </div>
                   <div className="relative group">
-                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-primary">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[#EB5500]">
                       <Navigation size={20} className="rotate-45" />
                     </div>
-                    <input type="text" placeholder="Drop-off location" className="w-full h-14 pl-14 pr-6 bg-black/[0.04] rounded-[22px] border-none outline-none focus:ring-2 focus:ring-primary/10 text-gray-900 placeholder:text-gray-400 text-sm font-normal transition-all shadow-inner" />
+                    <input 
+                      ref={dropRef}
+                      type="text" 
+                      placeholder="Drop-off location" 
+                      className="w-full h-14 pl-14 pr-6 bg-black/[0.04] rounded-[22px] border-none outline-none focus:ring-2 focus:ring-[#EB5500]/10 text-gray-900 placeholder:text-gray-400 text-sm font-normal transition-all shadow-inner" 
+                    />
                   </div>
                 </div>
 
-                <button className="w-full bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium h-14  rounded-sm text-lg shadow-[0_15px_30px_-5px_rgba(235,85,0,0.4)] transition-all cursor-pointer border-none active:scale-[0.98]  tracking-widest">
+                <button 
+                  onClick={handleGetStarted}
+                  className="w-full bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium h-14  rounded-sm text-lg shadow-[0_15px_30px_-5px_rgba(235,85,0,0.4)] transition-all cursor-pointer border-none active:scale-[0.98]  tracking-widest"
+                >
                   Get Started
                 </button>
               </div>

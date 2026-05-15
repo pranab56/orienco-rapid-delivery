@@ -1,14 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { authApi } from "../features/auth/authApi";
+import { baseApi } from "./apiBaseQuery";
 import authReducer from "../features/auth/authSlice";
-
-const apis = [authApi];
+import bookingReducer from "../features/parcel/bookingSlice";
 
 export const store = configureStore({
     reducer: {
         auth: authReducer,
-        ...Object.fromEntries(apis.map((api) => [api.reducerPath, api.reducer])),
+        booking: bookingReducer,
+        [baseApi.reducerPath]: baseApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(apis.map((api) => api.middleware)),
+        getDefaultMiddleware().concat(baseApi.middleware),
 });

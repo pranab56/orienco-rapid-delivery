@@ -2,8 +2,9 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { MapPin } from 'lucide-react';
+import { MapPin, Loader } from 'lucide-react';
 import Link from 'next/link';
+import { useGetMyPercelQuery } from '@/features/parcel/parcelApi';
 
 // Custom Scooter Icon component
 const Scooter = () => (
@@ -13,12 +14,28 @@ const Scooter = () => (
 );
 
 export default function Orders() {
-    // Dummy array representing the 3 list items with different mock statuses
-    const ordersList = [
-        { id: 'ORD-2024-8842', status: 'In-transit', time: '14 MIN', price: '$42.00', distance: '4.2 KM' },
-        { id: 'ORD-2024-8843', status: 'Delivered', time: '10 MIN', price: '$35.00', distance: '3.1 KM' },
-        { id: 'ORD-2024-8844', status: 'In-transit', time: '20 MIN', price: '$50.00', distance: '6.5 KM' },
-    ];
+    const { data: response, isLoading } = useGetMyPercelQuery(1); 
+    const parcels = response?.data?.parcels || [];
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center pt-24">
+                <Loader className="animate-spin text-[#EB5500]" size={40} />
+            </div>
+        );
+    }
+
+    if (parcels.length === 0) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center pt-24">
+                <h1 className="text-2xl font-medium mb-4">No Orders Found</h1>
+                <p className="text-gray-500 mb-8">You haven&apos;t booked any deliveries yet.</p>
+                <Link href="/booking" className="bg-[#EB5500] text-white px-8 py-3 rounded-lg font-medium hover:bg-[#D44D00] transition-colors">
+                    Book a Delivery
+                </Link>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen pb-16 pt-24 md:pb-32 md:pt-32 font-sans text-[#333333]">
@@ -26,51 +43,51 @@ export default function Orders() {
                 <h1 className="text-center font-medium text-2xl md:text-3xl mb-8 md:mb-10">Orders</h1>
 
                 <div className="space-y-6 md:space-y-8">
-                    {ordersList.map((item, idx) => (
-                        <Link href={`/orders/${item.id}?status=${item.status}`} key={idx} className="block">
-                                <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: idx * 0.1 }}
-                                    className="rounded-2xl p-5 md:p-10 border border-black/5 bg-[#F9F9F9]/50 cursor-pointer hover:shadow-md transition-all relative overflow-hidden"
-                                >
+                    {parcels.map((parcel: any, idx: number) => (
+                        <Link href={`/orders/${parcel._id}?status=${parcel.status}`} key={parcel._id} className="block">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: idx * 0.1 }}
+                                className="rounded-2xl p-5 md:p-10 border border-black/5 bg-[#F9F9F9]/50 cursor-pointer hover:shadow-md transition-all relative overflow-hidden"
+                            >
                                 {/* Top Badges */}
                                 <div className="flex md:absolute top-8 right-8 gap-2 md:gap-3 mb-5 md:mb-0">
                                     <div className="bg-[#A7F3D0] text-[#065F46] text-[10px] md:text-xs font-medium px-2.5 py-1.5 rounded-full flex items-center gap-1">
-                                        ⏱ {item.time}
+                                        ⏱ {parcel.duration || 'N/A'}
                                     </div>
                                     <div className="bg-[#FED7AA] text-[#C2410C] text-[10px] md:text-xs font-medium px-2.5 py-1.5 rounded-full">
-                                        {item.price}
+                                        ${parcel.totalDeliveryFee}
                                     </div>
                                 </div>
 
                                 {/* ID Information */}
                                 <p className="text-[10px] font-medium text-gray-400 uppercase tracking-widest mb-1.5">
-                                    Shipment Track • <span className={item.status === 'Delivered' ? 'text-green-600' : 'text-[#EB5500]'}>{item.status}</span>
+                                    Shipment Track • <span className={parcel.status === 'DELIVERED' ? 'text-green-600' : 'text-[#EB5500]'}>{parcel.status}</span>
                                 </p>
-                                <h2 className="text-lg md:text-2xl font-medium mb-6 md:mb-10">#{item.id}</h2>
+                                <h2 className="text-lg md:text-2xl font-medium mb-6 md:mb-10">#{parcel._id.slice(-8).toUpperCase()}</h2>
 
                                 {/* Timeline */}
                                 <div className="relative pl-9 md:pl-12 space-y-8 md:space-y-12 mb-6 md:mb-10">
                                     {/* Dotted border connecting points */}
                                     <div className="absolute left-[13px] md:left-[13px] top-[14px] -bottom-[5px] border-l-2 border-dashed border-gray-300 z-0"></div>
 
-                                    {/* Location 1 */}
+                                    {/* Pickup */}
                                     <div className="relative z-10 flex flex-col">
                                         <div className="absolute -left-9 md:-left-12 mt-1 flex items-center justify-center w-6 h-6 md:w-7 md:h-7 rounded-full bg-[#D1FAE5]">
                                             <div className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-[#059669]"></div>
                                         </div>
-                                        <h3 className="font-medium text-[13px] md:text-[15px]">Central Warehouse A</h3>
-                                        <p className="text-gray-500 text-[11px] md:text-sm font-medium">451 Industrial Way, San Francisco, CA 94107</p>
+                                        <h3 className="font-medium text-[13px] md:text-[15px]">Pickup Location</h3>
+                                        <p className="text-gray-500 text-[11px] md:text-sm font-medium">{parcel.pickupLocation.address}</p>
                                     </div>
 
-                                    {/* Location 2 */}
+                                    {/* Drop-off */}
                                     <div className="relative z-10 flex flex-col">
                                         <div className="absolute -left-9 md:-left-12 mt-1 flex items-center justify-center w-6 h-6 md:w-7 md:h-7 rounded-full bg-[#FFEDD5]">
                                             <div className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-[#D97706]"></div>
                                         </div>
-                                        <h3 className="font-medium text-[13px] md:text-[15px] mb-1">Global Media HQ</h3>
-                                        <p className="text-gray-500 text-[11px] md:text-sm font-medium">1200 Market Street, San Francisco, CA 94103</p>
+                                        <h3 className="font-medium text-[13px] md:text-[15px] mb-1">Drop-off Location</h3>
+                                        <p className="text-gray-500 text-[11px] md:text-sm font-medium">{parcel.dropLocation.address}</p>
                                     </div>
                                 </div>
 
@@ -85,7 +102,7 @@ export default function Orders() {
                                         </div>
                                         <div>
                                             <p className="text-[9px] md:text-[10px] uppercase font-medium text-gray-400">Vehicle</p>
-                                            <p className="font-medium text-xs md:text-[14px]">EV-Courier</p>
+                                            <p className="font-medium text-xs md:text-[14px] capitalize">{parcel.vehicleType}</p>
                                         </div>
                                     </div>
 
@@ -95,11 +112,11 @@ export default function Orders() {
                                         </div>
                                         <div>
                                             <p className="text-[9px] md:text-[10px] uppercase font-medium text-gray-400">Distance</p>
-                                            <p className="font-medium text-xs md:text-[14px]">{item.distance}</p>
+                                            <p className="font-medium text-xs md:text-[14px]">{parcel.distance.toFixed(2)} KM</p>
                                         </div>
                                     </div>
                                 </div>
-                                </motion.div>
+                            </motion.div>
                         </Link>
                     ))}
                 </div>

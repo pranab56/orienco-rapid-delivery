@@ -85,9 +85,9 @@ const Footer = () => {
               <div className="space-y-6 lg:space-y-10 text-center sm:text-left">
                 <h4 className="text-gray-900 font-bold text-lg md:text-xl tracking-tight uppercase text-xs opacity-50">Company</h4>
                 <ul className="space-y-4 lg:space-y-5 flex flex-col">
-                  {['Contact Us', 'Terms & Conditions', 'We are open 24/7'].map((link) => (
-                    <li key={link}>
-                      <Link href="#" className="text-gray-600 hover:text-[#EB5500] font-medium transition-all text-base md:text-lg">{link}</Link>
+                  {[{ name: 'Contact Us', href: 'contact' }, { name: 'Terms & Conditions', href: '/terms' }, { name: 'Privacy Policy', href: '/privacy' }].map((link) => (
+                    <li key={link.name}>
+                      <Link href={link.href} className="text-gray-600 hover:text-[#EB5500] font-medium transition-all text-base md:text-lg">{link.name}</Link>
                     </li>
                   ))}
                 </ul>

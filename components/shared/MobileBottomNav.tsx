@@ -12,7 +12,7 @@ export function MobileBottomNav() {
 
   const bottomNavItems = [
     { name: t('navbar.home'), href: '/', icon: Home },
-    { name: 'Book', href: '/book', icon: Package },
+    { name: 'Book', href: '/booking', icon: Package },
     { name: t('navbar.orders'), href: '/orders', icon: ListOrdered },
     { name: t('navbar.chat'), href: '/chat', icon: MessageSquare },
   ];

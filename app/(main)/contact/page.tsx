@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Phone, Mail, MapPin, Twitter, Instagram } from 'lucide-react';
+import { Phone, Mail, MapPin, Twitter, Instagram, Loader } from 'lucide-react';
 import { motion } from 'framer-motion';
 import GetInTouch from '@/components/home/GetInTouch';
+import { useCreateContactMutation } from '@/features/contact/contactApi';
+import toast from 'react-hot-toast';
 
 // Mock Discord Icon since lucide doesn't have it natively
 const DiscordIcon = () => (
@@ -23,8 +25,10 @@ export default function Contact() {
         message: '',
     });
 
+
+    const [createContact, { isLoading }] = useCreateContactMutation();
+
     const [errors, setErrors] = useState<Partial<Record<keyof typeof formData, string>>>({});
-    const [, setIsSubmitted] = useState(false);
 
     const subjects = ['General Inquiry', 'General Inquiry', 'General Inquiry', 'General Inquiry'];
 
@@ -41,13 +45,23 @@ export default function Contact() {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (validate()) {
-            setIsSubmitted(true);
-            // Backend handling logic
-            setTimeout(() => {
-                setIsSubmitted(false);
+        if (!validate()) return;
+
+        try {
+            const payload = {
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                phone: formData.phone,
+                subject: subjects[formData.subjectIndex],
+                message: formData.message
+            };
+            const response = await createContact(payload).unwrap();
+
+            if (response.success) {
+                toast.success(response.message || "Message sent successfully!");
                 setFormData({
                     firstName: '',
                     lastName: '',
@@ -56,7 +70,9 @@ export default function Contact() {
                     subjectIndex: 0,
                     message: '',
                 });
-            }, 3000);
+            }
+        } catch (error: any) {
+            toast.error(error?.data?.message || "Failed to send message. Please try again.");
         }
     };
 
@@ -198,7 +214,7 @@ export default function Contact() {
                                 <div className="relative flex flex-col group">
                                     <label htmlFor="phone" className="text-[12px] font-medium text-gray-800 mb-2 transition-colors group-focus-within:text-[#EB5500]">Phone Number</label>
                                     <input
-                                        type="tel"
+                                        type="number"
                                         id="phone"
                                         name="phone"
                                         value={formData.phone}
@@ -257,9 +273,9 @@ export default function Contact() {
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                     type="submit"
-                                    className="bg-[#EB5500] hover:bg-[#D44D00] cursor-pointer text-white text-[15px] font-semibold px-10 py-3.5 rounded-lg transition-colors shadow-lg shadow-orange-500/30 w-full sm:min-w-[200px] sm:w-auto"
+                                    className="bg-[#EB5500] flex items-center justify-center gap-2 hover:bg-[#D44D00] cursor-pointer text-white text-[15px] font-semibold px-10 py-3.5 rounded-lg transition-colors shadow-lg shadow-orange-500/30 w-full sm:min-w-[200px] sm:w-auto"
                                 >
-                                    Send Message
+                                    {isLoading && <div className='flex justify-center items-center gap-2 animate-spin'><Loader size={16} /></div>} Send Message
                                 </motion.button>
                             </div>
 

@@ -3,8 +3,12 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { useGetTermAndConditionQuery } from '@/features/policy/policyApi';
 
 export default function TermsPage() {
+  const { data, isLoading } = useGetTermAndConditionQuery(undefined);
+  console.log(data);
+
   return (
     <div className="bg-[#EAEAEA] min-h-screen pb-32">
       {/* Hero Section */}
@@ -34,76 +38,16 @@ export default function TermsPage() {
 
       {/* Terms Content Section */}
       <div className="container mx-auto px-6 lg:px-12 pt-16 max-w-5xl text-[#333333]">
-        <div className="space-y-12 font-sans tracking-wide">
-
-          <p className="text-[15px] md:text-[16px] font-medium leading-relaxed mb-4">
-            Please read these Terms and Conditions carefully before using our tradesperson platform Tradelock. By accessing or using the Platform, you agree to be bound by these Terms and Conditions.
-          </p>
-
-          <div>
-            <h2 className="font-medium text-2xl md:text-[28px] mb-4">1. Acceptance of Terms</h2>
-            <div className="space-y-4">
-              <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
-                By creating an account and using the Tradelock, you confirm that you have read, understood, and agreed to these Terms and Conditions.
-              </p>
-              <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
-                If you do not agree with any part of these terms, you must not use the Platform.
-              </p>
-            </div>
+        {isLoading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#EB5500]"></div>
           </div>
-
-          <div>
-            <h2 className="font-medium text-2xl md:text-[28px] mb-4">2. User Accounts</h2>
-            <div className="space-y-6">
-              <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
-                To access certain features, you must create an account as a Client, Tradesperson, or Company.
-              </p>
-              <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
-                You agree to provide accurate, complete, and up-to-date information.
-              </p>
-              <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
-                You are responsible for maintaining the confidentiality of your account credentials.
-              </p>
-              <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
-                You are fully responsible for all activities conducted under your account.
-              </p>
-              <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
-                If you suspect unauthorized access or misuse, you must notify us immediately.
-              </p>
-            </div>
-          </div>
-
-          <div>
-            <h2 className="font-medium text-2xl md:text-[28px] mb-4">3. Privacy Policy</h2>
-            <div className="space-y-6">
-              <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
-                All job details (scope, pricing, timeline) must be agreed upon before work begins.
-              </p>
-              <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
-                Once a job is set up and approved, it becomes an official agreement between the client and the tradesperson.
-              </p>
-              <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
-                Any changes must be mutually agreed upon through the Platform.
-              </p>
-            </div>
-          </div>
-
-          <div>
-            <h2 className="font-medium text-2xl md:text-[28px] mb-4">4. Governing Law</h2>
-            <div className="space-y-6">
-              <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
-                Payments may be held securely in escrow until job completion is confirmed.
-              </p>
-              <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
-                Funds are released only after the client approves the completed work.
-              </p>
-              <p className="text-gray-700 text-[15px] font-medium leading-relaxed">
-                The Platform is not responsible for disputes arising outside the agreed job scope.
-              </p>
-            </div>
-          </div>
-
-        </div>
+        ) : (
+          <div 
+            className="font-sans tracking-wide space-y-6 [&_p]:text-[15px] [&_p]:md:text-[16px] [&_p]:font-medium [&_p]:leading-relaxed [&_p]:mb-4 [&_h2]:font-medium [&_h2]:text-2xl [&_h2]:md:text-[28px] [&_h2]:mb-4 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-2 [&_li]:text-gray-700 [&_li]:text-[15px] [&_li]:font-medium [&_li]:leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: data?.data?.content || '' }}
+          />
+        )}
       </div>
     </div>
   );

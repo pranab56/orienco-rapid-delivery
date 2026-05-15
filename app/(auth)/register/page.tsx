@@ -48,7 +48,7 @@ export default function RegisterPage() {
     handleSubmit,
     formState: { errors },
     setValue,
-    watch,
+    getValues,
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -246,7 +246,7 @@ export default function RegisterPage() {
                     Welcome to the Orienco family. Your account has been successfully created.
                   </p>
                 </div>
-                <Link href={`/verify-otp?email=${watch('email')}`} className="w-full">
+                <Link href={`/verify-otp?email=${getValues('email')}`} className="w-full">
                   <Button className="w-full h-12 cursor-pointer bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm shadow-lg shadow-orange-500/20 active:scale-95 transition-all">
                     verify your email
                   </Button>

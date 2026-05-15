@@ -10,7 +10,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useState, Suspense } from 'react';
 import toast from 'react-hot-toast';
 
 import { motion } from 'framer-motion';
@@ -18,7 +18,7 @@ import { useVerifyOtpMutation } from '@/features/auth/authApi';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '@/features/auth/authSlice';
 
-export default function VerifyEmail() {
+function VerifyEmailForm() {
   const [otp, setOtp] = useState<string>('');
   const [isResending, setIsResending] = useState(false);
   const [verifyOtp, { isLoading }] = useVerifyOtpMutation();
@@ -137,4 +137,10 @@ export default function VerifyEmail() {
   );
 }
 
-
+export default function VerifyEmail() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <VerifyEmailForm />
+    </Suspense>
+  );
+}

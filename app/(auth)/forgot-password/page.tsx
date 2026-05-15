@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, CheckCircle2, Loader } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
@@ -13,10 +13,10 @@ import { useForm } from 'react-hook-form';
 import { Autoplay, EffectFade, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import * as z from 'zod';
-import { 
-  useForgotEmailMutation, 
-  useVerifyOtpMutation, 
-  useResendPasswordMutation 
+import {
+  useForgotEmailMutation,
+  useVerifyOtpMutation,
+  useResendPasswordMutation
 } from '@/features/auth/authApi';
 import toast from 'react-hot-toast';
 
@@ -164,7 +164,7 @@ export default function ForgotPasswordPage() {
             </SwiperSlide>
           ))}
         </Swiper>
-        
+
         {/* Back Button Overlay */}
         <div className="absolute top-6 left-6 z-20">
           <Link href="/" className="flex items-center gap-2 px-6 py-2 bg-black/10 backdrop-blur-md border border-white/20 rounded-full text-white hover:bg-white/20 transition-all group">
@@ -237,12 +237,12 @@ export default function ForgotPasswordPage() {
                     )}
                   </div>
 
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={isSendingEmail}
-                    className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm transition-all shadow-none active:scale-[0.98] disabled:opacity-70"
+                    className="w-full h-12 bg-[#EB5500] cursor-pointer hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm transition-all shadow-none active:scale-[0.98] disabled:opacity-70"
                   >
-                    {isSendingEmail ? 'Sending...' : 'Send OTP Codes'}
+                    {isSendingEmail && <div className='flex justify-center items-center gap-2 animate-spin'><Loader size={16} /></div>} Send OTP Codes
                   </Button>
 
                   <div className="text-center">
@@ -291,20 +291,16 @@ export default function ForgotPasswordPage() {
 
                 <div className="flex items-center justify-between text-xs font-medium">
                   <span className="text-gray-500">Didn&apos;t receive the code?</span>
-                  <button onClick={() => setOtp(['', '', '', '', '', ''])} className="text-[#EB5500] hover:underline font-bold">Resend OTP</button>
+                  <button onClick={() => setOtp(['', '', '', '', '', ''])} className="text-[#EB5500] hover:underline font-bold cursor-pointer">Resend OTP</button>
                 </div>
 
                 <Button
                   onClick={onVerifyOtp}
                   disabled={isVerifyingOtp}
-                  className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm transition-all shadow-none active:scale-[0.98] disabled:opacity-70"
+                  className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white cursor-pointer font-medium rounded-lg text-sm transition-all shadow-none active:scale-[0.98] disabled:opacity-70"
                 >
-                  {isVerifyingOtp ? 'Verifying...' : 'Verify & Continue'}
+                  {isVerifyingOtp && <div className='flex justify-center items-center gap-2 animate-spin'><Loader size={16} /></div>} Verify & Continue
                 </Button>
-
-                <div className="text-center">
-                  <button onClick={() => setStep(1)} className="text-xs font-bold text-gray-400 hover:text-gray-600">Cancel and Restart</button>
-                </div>
               </motion.div>
             )}
 
@@ -360,12 +356,12 @@ export default function ForgotPasswordPage() {
                     )}
                   </div>
 
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={isResettingPassword}
-                    className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm transition-all shadow-none active:scale-[0.98] disabled:opacity-70"
+                    className="w-full h-12 bg-[#EB5500] cursor-pointer hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm transition-all shadow-none active:scale-[0.98] disabled:opacity-70"
                   >
-                    {isResettingPassword ? 'Updating...' : 'Update Password'}
+                    {isResettingPassword && <div className='flex justify-center items-center gap-2 animate-spin'><Loader size={16} /></div>} Update Password
                   </Button>
                 </form>
               </motion.div>
@@ -388,7 +384,7 @@ export default function ForgotPasswordPage() {
                   </p>
                 </div>
                 <Link href="/login" className="w-full">
-                  <Button className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-bold rounded-lg text-sm shadow-lg shadow-orange-500/20 active:scale-95 transition-all">
+                  <Button className="w-full h-12 bg-[#EB5500] cursor-pointer hover:bg-[#D44D00] text-white font-bold rounded-lg text-sm shadow-lg shadow-orange-500/20 active:scale-95 transition-all">
                     Go to Login
                   </Button>
                 </Link>

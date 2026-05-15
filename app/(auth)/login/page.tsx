@@ -1,12 +1,11 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, Phone, Apple, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Phone, Apple, Eye, EyeOff, CheckCircle2, Loader } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useRef } from 'react';
@@ -82,6 +81,7 @@ export default function LoginPage() {
         toast.success(response.message);
         dispatch(setCredentials({
           token: response.data.accessToken,
+          refreshToken: response.data.refreshToken,
           user: response.data.userInfo
         }));
         setLoginStep("success");
@@ -226,12 +226,8 @@ export default function LoginPage() {
                         {errors.password && <p className="text-red-500 text-[10px] font-medium mt-1">{errors.password.message}</p>}
                       </div>
 
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <Checkbox id="remember" className="h-5 w-5 rounded-sm border-gray-300 data-[state=checked]:bg-[#EB5500] data-[state=checked]:border-[#EB5500]" />
-                          <Label htmlFor="remember" className="text-xs font-bold text-gray-800 cursor-pointer">Remember Password</Label>
-                        </div>
-                        <Link href="/forgot-password" title="Forgot Password" className="text-xs font-bold text-gray-800 transition-colors underline decoration-gray-800 decoration-1 underline-offset-2">Forgot Password</Link>
+                      <div className="flex items-center justify-end">
+                        <Link href="/forgot-password" title="Forgot Password" className="text-xs font-bold text-gray-800 transition-colors hover:underline decoration-gray-800 decoration-1 underline-offset-2">Forgot Password</Link>
                       </div>
                     </div>
                   ) : (
@@ -248,8 +244,8 @@ export default function LoginPage() {
                     </div>
                   )}
 
-                  <Button type="submit" className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm transition-all shadow-none active:scale-[0.98]">
-                    Sign In
+                  <Button type="submit" className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium rounded-lg text-sm cursor-pointer transition-all shadow-none active:scale-[0.98]">
+                    {isLoading && <div className='flex justify-center items-center gap-2 animate-spin'><Loader size={16} /></div>} Sign In
                   </Button>
                 </form>
 
@@ -354,12 +350,12 @@ export default function LoginPage() {
                 <div className="space-y-2">
                   <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Login Successful</h2>
                   <p className="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto">
-                    Welcome back to Orienco! Your account has been verified successfully.
+                    Welcome back to Orienco!
                   </p>
                 </div>
                 <Link href="/" className="w-full">
-                  <Button className="w-full h-12 bg-[#EB5500] hover:bg-[#D44D00] text-white font-bold rounded-lg text-sm shadow-lg shadow-orange-500/20 active:scale-95 transition-all">
-                    Go
+                  <Button className="w-full h-12 bg-[#EB5500] cursor-pointer hover:bg-[#D44D00] text-white font-bold rounded-lg text-sm shadow-lg shadow-orange-500/20 active:scale-95 transition-all">
+                    Go To Home
                   </Button>
                 </Link>
               </motion.div>

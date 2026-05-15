@@ -23,6 +23,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'assets.oriencoinc.com',
+      },
+      {
+        protocol: 'https',
         hostname: 't3.ftcdn.net',
       },
     ],

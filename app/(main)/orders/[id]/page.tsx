@@ -1,36 +1,122 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, Suspense, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ChevronLeft, Phone, MessageSquare, Star,
-    CheckCircle2, X
+    CheckCircle2, X, Loader
 } from 'lucide-react';
 import Link from 'next/link';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useSingleParcelDetailsQuery } from '@/features/parcel/parcelApi';
+import moment from 'moment';
 
 function OrderDetailContent() {
     const params = useParams();
-    const searchParams = useSearchParams();
-    const router = useRouter();
+    const orderId = params.id as string;
 
-    // Check if the order is completed (delivered). If 'status' is 'Delivered' in url.
-    const isCompleted = searchParams.get('status') === 'Delivered';
-    const orderId = params.id as string || 'ORD-2024-8842';
+    const { data: response, isLoading: parcelDetailsLoading } = useSingleParcelDetailsQuery(orderId);
+    const parcel = response?.data;
 
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [rating, setRating] = useState(0);
 
-    const trackingSteps = [
-        { id: 1, title: 'Request Sent', date: '30 May 2025 • 12:15' },
-        { id: 2, title: 'Pickup', date: '30 May 2025 • 12:15' },
-        { id: 3, title: 'In-transit', date: '30 May 2025 • 12:15' },
-        { id: 4, title: 'Delivered', date: '30 May 2025 • 12:15' },
+    const mapRef = useRef<HTMLDivElement>(null);
+    const googleMapRef = useRef<google.maps.Map | null>(null);
+
+    useEffect(() => {
+        if (typeof google === 'undefined' || !mapRef.current || !parcel) return;
+
+        const pickup = { lat: parcel.pickupLocation.coordinates[1], lng: parcel.pickupLocation.coordinates[0] };
+        const drop = { lat: parcel.dropLocation.coordinates[1], lng: parcel.dropLocation.coordinates[0] };
+
+        googleMapRef.current = new google.maps.Map(mapRef.current, {
+            center: pickup,
+            zoom: 12,
+            disableDefaultUI: true,
+            zoomControl: true,
+        });
+
+        const directionsService = new google.maps.DirectionsService();
+        const directionsRenderer = new google.maps.DirectionsRenderer({
+            map: googleMapRef.current,
+            suppressMarkers: true,
+            polylineOptions: {
+                strokeColor: "#EB5500",
+                strokeWeight: 5,
+            }
+        });
+
+        directionsService.route({
+            origin: pickup,
+            destination: drop,
+            travelMode: google.maps.TravelMode.DRIVING,
+        }, (result, status) => {
+            if (status === google.maps.DirectionsStatus.OK) {
+                directionsRenderer.setDirections(result);
+            }
+        });
+
+        // Custom Markers
+        new google.maps.Marker({
+            position: pickup,
+            map: googleMapRef.current,
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 8,
+                fillColor: "#EB5500",
+                fillOpacity: 1,
+                strokeWeight: 2,
+                strokeColor: "#FFFFFF",
+            },
+            title: "Pickup"
+        });
+
+        new google.maps.Marker({
+            position: drop,
+            map: googleMapRef.current,
+            icon: {
+                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                scale: 6,
+                fillColor: "#333333",
+                fillOpacity: 1,
+                strokeWeight: 2,
+                strokeColor: "#FFFFFF",
+            },
+            title: "Drop-off"
+        });
+
+    }, [parcel]);
+
+    if (parcelDetailsLoading) {
+        return (
+            <div className="container mx-auto px-4 max-w-4xl flex items-center justify-center py-20">
+                <Loader className="animate-spin text-[#EB5500]" size={40} />
+            </div>
+        );
+    }
+
+    if (!parcel) {
+        return (
+            <div className="container mx-auto px-4 max-w-4xl text-center py-20 font-medium">
+                Order not found.
+            </div>
+        );
+    }
+
+    const isCompleted = parcel.status === 'DELIVERED';
+
+    // Status mapping for tracker
+    const statusSteps = [
+        { key: 'PENDING', title: 'Request Sent', date: moment(parcel.createdAt).format('DD MMM YYYY • HH:mm') },
+        { key: 'ACCEPTED', title: 'Accepted', date: parcel.acceptedAt ? moment(parcel.acceptedAt).format('DD MMM YYYY • HH:mm') : '' },
+        { key: 'IN_TRANSIT', title: 'In-transit', date: parcel.pickedUpAt ? moment(parcel.pickedUpAt).format('DD MMM YYYY • HH:mm') : '' },
+        { key: 'DELIVERED', title: 'Delivered', date: parcel.deliveredAt ? moment(parcel.deliveredAt).format('DD MMM YYYY • HH:mm') : '' },
     ];
 
-    // If completed: index is 3 (Delivered), else index is 1 (Pickup)
-    const activeStepIndex = isCompleted ? 3 : 1;
+    const currentStatusIndex = statusSteps.findIndex(s => s.key === parcel.status);
+    const activeStepIndex = currentStatusIndex === -1 ? 0 : currentStatusIndex;
 
     return (
         <motion.div
@@ -46,65 +132,33 @@ function OrderDetailContent() {
                 >
                     <ChevronLeft size={18} className="text-gray-800" />
                 </Link>
-                <h1 className="font-medium text-xl md:text-2xl">#{orderId}</h1>
+                <h1 className="font-medium text-xl md:text-2xl">#{parcel._id.slice(-8).toUpperCase()}</h1>
             </div>
 
             {/* Map Display Box */}
             <div className="relative w-full h-[300px] md:h-[400px] mb-10 rounded-xl overflow-hidden shadow-lg border border-black/5 bg-[#EAEAEA]">
-                {/* Embedded Google Map */}
-                <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d11394.1370211155!2d12.441097232261763!3d43.9317926173003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x132d59bad360d009%3A0x647610111a8775f0!2sSan%20Marino!5e0!3m2!1sen!2sus!4v1712745778213!5m2!1sen!2sus"
-                    width="100%"
-                    height="100%"
-                    className="border-0 opacity-80"
-                    allowFullScreen={false}
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                ></iframe>
-
-                <div className="absolute inset-0 bg-blue-100/10 pointer-events-none" />
-
-                {/* Fake UI floating elements on map
-                <div className="absolute top-[40%] left-[45%] w-[120px] h-20 -rotate-45 bg-blue-500 rounded-xl" style={{ clipPath: 'polygon(0 40%, 100% 40%, 80% 60%, 20% 60%)' }} />
-                <div className="absolute top-[48%] left-[40%] flex flex-col items-center">
-                    <div className="w-14 h-14 bg-[#F59E0B] rounded-full border-4 border-white shadow-xl flex items-center justify-center text-white z-10">
-                        <Navigation size={22} className="rotate-45" />
-                    </div>
-                </div> */}
-                {/* {!isCompleted && (
-                    <div className="absolute bottom-[20%] left-[25%] bg-[#1E3A8A] text-white px-6 py-3 rounded-2xl font-bold shadow-xl border-4 border-white/20 text-3xl">
-                        3 hr 58 min
-                    </div>
-                )} */}
-                {/* {isCompleted && (
-                    <div className="absolute bottom-[20%] left-[25%] bg-[#10B981] text-white px-6 py-3 rounded-2xl font-bold shadow-xl border-4 border-white/20 text-xl">
-                        Delivered Successfully
-                    </div>
-                )} */}
-                {/* <div className="absolute top-[55%] left-[50%] flex flex-col items-center">
-                    <div className="w-14 h-14 bg-[#2563EB] rounded-full border-4 border-white shadow-xl flex items-center justify-center text-white z-10">
-                        <MessageSquare size={22} fill="currentColor" />
-                    </div>
-                </div> */}
+                <div ref={mapRef} className="w-full h-full" />
+                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-[#EB5500]/20 z-10">
+                    <p className="text-[10px] uppercase font-bold text-gray-400">Distance</p>
+                    <p className="text-[#EB5500] font-bold text-sm">{parcel.distance.toFixed(2)} KM</p>
+                    <p className="text-[10px] text-gray-500 font-medium">{parcel.duration}</p>
+                </div>
             </div>
 
             {/* Tracker Box */}
             <h2 className="font-medium text-base mb-4">Track your order</h2>
             <div className="bg-[#F3F3F3] rounded-2xl p-6 md:p-10 pt-8 pb-8 md:pt-12 md:pb-12 mb-8 shadow-sm border border-black/5">
                 <div className="relative pl-9 md:pl-12 space-y-8 md:space-y-12">
-                    {/* Full line bg */}
                     <div className="absolute left-[10px] top-[14px] -bottom-[6px] border-l-2 border-dashed border-gray-300 z-0"></div>
-                    {/* Completed active line bg */}
                     <div
                         className="absolute left-[10px] top-[14px] border-l-2 border-dashed border-[#10B981] z-0 transition-all duration-1000"
-                        style={{ height: `${(activeStepIndex / (trackingSteps.length - 1)) * 100}%` }}
+                        style={{ height: `${(activeStepIndex / (statusSteps.length - 1)) * 100}%` }}
                     ></div>
 
-                    {/* Steps mapped dynamically */}
-                    {trackingSteps.map((step, index) => {
+                    {statusSteps.map((step, index) => {
                         const isStepCompleted = index <= activeStepIndex;
                         return (
-                            <div key={step.id} className={`relative z-10 flex flex-col ${!isStepCompleted ? 'opacity-80' : ''}`}>
+                            <div key={step.key} className={`relative z-10 flex flex-col ${!isStepCompleted ? 'opacity-80' : ''}`}>
                                 <div className="absolute -left-9 md:-left-12 flex items-start justify-center pt-0.5">
                                     {isStepCompleted ? (
                                         <CheckCircle2 fill="white" className="text-[#10B981] bg-white rounded-full size-[22px] md:size-[26px]" />
@@ -113,7 +167,7 @@ function OrderDetailContent() {
                                     )}
                                 </div>
                                 <h3 className="font-medium text-[13px] md:text-[15px] mb-1">{step.title}</h3>
-                                <p className="text-gray-400 text-[10px] md:text-xs font-normal">{step.date}</p>
+                                <p className="text-gray-400 text-[10px] md:text-xs font-normal">{step.date || 'Pending...'}</p>
                             </div>
                         );
                     })}
@@ -121,45 +175,63 @@ function OrderDetailContent() {
             </div>
 
             {/* Rider Info Area */}
-            <div className="bg-[#E5E5E5] rounded-2xl p-5 md:p-8 shadow-sm border border-black/5">
-                <div className="flex justify-between items-start flex-wrap gap-4 mb-6 md:mb-8">
-                    <div className="flex-1">
-                        <p className="text-[10px] uppercase font-medium text-gray-400 mb-1 tracking-wider">Rider Info</p>
-                        <h3 className="text-lg md:text-2xl font-medium">Cameron Williamson</h3>
+            {parcel.driver ? (
+                <div className="bg-[#E5E5E5] rounded-2xl p-5 md:p-8 shadow-sm border border-black/5">
+                    <div className="flex justify-between items-start flex-wrap gap-4 mb-6 md:mb-8">
+                        <div className="flex items-center gap-4">
+                            <div className="relative w-12 h-12 md:w-16 md:h-16 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                                <Image
+                                    src={parcel.driver.image || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"}
+                                    alt={parcel.driver.fullName}
+                                    fill
+                                    className="object-cover"
+                                />
+                            </div>
+                            <div>
+                                <p className="text-[10px] uppercase font-medium text-gray-400 mb-1 tracking-wider">Rider Info</p>
+                                <h3 className="text-lg md:text-2xl font-medium">{parcel.driver.fullName}</h3>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-1.5 bg-[#D44D00]/10 px-3 md:px-4 py-1.5 md:py-2 rounded-full h-fit flex-shrink-0">
+                            <Star fill="#F59E0B" className="text-[#F59E0B]" size={14} />
+                            <span className="font-medium text-xs md:text-sm text-[#EB5500]">{parcel.driver.averageRating || '0.0'}</span>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-1.5 bg-[#D4D4D4] px-3 md:px-4 py-1.5 md:py-2 rounded-full h-fit flex-shrink-0">
-                        <Star fill="#F59E0B" className="text-[#F59E0B]" size={14} />
-                        <span className="font-medium text-xs md:text-sm text-[#EB5500]">4.9</span>
+
+                    <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
+                        <a
+                            href={`tel:${parcel.driver.phone}`}
+                            className="flex-1 bg-[#EB5500] hover:bg-[#D44D00] text-white h-12 flex justify-center items-center gap-2 py-3 font-medium rounded-sm cursor-pointer transition-all shadow-lg shadow-orange-500/20"
+                        >
+                            <Phone size={18} />
+                            Call
+                        </a>
+
+                        {!isCompleted ? (
+                            <Link
+                                href={`/chat/${parcel.driver._id}`}
+                                className="flex-1 bg-transparent h-12 border-2 border-gray-300 hover:border-[#EB5500] text-[#EB5500] py-3 flex justify-center items-center gap-2 font-medium rounded-sm cursor-pointer transition-all"
+                            >
+                                <MessageSquare size={18} />
+                                Message
+                            </Link>
+                        ) : (
+                            <button
+                                onClick={() => setShowReviewModal(true)}
+                                className="flex-1 bg-transparent h-12 border-2 border-gray-300 hover:border-[#EB5500] text-[#EB5500] py-3 flex justify-center items-center gap-2 font-medium rounded-sm cursor-pointer transition-all"
+                            >
+                                Give Review
+                            </button>
+                        )}
                     </div>
                 </div>
-
-                <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
-                    <button className="flex-1 bg-[#EB5500] hover:bg-[#D44D00] text-white h-12 flex justify-center items-center gap-2 py-3 font-medium rounded-sm cursor-pointer transition-all shadow-lg shadow-orange-500/20">
-                        <Phone size={18} />
-                        Call
-                    </button>
-
-                    {/* Dynamic Action Button based on Completion Status */}
-                    {!isCompleted ? (
-                        <button
-                            onClick={() => router.push("/chat")}
-                            className="flex-1 bg-transparent h-12 border-2 border-gray-300 hover:border-[#EB5500] text-[#EB5500] py-3 flex justify-center items-center gap-2 font-medium rounded-sm cursor-pointer transition-all"
-                        >
-                            <MessageSquare size={18} />
-                            Message
-                        </button>
-                    ) : (
-                        <button
-                            onClick={() => setShowReviewModal(true)}
-                            className="flex-1 bg-transparent h-12 border-2 border-gray-300 hover:border-[#EB5500] text-[#EB5500] py-3 flex justify-center items-center gap-2 font-medium rounded-sm cursor-pointer transition-all"
-                        >
-                            Give Review
-                        </button>
-                    )}
+            ) : (
+                <div className="bg-[#F3F3F3] rounded-2xl p-8 text-center border border-dashed border-gray-300">
+                    <p className="text-gray-500 font-medium">Looking for a rider nearby...</p>
                 </div>
-            </div>
+            )}
 
-            {/* Review Modal Overlay */}
+            {/* Review Modal */}
             <AnimatePresence>
                 {showReviewModal && (
                     <motion.div
@@ -174,7 +246,6 @@ function OrderDetailContent() {
                             exit={{ scale: 0.9, y: 20 }}
                             className="bg-[#EFEFEF] w-full max-w-md rounded-[32px] p-6 md:p-10 relative"
                         >
-                            {/* Close button */}
                             <button
                                 onClick={() => setShowReviewModal(false)}
                                 className="absolute right-4 top-4 bg-[#EF4444] text-white rounded-full p-1 hover:scale-110 transition-transform z-10"
@@ -182,16 +253,8 @@ function OrderDetailContent() {
                                 <X size={18} strokeWidth={3} />
                             </button>
 
-                            {/* Icon Top Bubble */}
-                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 rounded-xl flex items-center justify-center border-3 border-[#EFEFEF]">
-                                <Image src="/icons/review.png" alt="Review" width={50} height={50} />
-                            </div>
-
-                            {/* Review Modal Form */}
                             <div className="pt-8 flex flex-col items-center text-center">
                                 <h3 className="font-medium text-[#EB5500] text-lg mb-4">How was the driver?</h3>
-
-                                {/* Star Selector */}
                                 <div className="flex gap-2 mb-8">
                                     {[1, 2, 3, 4, 5].map((star) => (
                                         <button
@@ -207,7 +270,6 @@ function OrderDetailContent() {
                                         </button>
                                     ))}
                                 </div>
-
                                 <div className="w-full text-left flex flex-col">
                                     <label className="text-[12px] font-medium text-gray-600 mb-2">Description</label>
                                     <textarea
@@ -216,7 +278,6 @@ function OrderDetailContent() {
                                         placeholder="Please enter your message"
                                     ></textarea>
                                 </div>
-
                                 <button
                                     onClick={() => setShowReviewModal(false)}
                                     className="w-full mt-8 bg-[#EB5500] cursor-pointer hover:bg-[#D44D00] text-white font-medium py-3.5 rounded-xl transition-colors"

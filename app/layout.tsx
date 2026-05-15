@@ -1,11 +1,12 @@
 import { I18nProvider } from "@/components/providers/i18n-provider";
 import { LenisProvider } from "@/lib/lenis";
-import SplashScreen from "@/components/shared/SplashScreen";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ReduxProvider } from "@/components/providers/ReduxProvider";
 import { Toaster } from "react-hot-toast";
+import Script from "next/script";
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -27,6 +28,10 @@ export default function RootLayout({
       className={`${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white text-black selection:bg-zinc-100">
+        <Script
+          src={`https://maps.googleapis.com/maps/api/js?key=AIzaSyDwBdLOatYV5UMXO-zGDQMj2R1ErlK8Pqs&libraries=places`}
+          strategy="beforeInteractive"
+        />
         <ReduxProvider>
           <I18nProvider>
             {/* <SplashScreen /> */}

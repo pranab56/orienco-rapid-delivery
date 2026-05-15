@@ -8,6 +8,11 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '@/features/auth/authSlice';
+import { useRouter } from 'next/navigation';
+import { useGetUnReadCountQuery } from '@/features/notification/notificationApi';
+
 
 const languages = [
   { code: 'fr', name: 'Français' },
@@ -16,12 +21,24 @@ const languages = [
 
 export function Navbar() {
   const { t, i18n } = useTranslation('common');
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const { token, user } = useSelector((state: any) => state.auth);
+  const { data: unreadData } = useGetUnReadCountQuery(undefined, { skip: !token });
+  const unreadCount = unreadData?.data?.unreadCount || 0;
+
   const [profileOpen, setProfileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const profileRef = useRef<HTMLDivElement>(null);
   const langRef = useRef<HTMLDivElement>(null);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    setProfileOpen(false);
+    router.push('/login');
+  };
 
   const menuItems = [
     { name: t('navbar.home'), href: '/' },
@@ -141,73 +158,94 @@ export function Navbar() {
             <Menu size={20} />
           </button>
 
-          <Link href="/notifications">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="hidden md:flex w-11 h-11 items-center justify-center rounded bg-black/10 backdrop-blur-xs border border-white/10 text-white/50 hover:text-white hover:border-white/20 transition-all cursor-pointer relative"
-            >
-              <Bell size={26} />
-              <span className="absolute top-1.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-black animate-pulse" />
-            </motion.button>
-          </Link>
-
-          <div ref={profileRef} className="relative">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setProfileOpen(!profileOpen)}
-              className="w-11 h-11 rounded-full border-2 border-white/10 overflow-hidden cursor-pointer relative hover:border-primary/50 transition-all shadow-lg ring-offset-2 ring-offset-black"
-            >
-              <Image
-                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&auto=format"
-                alt="Avatar"
-                fill
-                className="object-cover"
-              />
-            </motion.button>
-
-            <AnimatePresence>
-              {profileOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 15, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 15, scale: 0.9 }}
-                  transition={{ duration: 0.2, type: "spring", damping: 20, stiffness: 300 }}
-                  className="absolute top-13 right-0 w-64 bg-white backdrop-blur-2xl rounded-xl overflow-hidden shadow-2xl border border-white/10 p-5 z-[101]"
+          {token ? (
+            <>
+              <Link href="/notifications">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="hidden md:flex w-11 h-11 items-center justify-center rounded bg-black/10 backdrop-blur-xs border border-white/10 text-white/50 hover:text-white hover:border-white/20 transition-all cursor-pointer relative"
                 >
-                  <div className="flex flex-col items-center text-center">
-                    <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border-2 border-primary/30 p-1 shadow-2xl">
-                      <Image
-                        src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&auto=format"
-                        alt="Salina Gomez"
-                        width={80}
-                        height={80}
-                        className="rounded-full object-cover"
-                      />
-                    </div>
-                    <h4 className="text-black font-medium text-lg tracking-tight">Salina Gomez</h4>
-                    <p className="text-black/70 text-[10px] uppercase tracking-widest font-normal mt-1">Premium Member</p>
-                  </div>
+                  <Bell size={26} />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-black animate-in zoom-in">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </motion.button>
+              </Link>
 
-                  <div className="mt-6 flex flex-col gap-2">
-                    <Link href="/settings" onClick={() => setProfileOpen(false)} className="w-full flex items-center gap-3 p-3 rounded-sm cursor-pointer bg-black/5 hover:bg-black/10 text-black/60 hover:text-black font-medium transition-all text-sm group">
-                      <div className="w-8 h-8 rounded-xl bg-black/5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                        <Settings size={14} />
+              <div ref={profileRef} className="relative">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setProfileOpen(!profileOpen)}
+                  className="w-11 h-11 rounded-full border-2 border-white/10 overflow-hidden cursor-pointer relative hover:border-primary/50 transition-all shadow-lg ring-offset-2 ring-offset-black"
+                >
+                  <Image
+                    src={user?.image || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&auto=format"}
+                    alt="Avatar"
+                    fill
+                    className="object-cover"
+                  />
+                </motion.button>
+
+                <AnimatePresence>
+                  {profileOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 15, scale: 0.9 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 15, scale: 0.9 }}
+                      transition={{ duration: 0.2, type: "spring", damping: 20, stiffness: 300 }}
+                      className="absolute top-13 right-0 w-64 bg-white backdrop-blur-2xl rounded-xl overflow-hidden shadow-2xl border border-white/10 p-5 z-[101]"
+                    >
+                      <div className="flex flex-col items-center text-center">
+                        <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border-2 border-primary/30 p-1 shadow-2xl">
+                          <Image
+                            src={user?.image || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&auto=format"}
+                            alt={user?.name || "User"}
+                            width={80}
+                            height={80}
+                            className="rounded-full object-cover"
+                          />
+                        </div>
+                        <h4 className="text-black font-medium text-lg tracking-tight">{user?.name || "User"}</h4>
+                        <p className="text-black/70 text-[10px] uppercase tracking-widest font-normal mt-1">{user?.role || "Premium Member"}</p>
                       </div>
-                      {t('navbar.settings')}
-                    </Link>
-                    <button className="w-full flex items-center gap-3 p-3 rounded-sm cursor-pointer bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 font-medium transition-all text-sm group">
-                      <div className="w-8 h-8 rounded-xl bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/10 transition-colors">
-                        <LogOut size={14} />
+
+                      <div className="mt-6 flex flex-col gap-2">
+                        <Link href="/settings" onClick={() => setProfileOpen(false)} className="w-full flex items-center gap-3 p-3 rounded-sm cursor-pointer bg-black/5 hover:bg-black/10 text-black/60 hover:text-black font-medium transition-all text-sm group">
+                          <div className="w-8 h-8 rounded-xl bg-black/5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                            <Settings size={14} />
+                          </div>
+                          {t('navbar.settings')}
+                        </Link>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center cursor-pointer gap-3 p-3 rounded-sm bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 font-medium transition-all text-sm group"
+                        >
+                          <div className="w-8 h-8 rounded-xl bg-red-500/10 cursor-pointer flex items-center justify-center group-hover:bg-red-500/10 transition-colors">
+                            <LogOut size={14} />
+                          </div>
+                          {t('navbar.sign_out')}
+                        </button>
                       </div>
-                      {t('navbar.sign_out')}
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </>
+          ) : (
+            <Link href="/login">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-2 h-11 px-6 border border-primary mt-1 rounded-sm bg-primary text-white font-normal cursor-pointer text-sm transition-all shadow-lg hover:bg-primary/90"
+              >
+                {t('navbar.sign_in')}
+              </motion.button>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -247,6 +285,23 @@ export function Navbar() {
                   </Link>
                 );
               })}
+              {!token && (
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-3xl font-medium text-primary mt-4"
+                >
+                  {t('navbar.sign_in')}
+                </Link>
+              )}
+              {token && (
+                <button
+                  onClick={handleLogout}
+                  className="text-3xl font-medium text-red-400 mt-4 text-left"
+                >
+                  {t('navbar.sign_out')}
+                </button>
+              )}
             </div>
           </motion.div>
         )}

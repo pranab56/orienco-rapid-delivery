@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
-import { Camera, Calendar as CalendarIcon } from 'lucide-react';
+import { Camera, Calendar as CalendarIcon, Loader } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -12,22 +12,47 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { useGetMyProfileQuery, useUpdateProfileMutation } from '@/features/profileAndSettings/profileApi';
+import toast from 'react-hot-toast';
 
 export default function PersonalInformationPage() {
+  const { data: profileResponse, isLoading: profileLoading } = useGetMyProfileQuery(undefined);
+  const [updateProfile, { isLoading }] = useUpdateProfileMutation();
+
   const [formData, setFormData] = useState({
-    fullName: 'Cameron Williamson',
-    phone: '+123 456 7890',
-    address: 'Al Rigga Metro Station, Deira, Dubai'
+    fullName: '',
+    phone: '',
+    address: ''
   });
 
-  const [date, setDate] = useState<Date | undefined>(new Date(2000, 0, 1));
+  const [date, setDate] = useState<Date | undefined>(undefined);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [errors, setErrors] = useState<Record<string, boolean>>({});
+
+  // Populate form with fetched data
+  React.useEffect(() => {
+    if (profileResponse?.data) {
+      const profile = profileResponse.data;
+      setFormData({
+        fullName: profile.fullName || '',
+        phone: profile.phone || '',
+        address: profile.address || ''
+      });
+      if (profile.dateOfBirth) {
+        setDate(new Date(profile.dateOfBirth));
+      }
+      if (profile.image) {
+        setPreviewImage(profile.image);
+      }
+    }
+  }, [profileResponse]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImage(reader.result as string);
@@ -36,7 +61,7 @@ export default function PersonalInformationPage() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const newErrors: Record<string, boolean> = {};
     if (!formData.fullName) newErrors.fullName = true;
     if (!formData.phone) newErrors.phone = true;
@@ -46,11 +71,31 @@ export default function PersonalInformationPage() {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      // Logic to save data would go here
-      console.log('Saving:', { ...formData, dob: date });
-      alert('Information saved successfully!');
+      const submitData = new FormData();
+      submitData.append('fullName', formData.fullName);
+      submitData.append('phone', formData.phone);
+      submitData.append('address', formData.address);
+      if (date) {
+        // Format to M-D-YY as shown in your Postman image (4-10-26) or standard ISO
+        submitData.append('dateOfBirth', date.toISOString());
+      }
+      if (imageFile) {
+        submitData.append('image', imageFile);
+      }
+
+      try {
+        await updateProfile(submitData).unwrap();
+        toast.success('Profile updated successfully!');
+      } catch (err: any) {
+        toast.error(err?.data?.message || 'Failed to update profile');
+      }
     }
   };
+
+
+  if (profileLoading) {
+    return <div className="flex items-center justify-center h-screen"><Loader size={40} className="animate-spin" /></div>;
+  }
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pb-20 px-4 md:px-0">
@@ -181,9 +226,11 @@ export default function PersonalInformationPage() {
         <div className="pt-8 flex sm:justify-end">
           <button
             onClick={handleSave}
-            className="w-full sm:w-auto bg-[#EB5500] hover:bg-[#D44D00] text-white px-12 py-3.5 rounded-sm font-medium text-base transition-all cursor-pointer shadow-lg shadow-[#EB5500]/20 active:scale-95"
+            disabled={isLoading}
+            className="w-full sm:w-auto bg-[#EB5500] hover:bg-[#D44D00] text-white px-12 py-3.5 rounded-sm font-medium text-base transition-all cursor-pointer shadow-lg shadow-[#EB5500]/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Save Changes
+            {isLoading && <Loader className="animate-spin" size={18} />}
+            {isLoading ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
       </div>
