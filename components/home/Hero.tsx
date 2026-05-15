@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { motion, useInView } from 'framer-motion';
-import { MapPin, Navigation } from 'lucide-react';
+import { Loader, MapPin, Navigation } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useDispatch } from 'react-redux';
@@ -23,6 +23,7 @@ export default function Hero() {
   const dropRef = useRef<HTMLInputElement>(null);
   const [pickupData, setPickupData] = useState({ address: '', coordinates: [0, 0] });
   const [dropData, setDropData] = useState({ address: '', coordinates: [0, 0] });
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (typeof google === 'undefined') return;
@@ -60,12 +61,17 @@ export default function Hero() {
   }, []);
 
   const handleGetStarted = () => {
-    dispatch(updateBooking({
-      pickupLocation: pickupData,
-      dropLocation: dropData,
-      vehicleType: packageSize === 'Quick' ? 'motorcycle' : packageSize === 'Standard' ? 'tricycle' : 'van',
-    }));
-    router.push('/booking');
+    setIsLoading(true);
+
+    setTimeout(() => {
+      dispatch(updateBooking({
+        pickupLocation: pickupData,
+        dropLocation: dropData,
+        vehicleType: packageSize === 'Quick' ? 'motorcycle' : packageSize === 'Standard' ? 'tricycle' : 'van',
+      }));
+      router.push('/booking');
+      setIsLoading(false);
+    }, 1000);
   };
 
   const stats = [
@@ -135,7 +141,7 @@ export default function Hero() {
               animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
               transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
             >
-              <button 
+              <button
                 onClick={handleGetStarted}
                 className="w-full md:w-auto bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium px-8 md:px-12 py-3 md:py-3.5 rounded-sm text-base md:text-lg transition-all cursor-pointer border-none active:scale-[0.98]"
               >
@@ -152,61 +158,40 @@ export default function Hero() {
             className="flex justify-center lg:justify-end relative z-50 pointer-events-auto mt-2 md:mt-20 lg:mt-64 mb-16 lg:mb-0"
           >
             <div className="bg-[#F2F2F2]/95 backdrop-blur-3xl rounded-xl p-6 pb-12 md:p-8 w-full max-w-[450px] shadow-2xl border border-white/20">
-              <h3 className="text-gray-900 font-medium text-xl md:text-2xl mb-6 md:mb-10 tracking-tight">Book a Delivery</h3>
+              <h3 className="text-gray-900 font-medium text-xl md:text-2xl mb-6 md:mb-5 tracking-tight">Book a Delivery</h3>
 
-              <div className="space-y-8">
-                <div className="bg-black/[0.06] p-1.5 rounded-2xl flex gap-1 relative overflow-hidden">
-                  {SIZES.map((size) => (
-                    <button
-                      key={size}
-                      onClick={() => setPackageSize(size)}
-                      className={cn(
-                        'flex-1 py-3 md:py-4 px-2 rounded-xl text-[11px] md:text-xs font-medium transition-all cursor-pointer tracking-wider uppercase relative z-10',
-                        packageSize === size ? 'text-gray-900' : 'text-gray-400 hover:text-gray-600'
-                      )}
-                    >
-                      {packageSize === size && (
-                        <motion.div
-                          layoutId="activeTab"
-                          className="absolute inset-0 bg-white rounded-xl shadow-md z-[-1]"
-                          transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                        />
-                      )}
-                      {size}
-                    </button>
-                  ))}
-                </div>
-
+              <div className="space-y-5">
                 <div className="space-y-4">
                   <div className="relative group">
                     <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#EB5500] transition-colors">
                       <MapPin size={20} />
                     </div>
-                    <input 
+                    <input
                       ref={pickupRef}
-                      type="text" 
-                      placeholder="Pickup location" 
-                      className="w-full h-14 pl-14 pr-6 bg-black/[0.04] rounded-[22px] border-none outline-none focus:ring-2 focus:ring-[#EB5500]/10 text-gray-900 placeholder:text-gray-400 text-sm font-normal transition-all shadow-inner" 
+                      type="text"
+                      placeholder="Pickup location"
+                      className="w-full h-14 pl-14 pr-6 bg-black/[0.04] rounded-[22px] border-none outline-none focus:ring-2 focus:ring-[#EB5500]/10 text-gray-900 placeholder:text-gray-400 text-sm font-normal transition-all shadow-inner"
                     />
                   </div>
                   <div className="relative group">
                     <div className="absolute left-5 top-1/2 -translate-y-1/2 text-[#EB5500]">
                       <Navigation size={20} className="rotate-45" />
                     </div>
-                    <input 
+                    <input
                       ref={dropRef}
-                      type="text" 
-                      placeholder="Drop-off location" 
-                      className="w-full h-14 pl-14 pr-6 bg-black/[0.04] rounded-[22px] border-none outline-none focus:ring-2 focus:ring-[#EB5500]/10 text-gray-900 placeholder:text-gray-400 text-sm font-normal transition-all shadow-inner" 
+                      type="text"
+                      placeholder="Drop-off location"
+                      className="w-full h-14 pl-14 pr-6 bg-black/[0.04] rounded-[22px] border-none outline-none focus:ring-2 focus:ring-[#EB5500]/10 text-gray-900 placeholder:text-gray-400 text-sm font-normal transition-all shadow-inner"
                     />
                   </div>
                 </div>
 
-                <button 
+                <button
                   onClick={handleGetStarted}
-                  className="w-full bg-[#EB5500] hover:bg-[#D44D00] text-white font-medium h-14  rounded-sm text-lg shadow-[0_15px_30px_-5px_rgba(235,85,0,0.4)] transition-all cursor-pointer border-none active:scale-[0.98]  tracking-widest"
+                  disabled={isLoading}
+                  className="w-full bg-[#EB5500] flex items-center justify-center gap-2 hover:bg-[#D44D00] text-white font-medium h-14  rounded-sm text-lg shadow-[0_15px_30px_-5px_rgba(235,85,0,0.4)] transition-all cursor-pointer border-none active:scale-[0.98]  tracking-widest disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  Get Started
+                  {isLoading && <div className='flex justify-center items-center gap-2 animate-spin'><Loader size={16} /></div>} Get Started
                 </button>
               </div>
             </div>

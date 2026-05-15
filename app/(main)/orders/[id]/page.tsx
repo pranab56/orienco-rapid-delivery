@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ChevronLeft, Phone, MessageSquare, Star,
-    CheckCircle2, X, Loader
+    CheckCircle2, X, Loader, Bike
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -111,6 +111,7 @@ function OrderDetailContent() {
     const statusSteps = [
         { key: 'PENDING', title: 'Request Sent', date: moment(parcel.createdAt).format('DD MMM YYYY • HH:mm') },
         { key: 'ACCEPTED', title: 'Accepted', date: parcel.acceptedAt ? moment(parcel.acceptedAt).format('DD MMM YYYY • HH:mm') : '' },
+        { key: 'PICKED_UP', title: 'Picked Up', date: parcel.pickedUpAt ? moment(parcel.pickedUpAt).format('DD MMM YYYY • HH:mm') : '' },
         { key: 'IN_TRANSIT', title: 'In-transit', date: parcel.pickedUpAt ? moment(parcel.pickedUpAt).format('DD MMM YYYY • HH:mm') : '' },
         { key: 'DELIVERED', title: 'Delivered', date: parcel.deliveredAt ? moment(parcel.deliveredAt).format('DD MMM YYYY • HH:mm') : '' },
     ];
@@ -148,7 +149,7 @@ function OrderDetailContent() {
             {/* Tracker Box */}
             <h2 className="font-medium text-base mb-4">Track your order</h2>
             <div className="bg-[#F3F3F3] rounded-2xl p-6 md:p-10 pt-8 pb-8 md:pt-12 md:pb-12 mb-8 shadow-sm border border-black/5">
-                <div className="relative pl-9 md:pl-12 space-y-8 md:space-y-12">
+                <div className="relative pl-9 md:pl-11.5 space-y-8 md:space-y-12">
                     <div className="absolute left-[10px] top-[14px] -bottom-[6px] border-l-2 border-dashed border-gray-300 z-0"></div>
                     <div
                         className="absolute left-[10px] top-[14px] border-l-2 border-dashed border-[#10B981] z-0 transition-all duration-1000"
@@ -199,13 +200,6 @@ function OrderDetailContent() {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
-                        <a
-                            href={`tel:${parcel.driver.phone}`}
-                            className="flex-1 bg-[#EB5500] hover:bg-[#D44D00] text-white h-12 flex justify-center items-center gap-2 py-3 font-medium rounded-sm cursor-pointer transition-all shadow-lg shadow-orange-500/20"
-                        >
-                            <Phone size={18} />
-                            Call
-                        </a>
 
                         {!isCompleted ? (
                             <Link
@@ -226,8 +220,52 @@ function OrderDetailContent() {
                     </div>
                 </div>
             ) : (
-                <div className="bg-[#F3F3F3] rounded-2xl p-8 text-center border border-dashed border-gray-300">
-                    <p className="text-gray-500 font-medium">Looking for a rider nearby...</p>
+                <div className="bg-white/50 backdrop-blur-md rounded-2xl p-10 text-center border border-orange-100 shadow-xl shadow-orange-500/5 relative overflow-hidden">
+                    {/* Animated Radar Background */}
+                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                        <motion.div
+                            animate={{ scale: [1, 2.5], opacity: [0.5, 0] }}
+                            transition={{ duration: 2.5, repeat: Infinity, ease: "easeOut" }}
+                            className="w-32 h-32 rounded-full border-2 border-orange-100"
+                        />
+                        <motion.div
+                            animate={{ scale: [1, 2.5], opacity: [0.5, 0] }}
+                            transition={{ duration: 2.5, repeat: Infinity, ease: "easeOut", delay: 0.8 }}
+                            className="w-32 h-32 rounded-full border-2 border-orange-100"
+                        />
+                        <motion.div
+                            animate={{ scale: [1, 2.5], opacity: [0.5, 0] }}
+                            transition={{ duration: 2.5, repeat: Infinity, ease: "easeOut", delay: 1.6 }}
+                            className="w-32 h-32 rounded-full border-2 border-orange-100"
+                        />
+                    </div>
+
+                    <div className="relative z-10 flex flex-col items-center">
+                        {/* <div className="w-16 h-16 bg-[#EB5500] rounded-full flex items-center justify-center mb-6 shadow-lg shadow-orange-500/30">
+                            <motion.div
+                                animate={{ x: [-2, 2, -2] }}
+                                transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
+                            >
+                                <Bike size={32} className="text-white" />
+                            </motion.div>
+                        </div> */}
+
+                        <h3 className="text-gray-900 font-bold text-lg mb-2">Finding a Rider</h3>
+                        <p className="text-gray-500 font-medium text-sm max-w-[260px]">
+                            Searching for the best rider nearby to handle your delivery...
+                        </p>
+
+                        <div className="mt-8 flex gap-1.5 justify-center">
+                            {[0, 1, 2].map((i) => (
+                                <motion.div
+                                    key={i}
+                                    animate={{ opacity: [0.3, 1, 0.3], scale: [1, 1.2, 1] }}
+                                    transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
+                                    className="w-2 h-2 bg-[#EB5500] rounded-full"
+                                />
+                            ))}
+                        </div>
+                    </div>
                 </div>
             )}
 

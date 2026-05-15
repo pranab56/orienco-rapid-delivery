@@ -6,12 +6,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     ChevronLeft, MapPin,
     Navigation, Bike, Truck, Car, User, Phone,
-    ShieldCheck, Loader
+    ShieldCheck, Loader, CalendarIcon
 } from 'lucide-react';
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateBooking, resetBooking } from '@/features/parcel/bookingSlice';
-import { useCreateParcelMutation } from '@/features/parcel/parcelApi';
+import { useCreateParcelMutation, useCalculateDistacePriceQuery } from '@/features/parcel/parcelApi';
 import toast from 'react-hot-toast';
 import GetInTouch from '@/components/home/GetInTouch';
 import Footer from '@/components/shared/Footer';
@@ -49,9 +58,22 @@ export default function BookDeliveryPage() {
     const dispatch = useDispatch();
     const bookingState = useSelector((state: any) => state.booking);
     const [createParcel, { isLoading }] = useCreateParcelMutation();
+    const { data: priceResponse, isLoading: isPriceLoading } = useCalculateDistacePriceQuery(
+        {
+            pickupLat: bookingState.pickupLocation.coordinates[1],
+            pickupLng: bookingState.pickupLocation.coordinates[0],
+            dropLat: bookingState.dropLocation.coordinates[1],
+            dropLng: bookingState.dropLocation.coordinates[0],
+        },
+        {
+            skip: bookingState.pickupLocation.coordinates[0] === 0 || bookingState.dropLocation.coordinates[0] === 0,
+        }
+    );
+    const priceData = priceResponse?.data;
 
     const [currentStep, setCurrentStep] = useState(1);
     const [errors, setErrors] = useState<Record<string, boolean>>({});
+    const [isStepLoading, setIsStepLoading] = useState(false);
 
     // Refs for Google Autocomplete and Map
     const pickupInputRef = useRef<HTMLInputElement>(null);
@@ -62,7 +84,13 @@ export default function BookDeliveryPage() {
     const directionsRendererRef = useRef<google.maps.DirectionsRenderer | null>(null);
 
     useEffect(() => {
-        if (typeof google === 'undefined' || currentStep !== 2) return;
+        if (typeof google === 'undefined') return;
+
+        if (currentStep !== 2) {
+            mapRef.current = null;
+            directionsRendererRef.current = null;
+            return;
+        }
 
         // Initialize Map
         if (mapContainerRef.current && !mapRef.current) {
@@ -108,7 +136,7 @@ export default function BookDeliveryPage() {
 
         setupAutocomplete(pickupInputRef, 'pickupLocation');
         setupAutocomplete(dropoffInputRef, 'dropLocation');
-    }, [currentStep, dispatch]);
+    }, [currentStep, dispatch, bookingState.pickupLocation.coordinates, bookingState.dropLocation.coordinates]);
 
     // Update markers and route when coordinates change
     useEffect(() => {
@@ -166,11 +194,11 @@ export default function BookDeliveryPage() {
             }, (result, status) => {
                 if (status === google.maps.DirectionsStatus.OK && directionsRendererRef.current && result) {
                     directionsRendererRef.current.setDirections(result);
-                    const route = result.routes[0].legs[0];
-                    dispatch(updateBooking({
-                        distance: route.distance?.text || '',
-                        duration: route.duration?.text || ''
-                    }));
+
+                    // Adjust map to show both markers
+                    const bounds = new google.maps.LatLngBounds();
+                    points.forEach(p => bounds.extend(p));
+                    mapRef.current?.fitBounds(bounds, { top: 50, bottom: 50, left: 50, right: 50 });
                 }
             });
         } else if (points.length === 1) {
@@ -179,7 +207,7 @@ export default function BookDeliveryPage() {
             if (directionsRendererRef.current) directionsRendererRef.current.setDirections({ routes: [] } as any);
             dispatch(updateBooking({ distance: '', duration: '' }));
         }
-    }, [bookingState.pickupLocation.coordinates, bookingState.dropLocation.coordinates]);
+    }, [currentStep, bookingState.pickupLocation.coordinates, bookingState.dropLocation.coordinates]);
 
     const activeStepData = STEPS.find(s => s.id === currentStep) || STEPS[0];
 
@@ -208,7 +236,11 @@ export default function BookDeliveryPage() {
 
     const handleContinue = () => {
         if (!validateStep(currentStep)) return;
-        if (currentStep < 5) setCurrentStep(prev => prev + 1);
+        setIsStepLoading(true);
+        setTimeout(() => {
+            if (currentStep < 5) setCurrentStep(prev => prev + 1);
+            setIsStepLoading(false);
+        }, 1000);
     };
 
     const handleInputChange = (field: string, value: any) => {
@@ -220,7 +252,13 @@ export default function BookDeliveryPage() {
 
     const handleSubmit = async () => {
         try {
-            const response = await createParcel(bookingState).unwrap();
+            const payload = {
+                ...bookingState,
+                totalDeliveryFee: priceData?.vehicles?.[bookingState.vehicleType]?.totalPrice || 0,
+                distance: priceData?.distanceKm || 0,
+                duration: priceData?.duration || '',
+            };
+            const response = await createParcel(payload).unwrap();
             if (response.success && response.data.paymentLink) {
                 toast.success("Parcel created successfully! Redirecting to payment...");
                 dispatch(resetBooking());
@@ -326,17 +364,25 @@ export default function BookDeliveryPage() {
                                 </div>
                                 <div>
                                     <label className="text-[12px] font-semibold text-gray-400 mb-2 block">What is the value of your item?</label>
-                                    <input
-                                        type="number"
-                                        value={bookingState.itemValue}
-                                        onChange={(e) => handleInputChange('itemValue', Number(e.target.value))}
-                                        placeholder="1200"
-                                        className={`w-full bg-[#E5E0DA]/50 border ${errors.itemValue ? 'border-red-500 focus:border-red-500' : 'border-transparent focus:border-[#EB5500]'} rounded-lg px-4 py-3.5 text-sm outline-none focus:bg-white transition-colors placeholder:text-gray-400`}
-                                    />
+                                    <div className="relative">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                                        <input
+                                            type="number"
+                                            value={bookingState.itemValue === 0 ? '' : bookingState.itemValue}
+                                            onChange={(e) => handleInputChange('itemValue', Number(e.target.value))}
+                                            placeholder="1200"
+                                            className={`w-full bg-[#E5E0DA]/50 border ${errors.itemValue ? 'border-red-500 focus:border-red-500' : 'border-transparent focus:border-[#EB5500]'} rounded-lg pl-8 pr-4 py-3.5 text-sm outline-none focus:bg-white transition-colors placeholder:text-gray-400`}
+                                        />
+                                    </div>
                                     {errors.itemValue && <span className="text-red-500 text-[10px] mt-1 ml-1 block">This field is required</span>}
                                 </div>
                                 <div className="pt-8">
-                                    <button onClick={handleContinue} className="w-full bg-[#EB5500] cursor-pointer text-white py-3.5 rounded-lg font-medium shadow-md hover:bg-[#D44D00] transition-colors">
+                                    <button
+                                        onClick={handleContinue}
+                                        disabled={isStepLoading}
+                                        className="w-full bg-[#EB5500] cursor-pointer text-white py-3.5 rounded-lg font-medium shadow-md hover:bg-[#D44D00] transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                                    >
+                                        {isStepLoading && <Loader size={18} className="animate-spin" />}
                                         Continue
                                     </button>
                                 </div>
@@ -381,12 +427,12 @@ export default function BookDeliveryPage() {
 
                                 <div className="w-full h-[250px] rounded-xl overflow-hidden shadow-sm relative border border-gray-100 bg-gray-50">
                                     <div ref={mapContainerRef} className="w-full h-full" />
-                                    {bookingState.distance && (
+                                    {priceData && (
                                         <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-[#EB5500]/20 z-10 animate-in fade-in slide-in-from-top-2">
                                             <div className="flex flex-col gap-0.5">
                                                 <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Distance</p>
-                                                <p className="text-[#EB5500] font-bold text-sm">{bookingState.distance}</p>
-                                                <p className="text-[10px] text-gray-500 font-medium">{bookingState.duration}</p>
+                                                <p className="text-[#EB5500] font-bold text-sm">{priceData.distanceKm} km</p>
+                                                <p className="text-[10px] text-gray-500 font-medium">{priceData.duration}</p>
                                             </div>
                                         </div>
                                     )}
@@ -397,7 +443,12 @@ export default function BookDeliveryPage() {
                                     )}
                                 </div>
 
-                                <button onClick={handleContinue} className="w-full bg-[#EB5500] cursor-pointer text-white py-3.5 rounded-lg font-medium shadow-md hover:bg-[#D44D00] transition-colors mt-2">
+                                <button
+                                    onClick={handleContinue}
+                                    disabled={isStepLoading}
+                                    className="w-full bg-[#EB5500] cursor-pointer text-white py-3.5 rounded-lg font-medium shadow-md hover:bg-[#D44D00] transition-colors mt-2 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                                >
+                                    {isStepLoading && <Loader size={18} className="animate-spin" />}
                                     Continue
                                 </button>
                             </motion.div>
@@ -413,8 +464,11 @@ export default function BookDeliveryPage() {
                                         </div>
                                         <div>
                                             <h3 className="font-medium text-[14px]">Motorcycle</h3>
-                                            <p className="text-[11px] text-gray-500 font-medium">Small items</p>
+                                            <p className="text-[11px] text-gray-500 font-medium">Small items • {priceData?.duration || '15-20 min'}</p>
                                         </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="font-bold text-[#EB5500]">${priceData?.vehicles?.motorcycle?.totalPrice || '5.99'}</p>
                                     </div>
                                 </div>
 
@@ -425,8 +479,11 @@ export default function BookDeliveryPage() {
                                         </div>
                                         <div>
                                             <h3 className="font-medium text-[14px]">Tricycle</h3>
-                                            <p className="text-[11px] text-gray-500 font-medium">Medium items</p>
+                                            <p className="text-[11px] text-gray-500 font-medium">Medium items • {priceData?.duration || '20-30 min'}</p>
                                         </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="font-bold text-[#EB5500]">${priceData?.vehicles?.tricycle?.totalPrice || '12.99'}</p>
                                     </div>
                                 </div>
 
@@ -437,15 +494,23 @@ export default function BookDeliveryPage() {
                                         </div>
                                         <div>
                                             <h3 className="font-medium text-[14px]">Van</h3>
-                                            <p className="text-[11px] text-gray-500 font-medium">Large items</p>
+                                            <p className="text-[11px] text-gray-500 font-medium">Large items • {priceData?.duration || '30-45 min'}</p>
                                         </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="font-bold text-[#EB5500]">${priceData?.vehicles?.van?.totalPrice || '24.99'}</p>
                                     </div>
                                 </div>
 
                                 {errors.vehicleType && <span className="text-red-500 text-[10px] block mt-2 ml-1 text-center font-medium">Please select a vehicle option</span>}
 
                                 <div className="pt-4">
-                                    <button onClick={handleContinue} className="w-full cursor-pointer bg-[#EB5500] text-white py-3.5 rounded-lg font-medium shadow-md hover:bg-[#D44D00] transition-colors">
+                                    <button
+                                        onClick={handleContinue}
+                                        disabled={isStepLoading}
+                                        className="w-full cursor-pointer bg-[#EB5500] text-white py-3.5 rounded-lg font-medium shadow-md hover:bg-[#D44D00] transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                                    >
+                                        {isStepLoading && <Loader size={18} className="animate-spin" />}
                                         Continue
                                     </button>
                                 </div>
@@ -480,19 +545,38 @@ export default function BookDeliveryPage() {
                                             className={`w-full bg-[#E5E0DA]/40 border ${errors.receiverPhone ? 'border-red-500' : 'border-transparent focus:border-[#EB5500]'} rounded-lg py-3.5 pl-11 pr-4 text-sm outline-none focus:bg-white`}
                                         />
                                     </div>
-                                    {errors.receiverPhone && <span className="text-red-500 text-[10px] mt-1 ml-1 block">Phone number is required</span>}
                                 </div>
 
                                 <div className="pt-2">
-                                    <label className="text-[12px] font-semibold text-gray-400 mb-2 block">Delivery Date</label>
-                                    <div className="relative">
-                                        <input
-                                            type="date"
-                                            value={bookingState.deliveryDate}
-                                            onChange={(e) => handleInputChange('deliveryDate', e.target.value)}
-                                            className={`w-full bg-[#E5E0DA]/40 border ${errors.deliveryDate ? 'border-red-500' : 'border-transparent focus:border-[#EB5500]'} rounded-lg py-3.5 px-4 text-sm outline-none focus:bg-white cursor-pointer`}
-                                        />
-                                    </div>
+                                    <label className="text-[12px] font-semibold w-full text-gray-400 mb-2 block">Delivery Date</label>
+                                    <Popover>
+                                        <PopoverTrigger asChild className="w-full">
+                                            <Button
+                                                variant={"outline"}
+                                                className={cn(
+                                                    "w-full bg-[#E5E0DA]/40 border rounded-lg py-7 px-4 text-sm justify-start text-left font-normal hover:bg-[#E5E0DA]/60 transition-colors",
+                                                    !bookingState.deliveryDate && "text-gray-400",
+                                                    errors.deliveryDate ? 'border-red-500' : 'border-transparent'
+                                                )}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4 text-gray-400" />
+                                                {bookingState.deliveryDate ? (
+                                                    format(new Date(bookingState.deliveryDate), "PPP")
+                                                ) : (
+                                                    <span>Pick a date</span>
+                                                )}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start" side="bottom">
+                                            <Calendar
+                                                mode="single"
+                                                selected={bookingState.deliveryDate ? new Date(bookingState.deliveryDate) : undefined}
+                                                onSelect={(date) => handleInputChange('deliveryDate', date ? date.toISOString() : '')}
+                                                initialFocus
+                                                disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
                                     {errors.deliveryDate && <span className="text-red-500 text-[10px] mt-1 ml-1 block">Please select date</span>}
                                 </div>
 
@@ -507,7 +591,12 @@ export default function BookDeliveryPage() {
                                 </div>
 
                                 <div className="pt-4">
-                                    <button onClick={handleContinue} className="w-full bg-[#EB5500] text-white py-3.5 rounded-lg font-medium shadow-md hover:bg-[#D44D00] transition-colors cursor-pointer">
+                                    <button
+                                        onClick={handleContinue}
+                                        disabled={isStepLoading}
+                                        className="w-full bg-[#EB5500] text-white py-3.5 rounded-lg font-medium shadow-md hover:bg-[#D44D00] transition-colors cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                                    >
+                                        {isStepLoading && <Loader size={18} className="animate-spin" />}
                                         Continue
                                     </button>
                                 </div>
@@ -545,9 +634,15 @@ export default function BookDeliveryPage() {
                                         </div>
                                     </div>
 
-                                    <div className="pt-4 border-t border-gray-200/50 flex justify-between items-center font-medium text-[15px]">
-                                        <span className="text-gray-800">Ready to Proceed?</span>
-                                        <span className="text-[#EB5500]">Payment Link will be generated</span>
+                                    <div className="pt-4 border-t border-gray-200/50 space-y-2">
+                                        <div className="flex justify-between items-center font-bold text-[16px]">
+                                            <span className="text-gray-900">Total Delivery Fee</span>
+                                            <span className="text-[#EB5500]">${priceData?.vehicles?.[bookingState.vehicleType]?.totalPrice || '0.00'}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center text-[12px] text-gray-400">
+                                            <span>Ready to Proceed?</span>
+                                            <span>Payment Link will be generated</span>
+                                        </div>
                                     </div>
                                 </div>
 

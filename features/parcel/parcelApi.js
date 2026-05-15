@@ -44,6 +44,14 @@ export const parcelApi = baseApi.injectEndpoints({
       invalidatesTags: ["Parcel"],
     }),
 
+    calculateDistacePrice: builder.query({
+      query: ({ pickupLat, pickupLng, dropLat, dropLng }) => ({
+        url: `/parcel/calculate-distance?pickupLat=${pickupLat}&pickupLng=${pickupLng}&dropLat=${dropLat}&dropLng=${dropLng}`,
+        method: "GET",
+      }),
+      invalidatesTags: ["Parcel"],
+    }),
+
 
   }),
 });
@@ -54,4 +62,5 @@ export const {
   useSingleParcelDetailsQuery,
   useGetMyPercelHistoryQuery,
   useSingleParcelHistoryDetailsQuery,
+  useCalculateDistacePriceQuery,
 } = parcelApi;
