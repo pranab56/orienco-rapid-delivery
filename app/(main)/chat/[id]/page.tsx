@@ -1,53 +1,143 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Paperclip, Send, ChevronLeft } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Paperclip, Send, ChevronLeft, Loader, MoreVertical, Edit2, Trash2, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { chatListMock } from '../mock-data';
+import {
+    useGetSpecificMessagesQuery,
+    useSendMessageMutation,
+    useEditMessageMutation,
+    useDeleteMessageMutation
+} from '@/features/messages/messageApi';
+import { useSelector } from 'react-redux';
+import moment from 'moment';
 
 type Message = { id: number; text: string; sender: string; time: string };
-
-// Mock DB for dynamic chat history mapping to user IDs
-const INITIAL_MESSAGES: Record<string, Message[]> = {
-    'david': [
-        { id: 1, text: "Hi! I've reviewed the project requirements and prepared some initial design concepts.", sender: 'them', time: '10:15 AM' },
-        { id: 2, text: "Great! Could you share the mockups?", sender: 'me', time: '10:20 AM' }
-    ],
-    'sarah': [
-        { id: 1, text: "I can help with the repair task", sender: 'them', time: '10:30 AM' }
-    ],
-    'emma': [
-        { id: 1, text: "When can we schedule a call?", sender: 'them', time: 'Yesterday' }
-    ]
-};
 
 export default function ChatWindow() {
     const params = useParams();
     const activeChat = params.id as string;
-    
+
     const [inputValue, setInputValue] = useState('');
-    const [messagesMap, setMessagesMap] = useState<Record<string, Message[]>>(INITIAL_MESSAGES);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-    const activeMessages = messagesMap[activeChat] || [];
-    const activeUserData = chatListMock.find(c => c.id === activeChat);
+    // Edit state
+    const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+    const [editValue, setEditValue] = useState('');
 
-    const handleSendMessage = () => {
-        if (!inputValue.trim()) return;
+    // Delete state
+    const [deletedMessages, setDeletedMessages] = useState<string[]>([]);
 
-        const newMsg = {
-            id: Date.now(),
-            text: inputValue.trim(),
-            sender: 'me',
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
+    const isAtBottomRef = useRef(true);
 
-        setMessagesMap(prev => ({
-            ...prev,
-            [activeChat]: [...(prev[activeChat] || []), newMsg]
-        }));
-        setInputValue('');
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const chatContainerRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const currentUser = useSelector((state: any) => state.auth?.user);
+    const myId = currentUser?._id || currentUser?.id;
+
+    const { data: messagesResponse, isLoading } = useGetSpecificMessagesQuery(activeChat, { skip: !activeChat });
+    const [sendMessage, { isLoading: isSending }] = useSendMessageMutation();
+    const [editMessage, { isLoading: isEditing }] = useEditMessageMutation();
+    const [deleteMessage] = useDeleteMessageMutation();
+
+    const activeMessages = messagesResponse?.data?.messages || [];
+    const activeUserData = messagesResponse?.data?.participant || null;
+
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+        // Consider 'at bottom' if within 100px of the bottom
+        isAtBottomRef.current = scrollHeight - scrollTop - clientHeight < 100;
+    };
+
+    const scrollToBottom = (force = false) => {
+        if (chatContainerRef.current && (isAtBottomRef.current || force)) {
+            chatContainerRef.current.scrollTo({
+                top: chatContainerRef.current.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+    };
+
+    const lastMessageId = activeMessages.length > 0 ? activeMessages[activeMessages.length - 1]._id : null;
+
+    useEffect(() => {
+        // Only auto-scroll if user is already at the bottom
+        if (isAtBottomRef.current) {
+            const timeout = setTimeout(() => {
+                scrollToBottom(true);
+            }, 150);
+            return () => clearTimeout(timeout);
+        }
+    }, [lastMessageId]);
+
+    const handleSendMessage = async () => {
+        if ((!inputValue.trim() && !selectedFile) || isSending) return;
+
+        try {
+            const formData = new FormData();
+            formData.append('chatId', activeChat);
+            formData.append('text', inputValue.trim());
+
+            if (selectedFile) {
+                formData.append('files', selectedFile);
+            }
+
+            await sendMessage(formData).unwrap();
+
+            setInputValue('');
+            handleRemoveFile();
+            // Force scroll down when the user actively sends a message
+            setTimeout(() => scrollToBottom(true), 100);
+        } catch (error) {
+            console.error("Failed to send message", error);
+        }
+    };
+
+    const handleFileAttach = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setSelectedFile(file);
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+    };
+
+    const handleRemoveFile = () => {
+        setSelectedFile(null);
+        setPreviewUrl(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
+    const handleEditSave = async (msgId: string) => {
+        if (!editValue.trim() || isEditing) return;
+        try {
+            await editMessage({ messageId: msgId, data: { text: editValue } }).unwrap();
+            setEditingMessageId(null);
+            setEditValue('');
+        } catch (error) {
+            console.error("Failed to edit message", error);
+        }
+    };
+
+    const handleDelete = async (msgId: string) => {
+        try {
+            setDeletedMessages(prev => [...prev, msgId]);
+            await deleteMessage({ messageId: msgId }).unwrap();
+        } catch (error) {
+            console.error("Failed to delete message", error);
+            setDeletedMessages(prev => prev.filter(id => id !== msgId));
+        }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -57,70 +147,154 @@ export default function ChatWindow() {
         }
     };
 
-    // If invalid ID matching
-    if (!activeUserData) {
+    if (isLoading) {
+        return <div className="p-8 text-gray-500">Loading messages...</div>;
+    }
+
+    if (!activeUserData && !isLoading) {
         return <div className="p-8 text-gray-500">User not found</div>;
     }
 
     return (
-        <div className="flex-1 flex flex-col min-w-0 h-full">
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden bg-white">
             {/* Chat Header */}
-            <div className="h-[70px] md:h-[84px] p-4 md:p-6 border-b border-gray-200 flex items-center gap-3 md:gap-4">
+            <div className="h-[70px] md:h-[84px] p-4 md:p-6 border-b border-gray-200 flex items-center gap-3 md:gap-4 shrink-0">
                 <Link href="/chat" className="md:hidden p-1 -ml-1 text-gray-500 hover:text-[#EB5500]">
                     <ChevronLeft size={24} />
                 </Link>
                 <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-300 flex-shrink-0 shadow-sm border border-black/5">
-                    {activeUserData.avatar && (
-                        <Image src={activeUserData.avatar} alt={activeUserData.name} fill className="object-cover" />
-                    )}
+                    {activeUserData?.image ? (
+                        <Image src={activeUserData.image} alt={activeUserData.fullName || "User"} fill className="object-cover" />
+                    ) : null}
                 </div>
-                <h2 className="font-medium text-[15px]">{activeUserData.name}</h2>
+                <h2 className="font-medium text-[15px]">{activeUserData?.fullName || "User"}</h2>
             </div>
 
             {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
-                {activeMessages.map((msg) => (
-                    msg.sender === 'them' ? (
-                        <div key={msg.id} className="flex flex-col items-start max-w-[85%] md:max-w-[70%]">
-                            <p className="text-[11px] text-gray-400 font-medium mb-1.5 ml-1">{activeUserData.name}</p>
-                            <div className="bg-[#EBEBEB] border border-gray-300 rounded-xl rounded-tl-sm p-4 text-[13px] text-gray-800 leading-relaxed shadow-sm">
-                                {msg.text}
+            <div
+                ref={chatContainerRef}
+                onScroll={handleScroll}
+                className="flex-1 overflow-y-auto p-6 md:p-8 space-y-4 min-h-0 bg-gray-50/30"
+            >
+                {activeMessages.map((msg: any) => {
+                    const isMe = msg.sender?._id === myId || msg.sender?.id === myId;
+                    const senderName = isMe ? "Me" : (msg.sender?.fullName || activeUserData?.fullName || "Them");
+                    const time = moment(msg.createdAt).format('hh:mm A');
+                    const isEditingThis = editingMessageId === msg._id;
+                    const isDeleted = msg.isDeleted || deletedMessages.includes(msg._id) || msg.text === "message had been deleted";
+                    const textToShow = isDeleted ? <span className="italic text-gray-500">Message had been deleted</span> : msg.text;
+
+                    return !isMe ? (
+                        <div key={msg._id} className="flex flex-col items-start max-w-[85%] md:max-w-[70%]">
+                            <p className="text-[11px] text-gray-400 font-medium mb-1.5 ml-1">{senderName}</p>
+                            <div className={`border border-gray-300 rounded-xl rounded-tl-sm ${!isDeleted && !msg.text ? 'p-1.5' : 'p-4'} text-[13px] leading-relaxed shadow-sm ${isDeleted ? 'bg-gray-100/50' : 'bg-[#EBEBEB] text-gray-800'}`}>
+                                {!isDeleted && msg.files && msg.files.length > 0 && msg.files[0] && (
+                                    <div className={`rounded-lg overflow-hidden relative w-[250px] sm:w-[280px] aspect-[4/5] bg-gray-200 ${msg.text ? 'mb-2' : ''}`}>
+                                        <Image src={msg.files[0]} alt="attachment" fill className="object-cover" />
+                                    </div>
+                                )}
+                                {textToShow && <span>{textToShow}</span>}
                             </div>
-                            <span className="text-[11px] text-gray-400 font-medium mt-1.5 ml-1">{msg.time}</span>
+                            <span className="text-[11px] text-gray-400 font-medium mt-1.5 ml-1">{time}</span>
                         </div>
                     ) : (
-                        <div key={msg.id} className="flex flex-col items-end self-end max-w-[85%] md:max-w-[70%] ml-auto">
-                            <div className="bg-[#EB5500] text-white rounded-xl rounded-tr-sm p-4 text-[13px] leading-relaxed shadow-md shadow-orange-500/20">
-                                {msg.text}
+                        <div key={msg._id} className="flex flex-col items-end self-end max-w-[85%] md:max-w-[70%] ml-auto">
+                            <div className="flex items-center justify-end gap-2 group w-full">
+                                {/* Hover Actions */}
+                                {!isDeleted && !isEditingThis && (
+                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-white shadow-sm border border-gray-200 rounded-lg p-1 flex-shrink-0">
+                                        <button onClick={() => { setEditingMessageId(msg._id); setEditValue(msg.text); }} className="p-1.5 text-gray-500 hover:text-[#EB5500] hover:bg-orange-50 rounded-md transition-colors" title="Edit">
+                                            <Edit2 size={14} />
+                                        </button>
+                                        <button onClick={() => handleDelete(msg._id)} className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors" title="Delete">
+                                            <Trash2 size={14} />
+                                        </button>
+                                    </div>
+                                )}
+
+                                {isEditingThis ? (
+                                    <div className="bg-white border-2 border-[#EB5500] rounded-xl rounded-tr-sm p-3 shadow-md w-full min-w-[250px]">
+                                        <textarea
+                                            value={editValue}
+                                            onChange={(e) => setEditValue(e.target.value)}
+                                            className="w-full bg-transparent text-[13px] outline-none resize-none"
+                                            rows={2}
+                                            autoFocus
+                                        />
+                                        <div className="flex justify-end gap-2 mt-2">
+                                            <button onClick={() => setEditingMessageId(null)} className="text-xs text-gray-500 hover:text-gray-700">Cancel</button>
+                                            <button onClick={() => handleEditSave(msg._id)} className="text-xs bg-[#EB5500] text-white px-3 py-1 rounded-md">{isEditing ? 'Saving...' : 'Save'}</button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className={`rounded-xl rounded-tr-sm ${!isDeleted && !msg.text ? 'p-1.5' : 'p-4'} text-[13px] leading-relaxed shadow-md shadow-orange-500/20 text-left ${isDeleted ? 'bg-orange-100/50 border border-orange-200 text-gray-600' : 'bg-[#EB5500] text-white'}`}>
+                                        {!isDeleted && msg.files && msg.files.length > 0 && msg.files[0] && (
+                                            <div className={`rounded-lg overflow-hidden relative w-[250px] sm:w-[280px] aspect-[4/5] bg-orange-400 ${msg.text ? 'mb-2' : ''}`}>
+                                                <Image src={msg.files[0]} alt="attachment" fill className="object-cover" />
+                                            </div>
+                                        )}
+                                        {textToShow && <span>{textToShow}</span>}
+                                    </div>
+                                )}
                             </div>
-                            <span className="text-[11px] text-gray-400 font-medium mt-1.5 mr-1">{msg.time}</span>
+                            <span className="text-[11px] text-gray-400 font-medium mt-1.5 mr-1">{time}</span>
                         </div>
-                    )
-                ))}
+                    );
+                })}
+                <div ref={messagesEndRef} className="h-1" />
             </div>
 
             {/* Input Area */}
-            <div className="p-4 md:p-6 border-t border-gray-200">
-                <div className="relative border border-gray-300 rounded-xl overflow-hidden focus-within:border-[#EB5500] focus-within:bg-white transition-colors h-[120px] flex flex-col">
-                    <textarea 
+            <div className="p-4 md:p-6 border-t border-gray-200 shrink-0">
+                <div className="relative border border-gray-300 rounded-xl overflow-hidden focus-within:border-[#EB5500] focus-within:bg-white transition-colors min-h-[120px] flex flex-col bg-white">
+                    {/* Image Preview Area */}
+                    {previewUrl && (
+                        <div className="p-4 pb-0">
+                            <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200 shadow-sm group">
+                                <Image src={previewUrl} alt="Preview" fill className="object-cover" />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <button onClick={handleRemoveFile} className="text-white hover:text-red-400 bg-black/50 rounded-full p-1">
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <textarea
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        className="w-full flex-1 bg-transparent p-4 text-[14px] outline-none resize-none placeholder:text-gray-400"
+                        disabled={isSending}
+                        className="w-full flex-1 bg-transparent p-4 text-[14px] outline-none resize-none placeholder:text-gray-400 disabled:opacity-50"
                         placeholder="Type your message..."
+                        rows={previewUrl ? 2 : 3}
                     ></textarea>
-                    
-                    <div className="p-3 flex justify-between items-center bg-transparent mt-auto">
-                        <button className="flex items-center gap-2 border border-gray-200 text-gray-700 px-3 md:px-4 py-2 rounded-lg cursor-pointer text-xs font-semibold transition-colors hover:bg-gray-50">
-                            <Paperclip size={14} />
-                            <span className="hidden md:inline">Attach file</span>
-                        </button>
-                        
-                        <button 
-                            onClick={handleSendMessage}
-                            className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-[#EB5500] transition-colors rounded-full hover:bg-gray-100 cursor-pointer"
+
+                    <div className="p-3 flex justify-between items-center bg-transparent mt-auto border-t border-gray-100">
+                        <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
+                        <button
+                            onClick={handleFileAttach}
+                            disabled={isSending}
+                            className="flex items-center gap-2 border border-gray-200 text-gray-700 px-3 md:px-4 py-2 rounded-lg cursor-pointer text-xs font-semibold transition-colors hover:bg-gray-50 disabled:opacity-50"
                         >
-                            <Send size={20} className="ml-1" />
+                            <Paperclip size={14} />
+                            <span className="hidden md:inline">Attach Image</span>
+                        </button>
+
+                        <button
+                            onClick={handleSendMessage}
+                            disabled={isSending || (!inputValue.trim() && !selectedFile)}
+                            className={`w-10 h-10 flex items-center justify-center transition-colors rounded-full ${inputValue.trim() || selectedFile
+                                    ? 'bg-[#EB5500] text-white hover:bg-[#D44D00]'
+                                    : 'bg-gray-100 text-gray-400'
+                                }`}
+                        >
+                            {isSending ? (
+                                <Loader size={18} className="animate-spin" />
+                            ) : (
+                                <Send size={18} className="ml-0.5" />
+                            )}
                         </button>
                     </div>
                 </div>

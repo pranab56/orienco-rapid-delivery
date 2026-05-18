@@ -5,7 +5,7 @@ export const chatApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         createChat: builder.mutation({
             query: (data) => ({
-                url: "/chat/create",
+                url: "/chat",
                 method: "POST",
                 body: data,
             }),
@@ -17,7 +17,7 @@ export const chatApi = baseApi.injectEndpoints({
                 url: "/chat",
                 method: "GET",
             }),
-            providesTags: ["Chat"],
+            providesTags: ["Chat"], 
         }),
     }),
 });

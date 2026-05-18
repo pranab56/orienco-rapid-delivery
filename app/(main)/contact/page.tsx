@@ -7,6 +7,8 @@ import { motion } from 'framer-motion';
 import GetInTouch from '@/components/home/GetInTouch';
 import { useCreateContactMutation } from '@/features/contact/contactApi';
 import toast from 'react-hot-toast';
+import { useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
 
 // Mock Discord Icon since lucide doesn't have it natively
 const DiscordIcon = () => (
@@ -24,6 +26,9 @@ export default function Contact() {
         subjectIndex: 0,
         message: '',
     });
+
+    const user = useSelector((state: any) => state.auth?.user);
+    const router = useRouter();
 
 
     const [createContact, { isLoading }] = useCreateContactMutation();
@@ -48,6 +53,11 @@ export default function Contact() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!validate()) return;
+        
+        if (!user) {
+            router.push('/login');
+            return;
+        }
 
         try {
             const payload = {

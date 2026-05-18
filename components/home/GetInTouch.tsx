@@ -3,8 +3,20 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
 
 const GetInTouch = () => {
+  const router = useRouter();
+  const user = useSelector((state: any) => state.auth?.user);
+
+  const handleGetStarted = () => {
+    if (!user) {
+      router.push('/login');
+    } else {
+      router.push('/booking');
+    }
+  };
   return (
     <section className="w-full container mx-auto px-4 py-20 overflow-hidden">
       <div className="relative w-full bg-[#EB5500] rounded-3xl overflow-hidden min-h-[400px] md:min-h-[500px] flex items-center p-6 md:p-24  border border-white/10">
@@ -28,7 +40,10 @@ const GetInTouch = () => {
           </div>
 
           <div className="space-y-8 md:space-y-10">
-            <button className="w-full sm:w-auto bg-white hover:bg-gray-50 text-[#EB5500] font-medium px-12 py-3 rounded-sm text-xl shadow-xl transition-all active:scale-[0.98] cursor-pointer">
+            <button 
+              onClick={handleGetStarted}
+              className="w-full sm:w-auto bg-white hover:bg-gray-50 text-[#EB5500] font-medium px-12 py-3 rounded-sm text-xl shadow-xl transition-all active:scale-[0.98] cursor-pointer"
+            >
               Get Started
             </button>
 

@@ -35,10 +35,10 @@ export default function RootLayout({
         <ReduxProvider>
           <I18nProvider>
             {/* <SplashScreen /> */}
-            <LenisProvider>
+            {/* <LenisProvider> */}
               {children}
               <Toaster />
-            </LenisProvider>
+            {/* </LenisProvider> */}
           </I18nProvider>
         </ReduxProvider>
       </body>

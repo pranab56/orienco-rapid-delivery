@@ -127,10 +127,20 @@ export function Navbar() {
         >
           {menuItems.map((item) => {
             const isActive = pathname === item.href;
+            const requiresAuth = ['/orders', '/history', '/chat'].includes(item.href);
+
+            const handleNavClick = (e: React.MouseEvent) => {
+              if (requiresAuth && !token) {
+                e.preventDefault();
+                router.push('/login');
+              }
+            };
+
             return (
               <Link
                 key={item.name}
                 href={item.href}
+                onClick={handleNavClick}
                 className={cn(
                   'relative px-6 py-2.5 text-base font-medium transition-all rounded-xl',
                   isActive ? 'text-white' : 'text-white/40 hover:text-white'
@@ -271,11 +281,23 @@ export function Navbar() {
             <div className="flex flex-col gap-6">
               {menuItems.map((item) => {
                 const isActive = pathname === item.href;
+                const requiresAuth = ['/orders', '/history', '/chat'].includes(item.href);
+
+                const handleMobileNavClick = (e: React.MouseEvent) => {
+                  if (requiresAuth && !token) {
+                    e.preventDefault();
+                    setMobileMenuOpen(false);
+                    router.push('/login');
+                  } else {
+                    setMobileMenuOpen(false);
+                  }
+                };
+
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={handleMobileNavClick}
                     className={cn(
                       "text-3xl font-medium transition-colors w-fit border-b-2 py-1",
                       isActive ? "text-primary border-primary" : "text-white/40 hover:text-white border-transparent"

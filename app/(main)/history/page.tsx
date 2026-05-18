@@ -1,11 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Star, Loader } from 'lucide-react';
 import Link from 'next/link';
 import { useGetMyPercelHistoryQuery } from '@/features/parcel/parcelApi';
 import Image from 'next/image';
+import { useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
 
 const Motorbike = () => (
     <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -16,6 +18,20 @@ const Motorbike = () => (
 export default function History() {
     const { data: response, isLoading } = useGetMyPercelHistoryQuery(1);
     const parcels = response?.data?.parcels || [];
+    console.log("HISTORY PARCELS DRIVER:", JSON.stringify(parcels[0]?.driver, null, 2));
+
+    const router = useRouter();
+    const user = useSelector((state: any) => state.auth?.user);
+
+    useEffect(() => {
+        if (!user) {
+            router.push('/login');
+        }
+    }, [user, router]);
+
+    if (!user) {
+        return <div className="min-h-screen flex items-center justify-center pt-24"><Loader className="animate-spin text-[#EB5500]" size={40} /></div>;
+    }
 
     if (isLoading) {
         return (
@@ -67,9 +83,9 @@ export default function History() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="bg-[#FFEDD5] text-[#EA580C] flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium">
-                                    <Star size={14} fill="currentColor" /> {parcel.driver?.averageRating || '0.0'}
-                                </div>
+                                {/* <div className="bg-[#FFEDD5] text-[#EA580C] flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium">
+                                    <Star size={14} fill="currentColor" /> {parcel.driver?.driverInfo?.averageRating || parcel.driver?.averageRating || '0.0'}
+                                </div> */}
                             </div>
 
                             {/* Timeline Locations */}
@@ -117,7 +133,7 @@ export default function History() {
                                         <h3 className="font-medium text-[15px]">{parcel.driver?.fullName || 'No Driver Assigned'}</h3>
                                         <div className="flex items-center gap-1 text-[#EAB308]">
                                             <Star size={12} fill="currentColor" />
-                                            <span className="text-gray-500 text-xs font-medium">{parcel.driver?.averageRating || '0.0'}</span>
+                                            <span className="text-gray-500 text-xs font-medium">{parcel.driver?.driverInfo?.averageRating || parcel.driver?.averageRating || '0.0'}</span>
                                         </div>
                                     </div>
                                 </div>

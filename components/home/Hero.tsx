@@ -5,7 +5,7 @@ import { motion, useInView } from 'framer-motion';
 import { Loader, MapPin, Navigation } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateBooking } from '@/features/parcel/bookingSlice';
 import { useRouter } from 'next/navigation';
 
@@ -24,6 +24,8 @@ export default function Hero() {
   const [pickupData, setPickupData] = useState({ address: '', coordinates: [0, 0] });
   const [dropData, setDropData] = useState({ address: '', coordinates: [0, 0] });
   const [isLoading, setIsLoading] = useState(false);
+
+  const user = useSelector((state: any) => state.auth?.user);
 
   useEffect(() => {
     if (typeof google === 'undefined') return;
@@ -64,6 +66,12 @@ export default function Hero() {
     setIsLoading(true);
 
     setTimeout(() => {
+      if (!user) {
+        router.push('/login');
+        setIsLoading(false);
+        return;
+      }
+
       dispatch(updateBooking({
         pickupLocation: pickupData,
         dropLocation: dropData,

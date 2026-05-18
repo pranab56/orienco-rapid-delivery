@@ -13,6 +13,7 @@ export default function HistoryDetails() {
     const historyId = params.id as string;
 
     const { data: response, isLoading } = useSingleParcelHistoryDetailsQuery(historyId);
+    console.log("parcel", response?.data)
     const parcel = response?.data;
 
     if (isLoading) {
@@ -64,7 +65,7 @@ export default function HistoryDetails() {
                                         </div>
                                         <div className="bg-[#E5E5E5] flex items-center gap-1.5 px-4 py-1.5 rounded-full">
                                             <Star size={14} fill="#EAB308" className="text-[#EAB308]" />
-                                            <span className="text-sm font-bold">{parcel.driver.averageRating || '0.0'}</span>
+                                            <span className="text-sm font-bold">{parcel.driver.driverInfo?.averageRating || parcel.driver.averageRating || '0.0'}</span>
                                         </div>
                                     </div>
                                 </>
@@ -193,7 +194,7 @@ export default function HistoryDetails() {
                     <div className="rounded-xl p-6 border border-[#EAC1AB] mt-4 bg-orange-50/30">
                         <h3 className="font-bold text-[14px]">Delivery Completed Successfully</h3>
                         <p className="text-[13px] text-gray-500 mt-2">
-                            {parcel.deliveredAt ? `Your package was delivered on ${moment(parcel.deliveredAt).format('MMMM D, YYYY')}.` : 'Your package was delivered successfully.'} 
+                            {parcel.deliveredAt ? `Your package was delivered on ${moment(parcel.deliveredAt).format('MMMM D, YYYY')}.` : 'Your package was delivered successfully.'}
                             Thank you for choosing our service!
                         </p>
                     </div>

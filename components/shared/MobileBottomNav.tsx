@@ -5,10 +5,14 @@ import Link from 'next/link';
 import { Home, Package, ListOrdered, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
 
 export function MobileBottomNav() {
   const pathname = usePathname();
   const { t } = useTranslation('common');
+  const { token } = useSelector((state: any) => state.auth);
+  const router = useRouter();
 
   const bottomNavItems = [
     { name: t('navbar.home'), href: '/', icon: Home },
@@ -23,10 +27,20 @@ export function MobileBottomNav() {
         {bottomNavItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
+          const requiresAuth = ['/booking', '/orders', '/chat'].includes(item.href);
+
+          const handleNavClick = (e: React.MouseEvent) => {
+            if (requiresAuth && !token) {
+              e.preventDefault();
+              router.push('/login');
+            }
+          };
+
           return (
             <Link
               key={item.href}
               href={item.href}
+              onClick={handleNavClick}
               className="flex flex-col items-center gap-1 cursor-pointer"
             >
               <div

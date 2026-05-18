@@ -1,10 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Loader } from 'lucide-react';
 import Link from 'next/link';
 import { useGetMyPercelQuery } from '@/features/parcel/parcelApi';
+import { useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
 
 // Custom Scooter Icon component
 const Scooter = () => (
@@ -16,6 +18,19 @@ const Scooter = () => (
 export default function Orders() {
     const { data: response, isLoading } = useGetMyPercelQuery(1); 
     const parcels = response?.data?.parcels || [];
+    
+    const router = useRouter();
+    const user = useSelector((state: any) => state.auth?.user);
+
+    useEffect(() => {
+        if (!user) {
+            router.push('/login');
+        }
+    }, [user, router]);
+
+    if (!user) {
+        return <div className="min-h-screen flex items-center justify-center pt-24"><Loader className="animate-spin text-[#EB5500]" size={40} /></div>;
+    }
 
     if (isLoading) {
         return (

@@ -4,12 +4,12 @@ import { baseApi } from "../../utils/apiBaseQuery";
 export const messageApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         sendMessage: builder.mutation({
-            query: (data) => ({
+            query: (formData) => ({
                 url: "/message",
                 method: "POST",
-                body: data,
+                body: formData,
             }),
-            invalidatesTags: ["message"],
+            invalidatesTags: ["message", "Chat"],
         }),
 
         getSpecificMessages: builder.query({

@@ -75,6 +75,14 @@ export default function BookDeliveryPage() {
     const [errors, setErrors] = useState<Record<string, boolean>>({});
     const [isStepLoading, setIsStepLoading] = useState(false);
 
+    const user = useSelector((state: any) => state.auth?.user);
+
+    useEffect(() => {
+        if (!user) {
+            router.push('/login');
+        }
+    }, [user, router]);
+
     // Refs for Google Autocomplete and Map
     const pickupInputRef = useRef<HTMLInputElement>(null);
     const dropoffInputRef = useRef<HTMLInputElement>(null);
@@ -273,6 +281,10 @@ export default function BookDeliveryPage() {
         if (currentStep > 1) setCurrentStep(prev => prev - 1);
         else router.push('/');
     };
+
+    if (!user) {
+        return <div className="min-h-screen flex items-center justify-center"><Loader className="animate-spin text-[#EB5500]" size={40} /></div>;
+    }
 
     return (
         <div className="relative min-h-screen font-sans text-[#333333]">

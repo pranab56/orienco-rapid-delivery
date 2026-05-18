@@ -8,19 +8,34 @@ import {
     CheckCircle2, X, Loader, Bike
 } from 'lucide-react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useSingleParcelDetailsQuery } from '@/features/parcel/parcelApi';
+import { useCreateChatMutation } from '@/features/messages/chatApi';
+import { useCreateFeedBackMutation } from '@/features/feedback/feedbackApi';
+import { useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 import moment from 'moment';
 
 function OrderDetailContent() {
     const params = useParams();
     const orderId = params.id as string;
 
+    console.log("order id ", orderId)
+
+    const router = useRouter();
+
     const { data: response, isLoading: parcelDetailsLoading } = useSingleParcelDetailsQuery(orderId);
     const parcel = response?.data;
 
+    const currentUser = useSelector((state: any) => state.auth?.user);
+    const myId = currentUser?._id || currentUser?.id;
+
+    const [createChat, { isLoading: isCreatingChat }] = useCreateChatMutation();
+    const [createFeedback, { isLoading: isSubmittingFeedback }] = useCreateFeedBackMutation();
+
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [rating, setRating] = useState(0);
+    const [comment, setComment] = useState('');
 
     const mapRef = useRef<HTMLDivElement>(null);
     const googleMapRef = useRef<google.maps.Map | null>(null);
@@ -119,6 +134,45 @@ function OrderDetailContent() {
     const currentStatusIndex = statusSteps.findIndex(s => s.key === parcel.status);
     const activeStepIndex = currentStatusIndex === -1 ? 0 : currentStatusIndex;
 
+    const handleMessageClick = async () => {
+        if (!parcel?.driver?._id) return;
+        try {
+            const res = await createChat({ participant: parcel.driver._id }).unwrap();
+            const chatId = res?.data?._id || res?._id;
+            if (chatId) {
+                router.push(`/chat/${chatId}`);
+            } else {
+                console.error("Chat ID not returned in response", res);
+            }
+        } catch (error) {
+            console.error("Failed to create chat", error);
+            toast.error("Failed to start chat.");
+        }
+    };
+
+    const handleSubmitReview = async () => {
+        if (rating === 0) {
+            toast.error("Please provide a rating");
+            return;
+        }
+
+        try {
+            const response = await createFeedback({
+                parcelId: orderId,
+                rating,
+                comment
+            }).unwrap();
+            toast.success(response?.message || "Review submitted successfully!");
+            router.push("/")
+            setShowReviewModal(false);
+            setRating(0);
+            setComment('');
+        } catch (error: any) {
+            console.error("Failed to submit review", error);
+            toast.error(error?.data?.message || "Failed to submit review.");
+        }
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -195,20 +249,20 @@ function OrderDetailContent() {
                         </div>
                         <div className="flex items-center gap-1.5 bg-[#D44D00]/10 px-3 md:px-4 py-1.5 md:py-2 rounded-full h-fit flex-shrink-0">
                             <Star fill="#F59E0B" className="text-[#F59E0B]" size={14} />
-                            <span className="font-medium text-xs md:text-sm text-[#EB5500]">{parcel.driver.averageRating || '0.0'}</span>
+                            <span className="font-medium text-xs md:text-sm text-[#EB5500]">{parcel.driver.driverInfo?.averageRating || parcel.driver.averageRating || '0.0'}</span>
                         </div>
                     </div>
-
                     <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
 
                         {!isCompleted ? (
-                            <Link
-                                href={`/chat/${parcel.driver._id}`}
-                                className="flex-1 bg-transparent h-12 border-2 border-gray-300 hover:border-[#EB5500] text-[#EB5500] py-3 flex justify-center items-center gap-2 font-medium rounded-sm cursor-pointer transition-all"
+                            <button
+                                onClick={handleMessageClick}
+                                disabled={isCreatingChat}
+                                className="flex-1 bg-transparent h-12 border-2 border-gray-300 hover:border-[#EB5500] text-[#EB5500] py-3 flex justify-center items-center gap-2 font-medium rounded-sm cursor-pointer transition-all disabled:opacity-50"
                             >
-                                <MessageSquare size={18} />
+                                {isCreatingChat ? <Loader size={18} className="animate-spin" /> : <MessageSquare size={18} />}
                                 Message
-                            </Link>
+                            </button>
                         ) : (
                             <button
                                 onClick={() => setShowReviewModal(true)}
@@ -312,15 +366,18 @@ function OrderDetailContent() {
                                     <label className="text-[12px] font-medium text-gray-600 mb-2">Description</label>
                                     <textarea
                                         rows={4}
+                                        value={comment}
+                                        onChange={(e) => setComment(e.target.value)}
                                         className="w-full bg-transparent border border-gray-300 rounded-xl p-3 text-sm focus:border-[#EB5500] outline-none resize-none placeholder:text-gray-400 focus:bg-white transition-colors"
                                         placeholder="Please enter your message"
                                     ></textarea>
                                 </div>
                                 <button
-                                    onClick={() => setShowReviewModal(false)}
-                                    className="w-full mt-8 bg-[#EB5500] cursor-pointer hover:bg-[#D44D00] text-white font-medium py-3.5 rounded-xl transition-colors"
+                                    onClick={handleSubmitReview}
+                                    disabled={isSubmittingFeedback}
+                                    className="w-full mt-8 flex justify-center items-center gap-2 bg-[#EB5500] cursor-pointer hover:bg-[#D44D00] disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-3.5 rounded-xl transition-colors"
                                 >
-                                    Submit
+                                    {isSubmittingFeedback ? <Loader size={20} className="animate-spin" /> : 'Submit'}
                                 </button>
                             </div>
                         </motion.div>
