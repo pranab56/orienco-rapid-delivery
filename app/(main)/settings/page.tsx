@@ -35,15 +35,18 @@ export default function PersonalInformationPage() {
   React.useEffect(() => {
     if (profileResponse?.data) {
       const profile = profileResponse.data;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         fullName: profile.fullName || '',
         phone: profile.phone || '',
         address: profile.address || ''
       });
       if (profile.dateOfBirth) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setDate(new Date(profile.dateOfBirth));
       }
       if (profile.image) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPreviewImage(profile.image);
       }
     }
