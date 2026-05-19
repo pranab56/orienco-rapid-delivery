@@ -13,7 +13,6 @@ import {
   UserCheck
 } from 'lucide-react';
 import Image from 'next/image';
-import { useTranslation } from 'react-i18next';
 
 interface InfoCardProps {
   icon: React.ElementType;
@@ -24,7 +23,6 @@ interface InfoCardProps {
 }
 
 const InfoCard = ({ icon: Icon, title, description, dark = false, hasButton = false }: InfoCardProps) => {
-  const { t } = useTranslation('common');
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -41,7 +39,7 @@ const InfoCard = ({ icon: Icon, title, description, dark = false, hasButton = fa
       </div>
       {hasButton && (
         <Button className="bg-[#2D2E32] hover:bg-[#1E1F22] text-white font-medium h-11 px-8 rounded-lg">
-          {t('about.help.learn_more')}
+          Learn More
         </Button>
       )}
     </motion.div>
@@ -56,8 +54,6 @@ const ServiceStep = ({ title, description }: { title: string, description: strin
 );
 
 export default function AboutPage() {
-  const { t } = useTranslation('common');
-
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -70,13 +66,13 @@ export default function AboutPage() {
           >
             <h1 
               className="text-xl md:text-4xl font-medium text-neutral-1 leading-tight tracking-tight uppercase"
-              dangerouslySetInnerHTML={{ __html: t('about.hero_title') }}
+              dangerouslySetInnerHTML={{ __html: "Reinventing Global Logistics & <br />Rapid On-Demand Delivery" }}
             />
             <p className="sm:text-lg text-sm text-neutral-2 max-w-xl font-medium leading-relaxed">
-              {t('about.hero_subtitle')}
+              Orienco Rapid Delivery is a premium global tech platform connecting businesses and individuals with instant, secure, and reliable shipping, cargo, and logistics networks.
             </p>
             <Button className="h-10 md:h-12 px-6 md:px-8 bg-primary hover:bg-primary/90 cursor-pointer text-white font-medium rounded-lg shadow-lg shadow-primary/20 transition-all">
-              {t('about.explore_btn')}
+              Explore Our Network
             </Button>
           </motion.div>
           <motion.div
@@ -86,7 +82,7 @@ export default function AboutPage() {
           >
             <Image
               src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&h=800&fit=crop"
-              alt={t('about.hero_img_alt')}
+              alt="Orienco logistics fulfillment center"
               width={1200}
               height={800}
               className="object-cover"
@@ -97,17 +93,17 @@ export default function AboutPage() {
 
       {/* Mission & Vision Section */}
       <section className="container mx-auto px-4 md:px-6 py-16 md:py-24 space-y-10 md:space-y-16">
-        <h2 className="text-2xl md:text-4xl font-medium text-neutral-1 text-center tracking-tight">{t('about.mission_vision_title')}</h2>
+        <h2 className="text-2xl md:text-4xl font-medium text-neutral-1 text-center tracking-tight">Our Core Values</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           <InfoCard
             icon={Target}
-            title={t('about.mission_title')}
-            description={t('about.mission_desc')}
+            title="Our Mission"
+            description="To empower local businesses and international operations by delivering excellence through seamless tech-driven logistics, prioritizing speed, absolute safety, and unmatched customer care."
           />
           <InfoCard
             icon={Eye}
-            title={t('about.vision_title')}
-            description={t('about.vision_desc')}
+            title="Our Vision"
+            description="To be the globally trusted standard in rapid courier logistics, bridging physical distance through frictionless, intelligent, and highly secure transport networks."
           />
         </div>
       </section>
@@ -115,7 +111,7 @@ export default function AboutPage() {
       {/* What We Do Section */}
       <section className="bg-[#1E2024] py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6 space-y-10 md:space-y-16">
-          <h2 className="text-2xl md:text-4xl font-medium text-white text-center tracking-tight">{t('about.what_we_do')}</h2>
+          <h2 className="text-2xl md:text-4xl font-medium text-white text-center tracking-tight">Services We Offer</h2>
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -126,20 +122,20 @@ export default function AboutPage() {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
           >
             <ServiceStep
-              title={t('about.services.properties')}
-              description={t('about.services.properties_desc')}
+              title="Parcel & Cargo Delivery"
+              description="Ultra-rapid parcel courier services and heavy freight shipping with real-time GPS tracking enabled."
             />
             <ServiceStep
-              title={t('about.services.hotels')}
-              description={t('about.services.hotels_desc')}
+              title="Corporate Logistics"
+              description="Tailored supply chain management and priority business logistics handling."
             />
             <ServiceStep
-              title={t('about.services.transport')}
-              description={t('about.services.transport_desc')}
+              title="Fleet Dispatching"
+              description="An active on-demand network of certified professional riders, drivers, and heavy vehicle fleets."
             />
             <ServiceStep
-              title={t('about.services.legal')}
-              description={t('about.services.legal_desc')}
+              title="Legal Courier Services"
+              description="Highly secure handling, notarization, and verification of confidential corporate contracts and Power of Attorney agreements."
             />
           </motion.div>
         </div>
@@ -148,26 +144,26 @@ export default function AboutPage() {
       {/* How Can We Help You? Section */}
       <section className="container mx-auto px-4 md:px-6 py-16 md:py-24 space-y-10 md:space-y-16">
         <div className="text-center space-y-3 md:space-y-4 max-w-2xl mx-auto">
-          <h2 className="text-2xl md:text-4xl font-medium text-neutral-1 tracking-tight">{t('about.help.title')}</h2>
-          <p className="text-neutral-2 font-medium italic">{t('about.help.subtitle')}</p>
+          <h2 className="text-2xl md:text-4xl font-medium text-neutral-1 tracking-tight">How Can We Help You?</h2>
+          <p className="text-neutral-2 font-medium italic">Select an option to scale your logistics operations</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <InfoCard
             icon={Home}
-            title={t('about.help.buy')}
-            description={t('about.help.desc')}
+            title="Business Shipping"
+            description="Get access to top-tier, on-demand shipping rates with dedicated customer service support."
             hasButton
           />
           <InfoCard
             icon={Key}
-            title={t('about.help.rent')}
-            description={t('about.help.desc')}
+            title="Instant Delivery"
+            description="Get access to top-tier, on-demand shipping rates with dedicated customer service support."
             hasButton
           />
           <InfoCard
             icon={Tag}
-            title={t('about.help.sell')}
-            description={t('about.help.desc')}
+            title="Bulk Fleet Hire"
+            description="Get access to top-tier, on-demand shipping rates with dedicated customer service support."
             hasButton
           />
         </div>
@@ -177,8 +173,8 @@ export default function AboutPage() {
       <section className="bg-orange-50/20 py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6 space-y-10 md:space-y-16">
           <div className="text-center space-y-3 md:space-y-4 max-w-3xl mx-auto font-medium">
-            <h2 className="text-2xl md:text-4xl font-medium text-neutral-1 tracking-tight">{t('why.title')}</h2>
-            <p className="text-neutral-2">{t('why.subtitle')}</p>
+            <h2 className="text-2xl md:text-4xl font-medium text-neutral-1 tracking-tight">Why Choose Orienco?</h2>
+            <p className="text-neutral-2">Discover the benefits of utilizing the industry&apos;s leading rapid logistics platform.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <motion.div
@@ -190,8 +186,8 @@ export default function AboutPage() {
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                 <Lock size={32} />
               </div>
-              <h3 className="text-xl font-medium text-neutral-1">{t('why.benefits.secure_title')}</h3>
-              <p className="text-sm text-neutral-2 leading-relaxed font-medium">{t('why.benefits.secure_desc')}</p>
+              <h3 className="text-xl font-medium text-neutral-1">Highly Secure</h3>
+              <p className="text-sm text-neutral-2 leading-relaxed font-medium">Your shipments and transactions are protected by next-generation encryption architectures.</p>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -203,8 +199,8 @@ export default function AboutPage() {
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                 <UserCheck size={32} />
               </div>
-              <h3 className="text-xl font-medium text-neutral-1">{t('why.benefits.partners_title')}</h3>
-              <p className="text-sm text-neutral-2 leading-relaxed font-medium">{t('why.benefits.partners_desc')}</p>
+              <h3 className="text-xl font-medium text-neutral-1">Vetted Professionals</h3>
+              <p className="text-sm text-neutral-2 leading-relaxed font-medium">Work only with certified, trusted delivery logistics riders and professional legal dispatchers.</p>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -216,8 +212,8 @@ export default function AboutPage() {
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                 <Globe size={32} />
               </div>
-              <h3 className="text-xl font-medium text-neutral-1">{t('why.benefits.remote_title')}</h3>
-              <p className="text-sm text-neutral-2 leading-relaxed font-medium">{t('why.benefits.remote_desc')}</p>
+              <h3 className="text-xl font-medium text-neutral-1">100% Remote Control</h3>
+              <p className="text-sm text-neutral-2 leading-relaxed font-medium">Track your orders, schedule courier pickups, and authorize dispatches entirely online from anywhere.</p>
             </motion.div>
           </div>
         </div>

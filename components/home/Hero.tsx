@@ -9,11 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateBooking } from '@/features/parcel/bookingSlice';
 import { useRouter } from 'next/navigation';
 
-const SIZES = ['Quick', 'Standard', 'Large'] as const;
-type PackageSize = (typeof SIZES)[number];
-
 export default function Hero() {
-  const [packageSize, setPackageSize] = useState<PackageSize>('Quick');
   const ref = useRef(null);
   const inView = useInView(ref, { once: true });
   const dispatch = useDispatch();
@@ -75,7 +71,7 @@ export default function Hero() {
       dispatch(updateBooking({
         pickupLocation: pickupData,
         dropLocation: dropData,
-        vehicleType: packageSize === 'Quick' ? 'motorcycle' : packageSize === 'Standard' ? 'tricycle' : 'van',
+        vehicleType: 'motorcycle',
       }));
       router.push('/booking');
       setIsLoading(false);
@@ -163,7 +159,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 100, scale: 0.95 }}
             animate={inView ? { opacity: 1, y: typeof window !== 'undefined' && window.innerWidth < 1024 ? 0 : 280, scale: 1 } : {}} // Pushing it down past the hero border only on LG
             transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="flex justify-center lg:justify-end relative z-50 pointer-events-auto mt-2 md:mt-20 lg:mt-64 mb-16 lg:mb-0"
+            className="flex justify-center lg:justify-end relative z-50 pointer-events-auto mt-2 md:mt-20 lg:mt-60 mb-16 lg:mb-0"
           >
             <div className="bg-[#F2F2F2]/95 backdrop-blur-3xl rounded-xl p-6 pb-12 md:p-8 w-full max-w-[450px] shadow-2xl border border-white/20">
               <h3 className="text-gray-900 font-medium text-xl md:text-2xl mb-6 md:mb-5 tracking-tight">Book a Delivery</h3>

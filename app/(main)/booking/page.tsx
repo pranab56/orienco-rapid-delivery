@@ -58,7 +58,7 @@ export default function BookDeliveryPage() {
     const dispatch = useDispatch();
     const bookingState = useSelector((state: any) => state.booking);
     const [createParcel, { isLoading }] = useCreateParcelMutation();
-    const { data: priceResponse, isLoading: isPriceLoading } = useCalculateDistacePriceQuery(
+    const { data: priceResponse } = useCalculateDistacePriceQuery(
         {
             pickupLat: bookingState.pickupLocation.coordinates[1],
             pickupLng: bookingState.pickupLocation.coordinates[0],
@@ -154,7 +154,7 @@ export default function BookDeliveryPage() {
         markersRef.current.forEach(m => m.setMap(null));
         markersRef.current = [];
 
-        const points = [];
+        const points: { lat: number; lng: number }[] = [];
         if (bookingState.pickupLocation.coordinates[0] !== 0) {
             const pos = { lat: bookingState.pickupLocation.coordinates[1], lng: bookingState.pickupLocation.coordinates[0] };
             const marker = new google.maps.Marker({
@@ -562,7 +562,8 @@ export default function BookDeliveryPage() {
                                 <div className="pt-2">
                                     <label className="text-[12px] font-semibold w-full text-gray-400 mb-2 block">Delivery Date</label>
                                     <Popover>
-                                        <PopoverTrigger asChild className="w-full">
+                                        {/* @ts-expect-error type definition mismatch */}
+                                        <PopoverTrigger asChild>
                                             <Button
                                                 variant={"outline"}
                                                 className={cn(

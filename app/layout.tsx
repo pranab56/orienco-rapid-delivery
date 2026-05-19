@@ -1,5 +1,4 @@
 import { I18nProvider } from "@/components/providers/i18n-provider";
-import { LenisProvider } from "@/lib/lenis";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";

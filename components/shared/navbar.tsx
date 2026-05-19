@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '@/features/auth/authSlice';
 import { useRouter } from 'next/navigation';
@@ -23,12 +22,21 @@ const languages = [
 ];
 
 export function Navbar() {
-  const { t, i18n } = useTranslation('common');
   const dispatch = useDispatch();
   const router = useRouter();
   const { token, user } = useSelector((state: any) => state.auth);
   const { data: unreadData, refetch: refetchUnreadCount } = useGetUnReadCountQuery(undefined, { skip: !token });
   const unreadCount = unreadData?.data?.unreadCount || 0;
+
+  const [currentLangCode, setCurrentLangCode] = useState('fr');
+
+  useEffect(() => {
+    const match = document.cookie.match(/googtrans=\/en\/([a-z]{2})/);
+    if (match && match[1]) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCurrentLangCode(match[1]);
+    }
+  }, []);
 
   // Real-time notifications and chat list updates socket integration
   useEffect(() => {
@@ -97,11 +105,11 @@ export function Navbar() {
   };
 
   const menuItems = [
-    { name: t('navbar.home'), href: '/' },
-    { name: t('navbar.orders'), href: '/orders' },
-    { name: t('navbar.history'), href: '/history' },
-    { name: t('navbar.chat'), href: '/chat' },
-    { name: t('navbar.contact'), href: '/contact' },
+    { name: 'Home', href: '/' },
+    { name: 'Orders', href: '/orders' },
+    { name: 'History', href: '/history' },
+    { name: 'Chat', href: '/chat' },
+    { name: 'Contact', href: '/contact' },
   ];
 
   useEffect(() => {
@@ -118,11 +126,14 @@ export function Navbar() {
   }, []);
 
   const changeLanguage = (code: string) => {
-    i18n.changeLanguage(code);
+    if (typeof window !== 'undefined' && window.__applyTranslate) {
+      window.__applyTranslate(code);
+      setCurrentLangCode(code);
+    }
     setLangOpen(false);
   };
 
-  const currentLang = languages.find((l) => l.code === (i18n.language || 'fr')) || languages[0];
+  const currentLang = languages.find((l) => l.code === currentLangCode) || languages[0];
 
   return (
     <nav className="fixed top-5 left-0 right-0 z-[100] flex justify-center w-full px-4 md:px-0">
@@ -140,7 +151,7 @@ export function Navbar() {
               <div className="absolute inset-0 bg-primary/20 animate-pulse" />
               <Globe size={20} className="text-white/80" />
             </div>
-            <span className="text-white font-medium text-xs tracking-widest uppercase">{currentLang.code}</span>
+            <span className="text-white font-medium text-xs tracking-widest uppercase notranslate">{currentLang.code}</span>
             <ChevronDown
               size={12}
               className={cn("text-white/50 transition-transform duration-300", langOpen && "rotate-180")}
@@ -162,7 +173,7 @@ export function Navbar() {
                     onClick={() => changeLanguage(lang.code)}
                     className={cn(
                       "w-full flex items-center gap-3 p-2.5 rounded-sm cursor-pointer transition-all text-sm font-medium",
-                      i18n.language === lang.code
+                      currentLangCode === lang.code
                         ? "bg-primary text-white"
                         : "text-black/60 hover:bg-black/10 hover:text-black"
                     )}
@@ -266,7 +277,7 @@ export function Navbar() {
                       className="absolute top-13 right-0 w-64 bg-white backdrop-blur-2xl rounded-xl overflow-hidden shadow-2xl border border-white/10 p-5 z-[101]"
                     >
                       <div className="flex flex-col items-center text-center">
-                        <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border-2 border-primary/30 p-1 shadow-2xl">
+                        <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border-2 border-primary/30 p-1">
                           <Image
                             src={user?.image || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&auto=format"}
                             alt={user?.name || "User"}
@@ -284,7 +295,7 @@ export function Navbar() {
                           <div className="w-8 h-8 rounded-xl bg-black/5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                             <Settings size={14} />
                           </div>
-                          {t('navbar.settings')}
+                          Settings
                         </Link>
                         <button
                           onClick={handleLogout}
@@ -293,7 +304,7 @@ export function Navbar() {
                           <div className="w-8 h-8 rounded-xl bg-red-500/10 cursor-pointer flex items-center justify-center group-hover:bg-red-500/10 transition-colors">
                             <LogOut size={14} />
                           </div>
-                          {t('navbar.sign_out')}
+                          Sign Out
                         </button>
                       </div>
                     </motion.div>
@@ -308,7 +319,7 @@ export function Navbar() {
                 whileTap={{ scale: 0.95 }}
                 className="flex items-center gap-2 h-11 px-6 border border-primary mt-1 rounded-sm bg-primary text-white font-normal cursor-pointer text-sm transition-all shadow-lg hover:bg-primary/90"
               >
-                {t('navbar.sign_in')}
+                Sign In
               </motion.button>
             </Link>
           )}
@@ -369,7 +380,7 @@ export function Navbar() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="text-3xl font-medium text-primary mt-4"
                 >
-                  {t('navbar.sign_in')}
+                  Sign In
                 </Link>
               )}
               {token && (
@@ -377,7 +388,7 @@ export function Navbar() {
                   onClick={handleLogout}
                   className="text-3xl font-medium text-red-400 mt-4 text-left"
                 >
-                  {t('navbar.sign_out')}
+                  Sign Out
                 </button>
               )}
             </div>

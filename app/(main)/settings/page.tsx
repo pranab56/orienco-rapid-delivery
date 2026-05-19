@@ -94,7 +94,7 @@ export default function PersonalInformationPage() {
 
 
   if (profileLoading) {
-    return <div className="flex items-center justify-center h-screen"><Loader size={40} className="animate-spin" /></div>;
+    return <div className="flex items-center justify-center h-[50vh]"><Loader size={40} className="animate-spin text-[#EB5500]" /></div>;
   }
 
   return (

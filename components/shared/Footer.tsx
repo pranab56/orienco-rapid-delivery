@@ -71,7 +71,7 @@ const Footer = () => {
 
               {/* Home Column */}
               <div className="space-y-6 lg:space-y-10 text-center sm:text-left">
-                <h4 className="text-gray-900 font-bold text-lg md:text-xl tracking-tight uppercase text-xs opacity-50">Quick Links</h4>
+                <h4 className="text-gray-900 font-bold text-lg tracking-tight uppercase opacity-50">Quick Links</h4>
                 <ul className="space-y-4 lg:space-y-5">
                   {['Home', 'History', 'Chat', 'Orders'].map((link) => (
                     <li key={link}>
@@ -83,7 +83,7 @@ const Footer = () => {
 
               {/* Contact Info Column */}
               <div className="space-y-6 lg:space-y-10 text-center sm:text-left">
-                <h4 className="text-gray-900 font-bold text-lg md:text-xl tracking-tight uppercase text-xs opacity-50">Company</h4>
+                <h4 className="text-gray-900 font-bold text-lg tracking-tight uppercase opacity-50">Company</h4>
                 <ul className="space-y-4 lg:space-y-5 flex flex-col">
                   {[{ name: 'Contact Us', href: 'contact' }, { name: 'Terms & Conditions', href: '/terms' }, { name: 'Privacy Policy', href: '/privacy' }].map((link) => (
                     <li key={link.name}>
@@ -95,13 +95,13 @@ const Footer = () => {
 
               {/* Business Offer Column */}
               <div className="space-y-8 lg:space-y-10 text-center sm:text-left sm:col-span-2 md:col-span-1 mt-6 md:mt-0">
-                <h4 className="text-gray-900 font-bold text-lg md:text-xl tracking-tight uppercase text-xs opacity-50">Business Offer</h4>
+                <h4 className="text-gray-900 font-bold text-lg md:text-lg tracking-tight uppercase text-xs opacity-50">Business Offer</h4>
                 <div className="space-y-4 lg:space-y-5">
                   <div className="flex flex-col">
-                    <Link href="tel:8473883747" className="text-gray-900 font-bold text-xl md:text-2xl hover:text-[#EB5500] transition-all tracking-tighter opacity-80">(847) 388-3747</Link>
+                    <Link href="tel:8473883747" className="text-gray-900 font-bold text-lg md:text-xl hover:text-[#EB5500] transition-all tracking-tighter opacity-80">(847) 388-3747</Link>
                   </div>
                   <div className="flex flex-col">
-                    <Link href="mailto:example@gmail.com" className="text-gray-900 font-medium text-lg md:text-xl hover:text-[#EB5500] transition-all tracking-tight opacity-70 underline underline-offset-4">example@gmail.com</Link>
+                    <Link href="mailto:example@gmail.com" className="text-gray-900 font-medium text-lg  hover:text-[#EB5500] transition-all tracking-tight opacity-70 underline underline-offset-4">example@gmail.com</Link>
                   </div>
                 </div>
               </div>

@@ -4,21 +4,19 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Home, Package, ListOrdered, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const { t } = useTranslation('common');
   const { token } = useSelector((state: any) => state.auth);
   const router = useRouter();
 
   const bottomNavItems = [
-    { name: t('navbar.home'), href: '/', icon: Home },
+    { name: 'Home', href: '/', icon: Home },
     { name: 'Book', href: '/booking', icon: Package },
-    { name: t('navbar.orders'), href: '/orders', icon: ListOrdered },
-    { name: t('navbar.chat'), href: '/chat', icon: MessageSquare },
+    { name: 'Orders', href: '/orders', icon: ListOrdered },
+    { name: 'Chat', href: '/chat', icon: MessageSquare },
   ];
 
   return (

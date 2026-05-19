@@ -4,8 +4,8 @@ import React, { useState, Suspense, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    ChevronLeft, Phone, MessageSquare, Star,
-    CheckCircle2, X, Loader, Bike
+    ChevronLeft, MessageSquare, Star,
+    CheckCircle2, X, Loader
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -29,8 +29,7 @@ function OrderDetailContent() {
     const { data: response, isLoading: parcelDetailsLoading } = useSingleParcelDetailsQuery(orderId);
     const parcel = response?.data;
 
-    const { token, user: currentUser } = useSelector((state: any) => state.auth);
-    const myId = currentUser?._id || currentUser?.id;
+    const { token } = useSelector((state: any) => state.auth);
 
     const [createChat, { isLoading: isCreatingChat }] = useCreateChatMutation();
     const [createFeedback, { isLoading: isSubmittingFeedback }] = useCreateFeedBackMutation();

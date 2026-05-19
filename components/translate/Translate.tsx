@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 
 "use client";
 
@@ -130,7 +130,7 @@ export default function GoogleTranslate() {
 
                         pageLanguage: "en",
 
-                        includedLanguages: "en,de,fr,nl,ro,pl,uk,it",
+                        includedLanguages: "en,fr",
 
                         autoDisplay: false,
 
@@ -250,7 +250,7 @@ export default function GoogleTranslate() {
 
         };
 
-        // Ensure default language cookie is set to German before script loads
+        // Ensure default language cookie is set to French before script loads
 
         if (!document.cookie.includes("googtrans=")) {
 
@@ -262,11 +262,11 @@ export default function GoogleTranslate() {
 
             const expires = date.toUTCString();
 
-            document.cookie = `googtrans=/en/de; expires=${expires}; path=/; SameSite=Lax`;
+            document.cookie = `googtrans=/en/fr; expires=${expires}; path=/; SameSite=Lax`;
 
             if (domain.includes(".")) {
 
-                document.cookie = `googtrans=/en/de; expires=${expires}; path=/; domain=.${domain}; SameSite=Lax`;
+                document.cookie = `googtrans=/en/fr; expires=${expires}; path=/; domain=.${domain}; SameSite=Lax`;
 
             }
 
@@ -289,16 +289,58 @@ export default function GoogleTranslate() {
     }, []);
 
     return (
-        <div
+        <>
+            <div
 
-            id="google_translate_element"
+                id="google_translate_element"
 
-            style={{ display: "none" }}
+                style={{ display: "none" }}
 
-            className="notranslate"
+                className="notranslate"
 
-        />
+            />
+            <style dangerouslySetInnerHTML={{ __html: `
+                /* Hide Google Translate Banner and Header */
+                iframe.goog-te-banner-frame,
+                .goog-te-banner-frame,
+                .goog-te-banner,
+                iframe.goog-te-banner-frame.skiptranslate {
+                    display: none !important;
+                    visibility: hidden !important;
+                }
 
+                html {
+                    top: 0px !important;
+                    border-top: 0px none !important;
+                    padding-top: 0px !important;
+                }
+
+                body {
+                    top: 0px !important;
+                    padding-top: 0px !important;
+                    margin-top: 0px !important;
+                }
+
+                /* Hide Google Translate Tooltip / Balloon Popups */
+                .goog-te-balloon-frame,
+                #goog-gt-tt,
+                #goog-gt-tt.goog-tooltip,
+                .goog-tooltip,
+                .goog-tooltip:hover {
+                    display: none !important;
+                    visibility: hidden !important;
+                    opacity: 0 !important;
+                }
+
+                /* Disable Google Translate hover highlight style */
+                .goog-text-highlight {
+                    background-color: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                    pointer-events: none !important;
+                }
+            `}} />
+        </>
     );
 
 }

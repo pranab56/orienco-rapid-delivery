@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Paperclip, Send, ChevronLeft, Loader, MoreVertical, Edit2, Trash2, X } from 'lucide-react';
+import { Paperclip, Send, ChevronLeft, Loader, Edit2, Trash2, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -16,8 +16,6 @@ import moment from 'moment';
 import { io } from 'socket.io-client';
 import { getToken } from '@/utils/storage';
 import { baseURL } from '@/utils/BaseURL';
-
-type Message = { id: number; text: string; sender: string; time: string };
 
 export default function ChatWindow() {
     const params = useParams();
@@ -48,6 +46,8 @@ export default function ChatWindow() {
     const [editMessage, { isLoading: isEditing }] = useEditMessageMutation();
     const [deleteMessage] = useDeleteMessageMutation();
 
+    console.log("message response", messagesResponse)
+
     const activeMessages = messagesResponse?.data?.messages || [];
     const activeUserData = messagesResponse?.data?.participant || null;
 
@@ -56,6 +56,7 @@ export default function ChatWindow() {
     // Synchronize local messages state with API query messages
     useEffect(() => {
         if (activeMessages) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setMessages(activeMessages);
         }
     }, [activeMessages]);
@@ -88,37 +89,40 @@ export default function ChatWindow() {
 
         socketInstance.on('message::received', (message: any) => {
             console.log('Real-time message received:', message);
-            
+
             // Trigger refetch to automatically keep the local RTK cache fully in sync with database (perfect for edits/deletes)
             refetch();
 
             // Extract the message ID supporting raw string, _id, messageId, and id properties
             const messageId = typeof message === 'string' ? message : (message?._id || message?.messageId || message?.id);
-            
+
             if (messageId) {
                 setMessages((prev) => {
                     // If raw string or explicit deleted flag, completely remove the message from the active list
-                    if (typeof message === 'string' || message.isDeleted || message.text === "message had been deleted" || message.type === 'delete') {
+                    if (typeof message === 'string' || message.isDeleted || message.text === "message had been deleted" || message.type === 'delete' || message.operationType === 'deleted') {
                         return prev.filter(m => (m._id !== messageId && m.id !== messageId));
                     }
 
                     const exists = prev.some(m => m._id === messageId || m.id === messageId);
+
                     if (exists) {
                         const existingItem = prev.find(m => m._id === messageId || m.id === messageId);
                         const updated = { ...existingItem, ...message };
-                        if (updated.isDeleted || updated.text === "message had been deleted" || updated.type === 'delete') {
+
+                        if (updated.isDeleted || updated.text === "message had been deleted" || updated.type === 'delete' || updated.operationType === 'deleted') {
                             return prev.filter(m => (m._id !== messageId && m.id !== messageId));
                         }
                         // Update by merging new fields to preserve original properties like sender, createdAt, etc.
                         return prev.map(m => (m._id === messageId || m.id === messageId) ? updated : m);
-                    } else if (message.chatId === activeChat) {
+                    } else if (message.chatId === activeChat && message.operationType !== 'deleted') {
                         // Only append new messages if they belong to this active chat room
                         return [...prev, message];
                     }
+
                     return prev;
                 });
             }
-            
+
             // Automatically scroll down when a message is received in active chat window
             setTimeout(() => {
                 if (chatContainerRef.current) {
@@ -239,12 +243,14 @@ export default function ChatWindow() {
     };
 
     if (isLoading) {
-        return <div className="p-8 text-gray-500">Loading messages...</div>;
+        return <div className="p-8 text-gray-500 text-center mt-20">Loading messages...</div>;
     }
 
     if (!activeUserData && !isLoading) {
         return <div className="p-8 text-gray-500">User not found</div>;
     }
+
+
 
     return (
         <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden bg-white">
@@ -255,8 +261,10 @@ export default function ChatWindow() {
                 </Link>
                 <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-300 flex-shrink-0 shadow-sm border border-black/5">
                     {activeUserData?.image ? (
-                        <Image src={activeUserData.image} alt={activeUserData.fullName || "User"} fill className="object-cover" />
-                    ) : null}
+                        <Image src={baseURL + activeUserData.image} alt={activeUserData.fullName || "User"} fill className="object-cover" />
+                    ) : (
+                        <Image src={"https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"} alt={activeUserData.fullName || "User"} fill className="object-cover" />
+                    )}
                 </div>
                 <h2 className="font-medium text-[15px]">{activeUserData?.fullName || "User"}</h2>
             </div>
@@ -274,66 +282,66 @@ export default function ChatWindow() {
                         const senderName = isMe ? "Me" : (msg.sender?.fullName || activeUserData?.fullName || "Them");
                         const time = moment(msg.createdAt).format('hh:mm A');
                         const isEditingThis = editingMessageId === msg._id;
-                    const isDeleted = msg.isDeleted || deletedMessages.includes(msg._id) || msg.text === "message had been deleted";
-                    const textToShow = isDeleted ? <span className="italic text-gray-500">Message had been deleted</span> : msg.text;
+                        const isDeleted = msg.isDeleted || deletedMessages.includes(msg._id) || msg.text === "message had been deleted";
+                        const textToShow = isDeleted ? <span className="italic text-gray-500">Message had been deleted</span> : msg.text;
 
-                    return !isMe ? (
-                        <div key={msg._id} className="flex flex-col items-start max-w-[85%] md:max-w-[70%]">
-                            <p className="text-[11px] text-gray-400 font-medium mb-1.5 ml-1">{senderName}</p>
-                            <div className={`border border-gray-300 rounded-xl rounded-tl-sm ${!isDeleted && !msg.text ? 'p-1.5' : 'p-4'} text-[13px] leading-relaxed shadow-sm ${isDeleted ? 'bg-gray-100/50' : 'bg-[#EBEBEB] text-gray-800'}`}>
-                                {!isDeleted && msg.files && msg.files.length > 0 && msg.files[0] && (
-                                    <div className={`rounded-lg overflow-hidden relative w-[250px] sm:w-[280px] aspect-[4/5] bg-gray-200 ${msg.text ? 'mb-2' : ''}`}>
-                                        <Image src={msg.files[0]} alt="attachment" fill className="object-cover" />
-                                    </div>
-                                )}
-                                {textToShow && <span>{textToShow}</span>}
-                            </div>
-                            <span className="text-[11px] text-gray-400 font-medium mt-1.5 ml-1">{time}</span>
-                        </div>
-                    ) : (
-                        <div key={msg._id} className="flex flex-col items-end self-end max-w-[85%] md:max-w-[70%] ml-auto">
-                            <div className="flex items-center justify-end gap-2 group w-full">
-                                {/* Hover Actions */}
-                                {!isDeleted && !isEditingThis && (
-                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-white shadow-sm border border-gray-200 rounded-lg p-1 flex-shrink-0">
-                                        <button onClick={() => { setEditingMessageId(msg._id); setEditValue(msg.text); }} className="p-1.5 text-gray-500 hover:text-[#EB5500] hover:bg-orange-50 rounded-md transition-colors" title="Edit">
-                                            <Edit2 size={14} />
-                                        </button>
-                                        <button onClick={() => handleDelete(msg._id)} className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors" title="Delete">
-                                            <Trash2 size={14} />
-                                        </button>
-                                    </div>
-                                )}
-
-                                {isEditingThis ? (
-                                    <div className="bg-white border-2 border-[#EB5500] rounded-xl rounded-tr-sm p-3 shadow-md w-full min-w-[250px]">
-                                        <textarea
-                                            value={editValue}
-                                            onChange={(e) => setEditValue(e.target.value)}
-                                            className="w-full bg-transparent text-[13px] outline-none resize-none"
-                                            rows={2}
-                                            autoFocus
-                                        />
-                                        <div className="flex justify-end gap-2 mt-2">
-                                            <button onClick={() => setEditingMessageId(null)} className="text-xs text-gray-500 hover:text-gray-700">Cancel</button>
-                                            <button onClick={() => handleEditSave(msg._id)} className="text-xs bg-[#EB5500] text-white px-3 py-1 rounded-md">{isEditing ? 'Saving...' : 'Save'}</button>
+                        return !isMe ? (
+                            <div key={msg._id} className="flex flex-col items-start max-w-[85%] md:max-w-[70%]">
+                                <p className="text-[11px] text-gray-400 font-medium mb-1.5 ml-1">{senderName}</p>
+                                <div className={`border border-gray-300 rounded-xl rounded-tl-sm ${!isDeleted && !msg.text ? 'p-1.5' : 'p-4'} text-[13px] leading-relaxed shadow-sm ${isDeleted ? 'bg-gray-100/50' : 'bg-[#EBEBEB] text-gray-800'}`}>
+                                    {!isDeleted && msg.files && msg.files.length > 0 && msg.files[0] && (
+                                        <div className={`rounded-lg overflow-hidden relative w-[250px] sm:w-[280px] aspect-[4/5] bg-gray-200 ${msg.text ? 'mb-2' : ''}`}>
+                                            <Image src={msg.files[0]} alt="attachment" fill className="object-cover" />
                                         </div>
-                                    </div>
-                                ) : (
-                                    <div className={`rounded-xl rounded-tr-sm ${!isDeleted && !msg.text ? 'p-1.5' : 'p-4'} text-[13px] leading-relaxed shadow-md shadow-orange-500/20 text-left ${isDeleted ? 'bg-orange-100/50 border border-orange-200 text-gray-600' : 'bg-[#EB5500] text-white'}`}>
-                                        {!isDeleted && msg.files && msg.files.length > 0 && msg.files[0] && (
-                                            <div className={`rounded-lg overflow-hidden relative w-[250px] sm:w-[280px] aspect-[4/5] bg-orange-400 ${msg.text ? 'mb-2' : ''}`}>
-                                                <Image src={msg.files[0]} alt="attachment" fill className="object-cover" />
-                                            </div>
-                                        )}
-                                        {textToShow && <span>{textToShow}</span>}
-                                    </div>
-                                )}
+                                    )}
+                                    {textToShow && <span>{textToShow}</span>}
+                                </div>
+                                <span className="text-[11px] text-gray-400 font-medium mt-1.5 ml-1">{time}</span>
                             </div>
-                            <span className="text-[11px] text-gray-400 font-medium mt-1.5 mr-1">{time}</span>
-                        </div>
-                    );
-                })}
+                        ) : (
+                            <div key={msg._id} className="flex flex-col items-end self-end max-w-[85%] md:max-w-[70%] ml-auto">
+                                <div className="flex items-center justify-end gap-2 group w-full">
+                                    {/* Hover Actions */}
+                                    {!isDeleted && !isEditingThis && (
+                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-white shadow-sm border border-gray-200 rounded-lg p-1 flex-shrink-0">
+                                            <button onClick={() => { setEditingMessageId(msg._id); setEditValue(msg.text); }} className="p-1.5 text-gray-500 hover:text-[#EB5500] hover:bg-orange-50 rounded-md cursor-pointer transition-colors" title="Edit">
+                                                <Edit2 size={14} />
+                                            </button>
+                                            <button onClick={() => handleDelete(msg._id)} className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-md cursor-pointer transition-colors" title="Delete">
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {isEditingThis ? (
+                                        <div className="bg-white border-2 border-[#EB5500] rounded-xl rounded-tr-sm p-3 shadow-md w-full min-w-[250px]">
+                                            <textarea
+                                                value={editValue}
+                                                onChange={(e) => setEditValue(e.target.value)}
+                                                className="w-full bg-transparent text-[13px] outline-none resize-none"
+                                                rows={2}
+                                                autoFocus
+                                            />
+                                            <div className="flex justify-end gap-2 mt-2">
+                                                <button onClick={() => setEditingMessageId(null)} className="text-xs text-gray-500 hover:text-gray-700">Cancel</button>
+                                                <button onClick={() => handleEditSave(msg._id)} className="text-xs bg-[#EB5500] text-white px-3 py-1 rounded-md">{isEditing ? 'Saving...' : 'Save'}</button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className={`rounded-xl rounded-tr-sm ${!isDeleted && !msg.text ? 'p-1.5' : 'p-4'} text-[13px] leading-relaxed shadow-md shadow-orange-500/20 text-left ${isDeleted ? 'bg-orange-100/50 border border-orange-200 text-gray-600' : 'bg-[#EB5500] text-white'}`}>
+                                            {!isDeleted && msg.files && msg.files.length > 0 && msg.files[0] && (
+                                                <div className={`rounded-lg overflow-hidden relative w-[250px] sm:w-[280px] aspect-[4/5] bg-orange-400 ${msg.text ? 'mb-2' : ''}`}>
+                                                    <Image src={msg.files[0]} alt="attachment" fill className="object-cover" />
+                                                </div>
+                                            )}
+                                            {textToShow && <span>{textToShow}</span>}
+                                        </div>
+                                    )}
+                                </div>
+                                <span className="text-[11px] text-gray-400 font-medium mt-1.5 mr-1">{time}</span>
+                            </div>
+                        );
+                    })}
                 <div ref={messagesEndRef} className="h-1" />
             </div>
 
@@ -378,9 +386,9 @@ export default function ChatWindow() {
                         <button
                             onClick={handleSendMessage}
                             disabled={isSending || (!inputValue.trim() && !selectedFile)}
-                            className={`w-10 h-10 flex items-center justify-center transition-colors rounded-full ${inputValue.trim() || selectedFile
-                                    ? 'bg-[#EB5500] text-white hover:bg-[#D44D00]'
-                                    : 'bg-gray-100 text-gray-400'
+                            className={`w-10 h-10 flex items-center cursor-pointer justify-center transition-colors rounded-full ${inputValue.trim() || selectedFile
+                                ? 'bg-[#EB5500] text-white hover:bg-[#D44D00]'
+                                : 'bg-gray-100 text-gray-400'
                                 }`}
                         >
                             {isSending ? (
