@@ -12,6 +12,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '@/features/auth/authSlice';
 import { useRouter } from 'next/navigation';
 import { useGetUnReadCountQuery } from '@/features/notification/notificationApi';
+import { io } from 'socket.io-client';
+import { baseURL } from '@/utils/BaseURL';
+import { baseApi } from '@/utils/apiBaseQuery';
 
 
 const languages = [
@@ -24,8 +27,61 @@ export function Navbar() {
   const dispatch = useDispatch();
   const router = useRouter();
   const { token, user } = useSelector((state: any) => state.auth);
-  const { data: unreadData } = useGetUnReadCountQuery(undefined, { skip: !token });
+  const { data: unreadData, refetch: refetchUnreadCount } = useGetUnReadCountQuery(undefined, { skip: !token });
   const unreadCount = unreadData?.data?.unreadCount || 0;
+
+  // Real-time notifications and chat list updates socket integration
+  useEffect(() => {
+    if (!token || !user) return;
+
+    const myId = user?._id || user?.id;
+    if (!myId) return;
+
+    // Connect to the /notifications socket namespace
+    const socketInstance = io(`${baseURL}/notifications`, {
+      auth: {
+        token: token
+      },
+      query: {
+        token: token
+      },
+      extraHeaders: {
+        token: token
+      },
+      transports: ['websocket', 'polling']
+    });
+
+    socketInstance.on('connect', () => {
+      console.log('Successfully connected to notifications socket');
+    });
+
+    // Listen for real-time user notification events
+    socketInstance.on(`notification::${myId}`, (data: any) => {
+      console.log('Real-time notification received:', data);
+      
+      // Refresh the global unread count badge in navbar
+      refetchUnreadCount();
+      
+      // Instantly trigger refetch of all notifications queries currently rendered on any page
+      dispatch(baseApi.util.invalidateTags(['notification']));
+    });
+
+    // Listen for real-time chat list update events
+    socketInstance.on(`chatListUpdate::${myId}`, (data: any) => {
+      console.log('Real-time chat list update received:', data);
+      
+      // Instantly trigger refetch of chat details / lists currently rendered on any page
+      dispatch(baseApi.util.invalidateTags(['Chat']));
+    });
+
+    socketInstance.on('disconnect', () => {
+      console.log('Disconnected from notifications socket');
+    });
+
+    return () => {
+      socketInstance.disconnect();
+    };
+  }, [token, user, dispatch, refetchUnreadCount]);
 
   const [profileOpen, setProfileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);

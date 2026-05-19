@@ -15,6 +15,8 @@ import { useCreateFeedBackMutation } from '@/features/feedback/feedbackApi';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import moment from 'moment';
+import { io } from 'socket.io-client';
+import { baseURL } from '@/utils/BaseURL';
 
 function OrderDetailContent() {
     const params = useParams();
@@ -27,7 +29,7 @@ function OrderDetailContent() {
     const { data: response, isLoading: parcelDetailsLoading } = useSingleParcelDetailsQuery(orderId);
     const parcel = response?.data;
 
-    const currentUser = useSelector((state: any) => state.auth?.user);
+    const { token, user: currentUser } = useSelector((state: any) => state.auth);
     const myId = currentUser?._id || currentUser?.id;
 
     const [createChat, { isLoading: isCreatingChat }] = useCreateChatMutation();
@@ -39,6 +41,82 @@ function OrderDetailContent() {
 
     const mapRef = useRef<HTMLDivElement>(null);
     const googleMapRef = useRef<google.maps.Map | null>(null);
+
+    const [driverLocation, setDriverLocation] = useState<{ lat: number, lng: number } | null>(null);
+    const driverMarkerRef = useRef<google.maps.Marker | null>(null);
+
+    // Connect to /tracking socket namespace and track the parcel driver in real-time
+    useEffect(() => {
+        if (!orderId || !token) return;
+
+        // Connect to the tracking socket namespace
+        const socketInstance = io(`${baseURL}/tracking`, {
+            auth: { token },
+            query: { token },
+            extraHeaders: { token },
+            transports: ['websocket', 'polling']
+        });
+
+        socketInstance.on('connect', () => {
+            console.log('Connected to tracking socket. Emitting user::track-parcel for:', orderId);
+            socketInstance.emit('user::track-parcel', orderId);
+        });
+
+        // Listen for live location updates
+        socketInstance.on('location::updated', (data: any) => {
+            console.log('Live location update received:', data);
+            if (data && typeof data.lat === 'number' && typeof data.lng === 'number') {
+                setDriverLocation({ lat: data.lat, lng: data.lng });
+            }
+        });
+
+        socketInstance.on('disconnect', () => {
+            console.log('Disconnected from tracking socket');
+        });
+
+        return () => {
+            console.log('Leaving tracking page. Emitting user::untrack-parcel for:', orderId);
+            socketInstance.emit('user::untrack-parcel', orderId);
+            socketInstance.disconnect();
+            
+            // Clean up the driver marker when page is left/unmounted
+            if (driverMarkerRef.current) {
+                driverMarkerRef.current.setMap(null);
+                driverMarkerRef.current = null;
+            }
+        };
+    }, [orderId, token]);
+
+    // Handle Live Driver Location Marker updates on Google Maps
+    useEffect(() => {
+        if (typeof google === 'undefined' || !googleMapRef.current || !driverLocation) return;
+
+        const position = { lat: driverLocation.lat, lng: driverLocation.lng };
+
+        if (!driverMarkerRef.current) {
+            // Create a custom styled live driver bike/dot marker
+            driverMarkerRef.current = new google.maps.Marker({
+                position,
+                map: googleMapRef.current,
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: "#10B981", // Emerald Green representing Active Live Tracking
+                    fillOpacity: 1,
+                    strokeWeight: 3,
+                    strokeColor: "#FFFFFF", // White outline to make it pop!
+                },
+                title: "Driver Live Location"
+            });
+        } else {
+            // Move marker to the new coordinates smoothly
+            driverMarkerRef.current.setPosition(position);
+        }
+
+        // Smoothly pan camera to center on driver's live coordinate
+        googleMapRef.current.panTo(position);
+
+    }, [driverLocation]);
 
     useEffect(() => {
         if (typeof google === 'undefined' || !mapRef.current || !parcel) return;

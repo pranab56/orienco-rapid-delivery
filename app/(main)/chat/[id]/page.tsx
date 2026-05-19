@@ -13,6 +13,9 @@ import {
 } from '@/features/messages/messageApi';
 import { useSelector } from 'react-redux';
 import moment from 'moment';
+import { io } from 'socket.io-client';
+import { getToken } from '@/utils/storage';
+import { baseURL } from '@/utils/BaseURL';
 
 type Message = { id: number; text: string; sender: string; time: string };
 
@@ -40,13 +43,101 @@ export default function ChatWindow() {
     const currentUser = useSelector((state: any) => state.auth?.user);
     const myId = currentUser?._id || currentUser?.id;
 
-    const { data: messagesResponse, isLoading } = useGetSpecificMessagesQuery(activeChat, { skip: !activeChat });
+    const { data: messagesResponse, isLoading, refetch } = useGetSpecificMessagesQuery(activeChat, { skip: !activeChat });
     const [sendMessage, { isLoading: isSending }] = useSendMessageMutation();
     const [editMessage, { isLoading: isEditing }] = useEditMessageMutation();
     const [deleteMessage] = useDeleteMessageMutation();
 
     const activeMessages = messagesResponse?.data?.messages || [];
     const activeUserData = messagesResponse?.data?.participant || null;
+
+    const [messages, setMessages] = useState<any[]>([]);
+
+    // Synchronize local messages state with API query messages
+    useEffect(() => {
+        if (activeMessages) {
+            setMessages(activeMessages);
+        }
+    }, [activeMessages]);
+
+    // Socket.io connection and real-time chat joining flow
+    useEffect(() => {
+        if (!activeChat) return;
+
+        const token = getToken();
+        if (!token) return;
+
+        // Establish the socket connection with token in auth, query, and headers
+        const socketInstance = io(`${baseURL}/chat`, {
+            auth: {
+                token: token
+            },
+            query: {
+                token: token
+            },
+            extraHeaders: {
+                token: token
+            },
+            transports: ['websocket', 'polling']
+        });
+
+        socketInstance.on('connect', () => {
+            console.log('Successfully connected to chat socket. Joining chat:', activeChat);
+            socketInstance.emit('join-chat', activeChat);
+        });
+
+        socketInstance.on('message::received', (message: any) => {
+            console.log('Real-time message received:', message);
+            
+            // Trigger refetch to automatically keep the local RTK cache fully in sync with database (perfect for edits/deletes)
+            refetch();
+
+            // Extract the message ID supporting raw string, _id, messageId, and id properties
+            const messageId = typeof message === 'string' ? message : (message?._id || message?.messageId || message?.id);
+            
+            if (messageId) {
+                setMessages((prev) => {
+                    // If raw string or explicit deleted flag, completely remove the message from the active list
+                    if (typeof message === 'string' || message.isDeleted || message.text === "message had been deleted" || message.type === 'delete') {
+                        return prev.filter(m => (m._id !== messageId && m.id !== messageId));
+                    }
+
+                    const exists = prev.some(m => m._id === messageId || m.id === messageId);
+                    if (exists) {
+                        const existingItem = prev.find(m => m._id === messageId || m.id === messageId);
+                        const updated = { ...existingItem, ...message };
+                        if (updated.isDeleted || updated.text === "message had been deleted" || updated.type === 'delete') {
+                            return prev.filter(m => (m._id !== messageId && m.id !== messageId));
+                        }
+                        // Update by merging new fields to preserve original properties like sender, createdAt, etc.
+                        return prev.map(m => (m._id === messageId || m.id === messageId) ? updated : m);
+                    } else if (message.chatId === activeChat) {
+                        // Only append new messages if they belong to this active chat room
+                        return [...prev, message];
+                    }
+                    return prev;
+                });
+            }
+            
+            // Automatically scroll down when a message is received in active chat window
+            setTimeout(() => {
+                if (chatContainerRef.current) {
+                    chatContainerRef.current.scrollTo({
+                        top: chatContainerRef.current.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 100);
+        });
+
+        socketInstance.on('disconnect', () => {
+            console.log('Disconnected from chat socket');
+        });
+
+        return () => {
+            socketInstance.disconnect();
+        };
+    }, [activeChat]);
 
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
@@ -63,7 +154,7 @@ export default function ChatWindow() {
         }
     };
 
-    const lastMessageId = activeMessages.length > 0 ? activeMessages[activeMessages.length - 1]._id : null;
+    const lastMessageId = messages.length > 0 ? messages[messages.length - 1]._id : null;
 
     useEffect(() => {
         // Only auto-scroll if user is already at the bottom
@@ -176,11 +267,13 @@ export default function ChatWindow() {
                 onScroll={handleScroll}
                 className="flex-1 overflow-y-auto p-6 md:p-8 space-y-4 min-h-0 bg-gray-50/30"
             >
-                {activeMessages.map((msg: any) => {
-                    const isMe = msg.sender?._id === myId || msg.sender?.id === myId;
-                    const senderName = isMe ? "Me" : (msg.sender?.fullName || activeUserData?.fullName || "Them");
-                    const time = moment(msg.createdAt).format('hh:mm A');
-                    const isEditingThis = editingMessageId === msg._id;
+                {messages
+                    .filter((msg: any) => !msg.isDeleted && !deletedMessages.includes(msg._id) && msg.text !== "message had been deleted")
+                    .map((msg: any) => {
+                        const isMe = msg.sender?._id === myId || msg.sender?.id === myId || msg.sender === myId;
+                        const senderName = isMe ? "Me" : (msg.sender?.fullName || activeUserData?.fullName || "Them");
+                        const time = moment(msg.createdAt).format('hh:mm A');
+                        const isEditingThis = editingMessageId === msg._id;
                     const isDeleted = msg.isDeleted || deletedMessages.includes(msg._id) || msg.text === "message had been deleted";
                     const textToShow = isDeleted ? <span className="italic text-gray-500">Message had been deleted</span> : msg.text;
 
