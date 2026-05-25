@@ -1,13 +1,13 @@
 'use client';
 
+import { updateBooking } from '@/features/parcel/bookingSlice';
 import { cn } from '@/lib/utils';
 import { motion, useInView } from 'framer-motion';
 import { Loader, MapPin, Navigation } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateBooking } from '@/features/parcel/bookingSlice';
 import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function Hero() {
   const ref = useRef(null);

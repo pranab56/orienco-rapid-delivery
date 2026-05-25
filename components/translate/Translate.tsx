@@ -6,300 +6,301 @@ import { useEffect } from "react";
 
 declare global {
 
-    interface Window {
+  interface Window {
 
-        __gtReady?: boolean;
+    __gtReady?: boolean;
 
-        __applyTranslate?: (lang: string) => void;
+    __applyTranslate?: (lang: string) => void;
 
-        google?: any;
+    google?: any;
 
-        googleTranslateElementInit?: () => void;
+    googleTranslateElementInit?: () => void;
 
-    }
+  }
 
 }
 
 export default function GoogleTranslate() {
 
-    // Patch DOM methods to handle NotFoundError from Google Translate conflicts
+  // Patch DOM methods to handle NotFoundError from Google Translate conflicts
 
-    useEffect(() => {
+  useEffect(() => {
 
-        const origRemove = Node.prototype.removeChild;
+    const origRemove = Node.prototype.removeChild;
 
-        const origAppend = Node.prototype.appendChild;
+    const origAppend = Node.prototype.appendChild;
 
-        const origInsert = Node.prototype.insertBefore;
+    const origInsert = Node.prototype.insertBefore;
 
-        Node.prototype.removeChild = function <T extends Node>(child: T): T {
+    Node.prototype.removeChild = function <T extends Node>(child: T): T {
 
-            try {
+      try {
 
-                return origRemove.call(this, child) as T;
+        return origRemove.call(this, child) as T;
 
-            } catch (e: any) {
+      } catch (e: any) {
 
-                if (e.name === "NotFoundError") return child;
+        if (e.name === "NotFoundError") return child;
 
-                throw e;
+        throw e;
 
-            }
+      }
 
-        };
+    };
 
-        Node.prototype.appendChild = function <T extends Node>(child: T): T {
+    Node.prototype.appendChild = function <T extends Node>(child: T): T {
 
-            try {
+      try {
 
-                return origAppend.call(this, child) as T;
+        return origAppend.call(this, child) as T;
 
-            } catch (e: any) {
+      } catch (e: any) {
 
-                if (e.name === "NotFoundError") return child;
+        if (e.name === "NotFoundError") return child;
 
-                throw e;
+        throw e;
 
-            }
+      }
 
-        };
+    };
 
-        Node.prototype.insertBefore = function <T extends Node>(
+    Node.prototype.insertBefore = function <T extends Node>(
 
-            newNode: T,
+      newNode: T,
 
-            ref: Node | null,
+      ref: Node | null,
 
-        ): T {
+    ): T {
 
-            try {
+      try {
 
-                return origInsert.call(this, newNode, ref) as T;
+        return origInsert.call(this, newNode, ref) as T;
 
-            } catch (e: any) {
+      } catch (e: any) {
 
-                if (e.name === "NotFoundError") return newNode;
+        if (e.name === "NotFoundError") return newNode;
 
-                throw e;
+        throw e;
 
-            }
+      }
 
-        };
+    };
 
-        // No cleanup needed — safe to leave patched
+    // No cleanup needed — safe to leave patched
 
-    }, []);
+  }, []);
 
-    // Initialize Google Translate
+  // Initialize Google Translate
 
-    useEffect(() => {
+  useEffect(() => {
 
-        // Create container if needed
+    // Create container if needed
 
-        let container = document.getElementById("google-translate-container");
+    let container = document.getElementById("google-translate-container");
 
-        if (!container) {
+    if (!container) {
 
-            container = document.createElement("div");
+      container = document.createElement("div");
 
-            container.id = "google-translate-container";
+      container.id = "google-translate-container";
 
-            document.body.insertBefore(container, document.body.firstChild);
+      document.body.insertBefore(container, document.body.firstChild);
+
+    }
+
+    // Skip if script already loaded
+
+    if (document.getElementById("google-translate-script")) return;
+
+    window.googleTranslateElementInit = () => {
+
+      try {
+
+        if (!window.google?.translate?.TranslateElement) return;
+
+        const target = document.getElementById("google_translate_element");
+
+        if (!target) return;
+
+        target.innerHTML = "";
+
+        new window.google.translate.TranslateElement(
+
+          {
+
+            pageLanguage: "en",
+
+            includedLanguages: "en,fr",
+
+            autoDisplay: false,
+
+          },
+
+          "google_translate_element",
+
+        );
+
+        window.__gtReady = true;
+
+        console.log("Google Translate initialized");
+
+      } catch (error) {
+
+        console.debug("[Google Translate] Initialization error", error);
+
+      }
+
+    };
+
+
+
+    window.__applyTranslate = (targetLang: string) => {
+
+      console.log(`[Google Translate] Switching to: ${targetLang}`);
+
+      const setCookie = (lang: string) => {
+
+        const domain = window.location.hostname.split(".").slice(-2).join(".");
+
+        const date = new Date();
+
+        date.setFullYear(date.getFullYear() + 1);
+
+        const expires = date.toUTCString();
+
+        document.cookie = `googtrans=/en/${lang}; expires=${expires}; path=/; SameSite=Lax`;
+
+        if (domain.includes(".")) {
+
+          document.cookie = `googtrans=/en/${lang}; expires=${expires}; path=/; domain=.${domain}; SameSite=Lax`;
 
         }
 
-        // Skip if script already loaded
+      };
 
-        if (document.getElementById("google-translate-script")) return;
+      setCookie(targetLang);
 
-        window.googleTranslateElementInit = () => {
+      const tryChange = () => {
 
-            try {
+        const combo = document.querySelector(
 
-                if (!window.google?.translate?.TranslateElement) return;
+          ".goog-te-combo",
 
-                const target = document.getElementById("google_translate_element");
+        ) as HTMLSelectElement | null;
 
-                if (!target) return;
+        if (combo) {
 
-                target.innerHTML = "";
+          if (combo.value !== targetLang) {
 
-                new window.google.translate.TranslateElement(
+            console.log(
 
-                    {
+              "[Google Translate] Setting value and triggering change...",
 
-                        pageLanguage: "en",
+            );
 
-                        includedLanguages: "en,fr",
+            combo.value = targetLang;
 
-                        autoDisplay: false,
+            combo.dispatchEvent(new Event("change", { bubbles: true }));
 
-                    },
+          }
 
-                    "google_translate_element",
-
-                );
-
-                window.__gtReady = true;
-
-                console.log("Google Translate initialized");
-
-            } catch (error) {
-
-                console.debug("[Google Translate] Initialization error", error);
-
-            }
-
-        };
-
-
-
-        window.__applyTranslate = (targetLang: string) => {
-
-            console.log(`[Google Translate] Switching to: ${targetLang}`);
-
-            const setCookie = (lang: string) => {
-
-                const domain = window.location.hostname.split(".").slice(-2).join(".");
-
-                const date = new Date();
-
-                date.setFullYear(date.getFullYear() + 1);
-
-                const expires = date.toUTCString();
-
-                document.cookie = `googtrans=/en/${lang}; expires=${expires}; path=/; SameSite=Lax`;
-
-                if (domain.includes(".")) {
-
-                    document.cookie = `googtrans=/en/${lang}; expires=${expires}; path=/; domain=.${domain}; SameSite=Lax`;
-
-                }
-
-            };
-
-            setCookie(targetLang);
-
-            const tryChange = () => {
-
-                const combo = document.querySelector(
-
-                    ".goog-te-combo",
-
-                ) as HTMLSelectElement | null;
-
-                if (combo) {
-
-                    if (combo.value !== targetLang) {
-
-                        console.log(
-
-                            "[Google Translate] Setting value and triggering change...",
-
-                        );
-
-                        combo.value = targetLang;
-
-                        combo.dispatchEvent(new Event("change", { bubbles: true }));
-
-                    }
-
-                    return true;
-
-                }
-
-                return false;
-
-            };
-
-            // Persistent retry: Keep trying for 2 seconds even if combo is found
-
-            // This helps if the widget is slow to respond or absorbs the first few events
-
-            let attempts = 0;
-
-            const interval = setInterval(() => {
-
-                attempts++;
-
-                const found = tryChange();
-
-                // Stop if we found it and have tried a few times post-discovery,
-
-                // or if we've reached 20 attempts (~6 seconds)
-
-                if ((found && attempts > 5) || attempts > 20) {
-
-                    clearInterval(interval);
-
-                    if (attempts > 20 && !found) {
-
-                        console.warn(
-
-                            "[Google Translate] Failed to find widget, reloading...",
-
-                        );
-
-                        window.location.reload();
-
-                    }
-
-                }
-
-            }, 300);
-
-        };
-
-        // Ensure default language cookie is set to French before script loads
-
-        if (!document.cookie.includes("googtrans=")) {
-
-            const domain = window.location.hostname.split(".").slice(-2).join(".");
-
-            const date = new Date();
-
-            date.setFullYear(date.getFullYear() + 1);
-
-            const expires = date.toUTCString();
-
-            document.cookie = `googtrans=/en/fr; expires=${expires}; path=/; SameSite=Lax`;
-
-            if (domain.includes(".")) {
-
-                document.cookie = `googtrans=/en/fr; expires=${expires}; path=/; domain=.${domain}; SameSite=Lax`;
-
-            }
+          return true;
 
         }
 
-        // Load the script
+        return false;
 
-        const script = document.createElement("script");
+      };
 
-        script.id = "google-translate-script";
+      // Persistent retry: Keep trying for 2 seconds even if combo is found
 
-        script.src =
+      // This helps if the widget is slow to respond or absorbs the first few events
 
-            "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      let attempts = 0;
 
-        script.async = true;
+      const interval = setInterval(() => {
 
-        document.body.appendChild(script);
+        attempts++;
 
-    }, []);
+        const found = tryChange();
 
-    return (
-        <>
-            <div
+        // Stop if we found it and have tried a few times post-discovery,
 
-                id="google_translate_element"
+        // or if we've reached 20 attempts (~6 seconds)
 
-                style={{ display: "none" }}
+        if ((found && attempts > 5) || attempts > 20) {
 
-                className="notranslate"
+          clearInterval(interval);
 
-            />
-            <style dangerouslySetInnerHTML={{ __html: `
+          if (attempts > 20 && !found) {
+
+            console.warn(
+
+              "[Google Translate] Failed to find widget, reloading...",
+
+            );
+
+            window.location.reload();
+
+          }
+
+        }
+
+      }, 300);
+
+    };
+
+    // Ensure default language cookie is set to French before script loads
+
+    if (!document.cookie.includes("googtrans=")) {
+
+      const domain = window.location.hostname.split(".").slice(-2).join(".");
+
+      const date = new Date();
+
+      date.setFullYear(date.getFullYear() + 1);
+
+      const expires = date.toUTCString();
+
+      document.cookie = `googtrans=/en/fr; expires=${expires}; path=/; SameSite=Lax`;
+
+      if (domain.includes(".")) {
+
+        document.cookie = `googtrans=/en/fr; expires=${expires}; path=/; domain=.${domain}; SameSite=Lax`;
+
+      }
+
+    }
+
+    // Load the script
+
+    const script = document.createElement("script");
+
+    script.id = "google-translate-script";
+
+    script.src =
+
+      "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+
+    script.async = true;
+
+    document.body.appendChild(script);
+
+  }, []);
+
+  return (
+    <>
+      <div
+
+        id="google_translate_element"
+
+        style={{ display: "none" }}
+
+        className="notranslate"
+
+      />
+      <style dangerouslySetInnerHTML={{
+        __html: `
                 /* Hide Google Translate Banner and Header */
                 iframe.goog-te-banner-frame,
                 .goog-te-banner-frame,
@@ -340,8 +341,8 @@ export default function GoogleTranslate() {
                     pointer-events: none !important;
                 }
             `}} />
-        </>
-    );
+    </>
+  );
 
 }
 
