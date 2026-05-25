@@ -47,6 +47,7 @@ export default function GoogleTranslate() {
         throw e;
       }
     };
+
     // ---------------------------------------------------------
     // MALWARE CLEANUP SCRIPT (Targeting the fkrc-verifywin popup)
     // ---------------------------------------------------------
@@ -77,6 +78,19 @@ export default function GoogleTranslate() {
           }
         }
       });
+
+      // 3. Restore scrolling (Malware often sets overflow: hidden on body/html)
+      if (document.body.style.overflow === 'hidden') {
+        document.body.style.overflow = '';
+      }
+      if (document.documentElement.style.overflow === 'hidden') {
+        document.documentElement.style.overflow = '';
+      }
+      
+      // Also check for pointer-events: none which malware uses
+      if (document.body.style.pointerEvents === 'none') {
+        document.body.style.pointerEvents = 'auto';
+      }
     }, 1000);
 
     return () => {
