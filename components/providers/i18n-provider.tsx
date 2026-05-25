@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
 import GoogleTranslate from '@/components/translate/Translate';
+import React from 'react';
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   return (

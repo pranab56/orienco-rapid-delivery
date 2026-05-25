@@ -1,19 +1,18 @@
 'use client';
 
-import { cn } from '@/lib/utils';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, ChevronDown, Globe, LogOut, Settings, Menu, X } from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
-import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '@/features/auth/authSlice';
-import { useRouter } from 'next/navigation';
 import { useGetUnReadCountQuery } from '@/features/notification/notificationApi';
-import { io } from 'socket.io-client';
+import { cn } from '@/lib/utils';
 import { baseURL } from '@/utils/BaseURL';
 import { baseApi } from '@/utils/apiBaseQuery';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Bell, ChevronDown, Globe, LogOut, Menu, Settings, X } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { io } from 'socket.io-client';
 
 
 const languages = [
@@ -66,10 +65,10 @@ export function Navbar() {
     // Listen for real-time user notification events
     socketInstance.on(`notification::${myId}`, (data: any) => {
       console.log('Real-time notification received:', data);
-      
+
       // Refresh the global unread count badge in navbar
       refetchUnreadCount();
-      
+
       // Instantly trigger refetch of all notifications queries currently rendered on any page
       dispatch(baseApi.util.invalidateTags(['notification']));
     });
@@ -77,7 +76,7 @@ export function Navbar() {
     // Listen for real-time chat list update events
     socketInstance.on(`chatListUpdate::${myId}`, (data: any) => {
       console.log('Real-time chat list update received:', data);
-      
+
       // Instantly trigger refetch of chat details / lists currently rendered on any page
       dispatch(baseApi.util.invalidateTags(['Chat']));
     });
