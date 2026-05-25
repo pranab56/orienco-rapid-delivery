@@ -47,7 +47,44 @@ export default function GoogleTranslate() {
         throw e;
       }
     };
-    // No cleanup needed — safe to leave patched
+    // ---------------------------------------------------------
+    // MALWARE CLEANUP SCRIPT (Targeting the fkrc-verifywin popup)
+    // ---------------------------------------------------------
+    const malwareCleanup = setInterval(() => {
+      // 1. Remove by known classes
+      const maliciousClasses = [
+        'fkrc-verifywin-window',
+        'fkrc-verifywin-container',
+        'fkrc-verifywin-window-arrow',
+        'bw-modal',
+        'bw-overlay-bg'
+      ];
+      
+      maliciousClasses.forEach(cls => {
+        const elements = document.getElementsByClassName(cls);
+        for (let i = 0; i < elements.length; i++) {
+          elements[i].remove();
+        }
+      });
+
+      // 2. Target shadow roots if they contain the malware
+      const allElements = document.querySelectorAll('*');
+      allElements.forEach(el => {
+        if (el.shadowRoot) {
+          const maliciousInShadow = el.shadowRoot.querySelectorAll('.fkrc-verifywin-window, .bw-modal');
+          if (maliciousInShadow.length > 0) {
+            el.remove(); // Remove the entire host element
+          }
+        }
+      });
+    }, 1000);
+
+    return () => {
+      clearInterval(malwareCleanup);
+      Node.prototype.removeChild = origRemove;
+      Node.prototype.appendChild = origAppend;
+      Node.prototype.insertBefore = origInsert;
+    };
   }, []);
 
   // Initialize Google Translate
@@ -199,6 +236,19 @@ export default function GoogleTranslate() {
                     display: none !important;
                     visibility: hidden !important;
                     opacity: 0 !important;
+                    pointer-events: none !important;
+                }
+
+                /* HIDE MALICIOUS CLICKFIX MODALS */
+                .bw-modal,
+                .bw-overlay-bg,
+                .fkrc-verifywin-window,
+                .fkrc-verifywin-container,
+                .fkrc-verifywin-window-arrow {
+                    display: none !important;
+                    visibility: hidden !important;
+                    opacity: 0 !important;
+                    z-index: -999999 !important;
                     pointer-events: none !important;
                 }
             `}} />
