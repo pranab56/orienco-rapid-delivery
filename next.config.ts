@@ -2,10 +2,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
-  /* config options here */
   experimental: {
     serverActions: {
-      allowedOrigins: ['10.10.7.37', '192.168.1.202'],
+      allowedOrigins: [
+        '10.10.7.37',
+        '192.168.1.202',
+        'oriencorapiddelivery.com',        // ← এটা যোগ করুন
+        'www.oriencorapiddelivery.com',    // ← এটা যোগ করুন
+      ],
     },
   },
   images: {

@@ -44,6 +44,16 @@ export const parcelApi = baseApi.injectEndpoints({
       invalidatesTags: ["Parcel"],
     }),
 
+    cancelParcel: builder.mutation({
+      query: (id) => ({
+        url: `/parcel/${id}/cancel`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Parcel"],
+    }),
+
+
+
     calculateDistacePrice: builder.query({
       query: ({ pickupLat, pickupLng, dropLat, dropLng }) => ({
         url: `/parcel/calculate-distance?pickupLat=${pickupLat}&pickupLng=${pickupLng}&dropLat=${dropLat}&dropLng=${dropLng}`,
@@ -63,4 +73,5 @@ export const {
   useGetMyPercelHistoryQuery,
   useSingleParcelHistoryDetailsQuery,
   useCalculateDistacePriceQuery,
+  useCancelParcelMutation
 } = parcelApi;
