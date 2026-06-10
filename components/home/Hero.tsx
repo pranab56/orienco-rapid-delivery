@@ -28,7 +28,6 @@ export default function Hero() {
 
     const options = {
       types: ['address'],
-      componentRestrictions: { country: 'BD' }, // Assuming Bangladesh based on user example
     };
 
     if (pickupRef.current) {

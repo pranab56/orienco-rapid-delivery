@@ -47,7 +47,7 @@ const STEPS = [
   {
     id: 3,
     title: 'Choose the Right Vehicle\nfor Your Delivery\nNeeds.',
-    bgImage: 'https://images.unsplash.com/photo-1526948128573-703ea3aebc18?q=80&w=2000&auto=format&fit=crop',
+    bgImage: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2000&auto=format&fit=crop',
   },
   {
     id: 4,
@@ -130,7 +130,6 @@ export default function BookDeliveryPage() {
 
     const options = {
       types: ['address'],
-      componentRestrictions: { country: 'BD' },
     };
 
     const setupAutocomplete = (inputRef: React.RefObject<HTMLInputElement | null>, field: 'pickupLocation' | 'dropLocation') => {
@@ -396,13 +395,13 @@ export default function BookDeliveryPage() {
                 <div>
                   <label className="text-[12px] font-semibold text-gray-400 mb-2 block">What is the value of your item?</label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">CFA franc</span>
                     <input
                       type="number"
                       value={bookingState.itemValue === 0 ? '' : bookingState.itemValue}
                       onChange={(e) => handleInputChange('itemValue', Number(e.target.value))}
                       placeholder="1200"
-                      className={`w-full bg-[#E5E0DA]/50 border ${errors.itemValue ? 'border-red-500 focus:border-red-500' : 'border-transparent focus:border-[#EB5500]'} rounded-lg pl-8 pr-4 py-3.5 text-sm outline-none focus:bg-white transition-colors placeholder:text-gray-400`}
+                      className={`w-full bg-[#E5E0DA]/50 border ${errors.itemValue ? 'border-red-500 focus:border-red-500' : 'border-transparent focus:border-[#EB5500]'} rounded-lg pl-24 pr-4 py-3.5 text-sm outline-none focus:bg-white transition-colors placeholder:text-gray-400`}
                     />
                   </div>
                   {errors.itemValue && <span className="text-red-500 text-[10px] mt-1 ml-1 block">This field is required</span>}
@@ -499,7 +498,7 @@ export default function BookDeliveryPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-[#EB5500]">${priceData?.vehicles?.motorcycle?.totalPrice || '5.99'}</p>
+                    <p className="font-bold text-[#EB5500]">CFA franc {priceData?.vehicles?.motorcycle?.totalPrice || '5.99'}</p>
                   </div>
                 </div>
 
@@ -514,7 +513,7 @@ export default function BookDeliveryPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-[#EB5500]">${priceData?.vehicles?.tricycle?.totalPrice || '12.99'}</p>
+                    <p className="font-bold text-[#EB5500]">CFA franc {priceData?.vehicles?.tricycle?.totalPrice || '12.99'}</p>
                   </div>
                 </div>
 
@@ -529,7 +528,7 @@ export default function BookDeliveryPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-[#EB5500]">${priceData?.vehicles?.van?.totalPrice || '24.99'}</p>
+                    <p className="font-bold text-[#EB5500]">CFA franc {priceData?.vehicles?.van?.totalPrice || '24.99'}</p>
                   </div>
                 </div>
 
@@ -701,7 +700,7 @@ export default function BookDeliveryPage() {
                     </div>
                     <div>
                       <p className="text-gray-400 text-[11px] uppercase font-bold">Item Value</p>
-                      <p className="font-medium text-gray-800">${bookingState.itemValue}</p>
+                      <p className="font-medium text-gray-800">CFA franc {bookingState.itemValue}</p>
                     </div>
                     <div className="col-span-2">
                       <p className="text-gray-400 text-[11px] uppercase font-bold">Pickup</p>
@@ -724,7 +723,7 @@ export default function BookDeliveryPage() {
                   <div className="pt-4 border-t border-gray-200/50 space-y-2">
                     <div className="flex justify-between items-center font-bold text-[16px]">
                       <span className="text-gray-900">Total Delivery Fee</span>
-                      <span className="text-[#EB5500]">${priceData?.vehicles?.[bookingState.vehicleType]?.totalPrice || '0.00'}</span>
+                      <span className="text-[#EB5500]">CFA franc {priceData?.vehicles?.[bookingState.vehicleType]?.totalPrice || '0.00'}</span>
                     </div>
                     <div className="flex justify-between items-center text-[12px] text-gray-400">
                       <span>Ready to Proceed?</span>

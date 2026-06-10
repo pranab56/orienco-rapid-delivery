@@ -164,15 +164,15 @@ export default function HistoryDetails() {
                         <div className="rounded-xl p-6 md:p-8 border border-gray-200 flex flex-col gap-4 text-[13px]">
                             <div className="flex justify-between gap-4">
                                 <span className="text-gray-500 font-medium">Base fare</span>
-                                <span className="font-medium">${parcel.baseFare}</span>
+                                <span className="font-medium">CFA franc {parcel.baseFare}</span>
                             </div>
                             <div className="flex justify-between gap-4 mb-2">
                                 <span className="text-gray-500 font-medium">Distance ({parcel.distance.toFixed(2)} km)</span>
-                                <span className="font-medium">${(parcel.totalDeliveryFee - parcel.baseFare).toFixed(2)}</span>
+                                <span className="font-medium">CFA franc {(parcel.totalDeliveryFee - parcel.baseFare).toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between gap-4 pt-4 border-t border-gray-300">
                                 <span className="font-bold text-gray-800 text-sm">Total</span>
-                                <span className="font-bold text-[#EB5500] text-sm">${parcel.totalDeliveryFee}</span>
+                                <span className="font-bold text-[#EB5500] text-sm">CFA franc {parcel.totalDeliveryFee}</span>
                             </div>
                         </div>
                     </div>

@@ -73,7 +73,7 @@ export default function History() {
                                     <h2 className="text-[16px] font-medium mb-4">Order ID: #{parcel._id.slice(-8).toUpperCase()}</h2>
                                     <div className="flex gap-3">
                                         <div className="bg-[#D1FAE5] text-[#059669] text-sm font-medium px-4 py-1.5 rounded-full">
-                                            ${parcel.totalDeliveryFee}
+                                            CFA franc {parcel.totalDeliveryFee}
                                         </div>
                                         <div className="bg-[#E5E5E5] text-gray-600 flex items-center gap-1.5 text-sm font-medium px-4 py-1.5 rounded-full">
                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

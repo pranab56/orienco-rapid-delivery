@@ -72,7 +72,7 @@ export default function Orders() {
                                         ⏱ {parcel.duration || 'N/A'}
                                     </div>
                                     <div className="bg-[#FED7AA] text-[#C2410C] text-[10px] md:text-xs font-medium px-2.5 py-1.5 rounded-full">
-                                        ${parcel.totalDeliveryFee}
+                                        CFA franc {parcel.totalDeliveryFee}
                                     </div>
                                 </div>
 

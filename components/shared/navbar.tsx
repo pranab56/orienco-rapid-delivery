@@ -27,7 +27,7 @@ export function Navbar() {
   const { data: unreadData, refetch: refetchUnreadCount } = useGetUnReadCountQuery(undefined, { skip: !token });
   const unreadCount = unreadData?.data?.unreadCount || 0;
 
-  const [currentLangCode, setCurrentLangCode] = useState('fr');
+  const [currentLangCode, setCurrentLangCode] = useState('en');
 
   useEffect(() => {
     const match = document.cookie.match(/googtrans=\/en\/([a-z]{2})/);
