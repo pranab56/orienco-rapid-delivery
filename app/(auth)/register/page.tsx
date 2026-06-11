@@ -5,8 +5,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Eye, EyeOff, CheckCircle2, Loader } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowLeft, CheckCircle2, Eye, EyeOff, Loader } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -16,11 +16,11 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import * as z from 'zod';
 
 // Swiper styles
+import { useSignUpMutation } from '@/features/auth/authApi';
+import toast from 'react-hot-toast';
 import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/pagination';
-import { useSignUpMutation } from '@/features/auth/authApi';
-import toast from 'react-hot-toast';
 
 const slides = [
   { image: "/images/auth/image1.jpg" },
@@ -74,7 +74,7 @@ export default function RegisterPage() {
         setIsSuccess(true);
       }
     } catch (error: any) {
-      toast.error(error.message)
+      toast.error(error?.data?.message)
     }
   };
 
