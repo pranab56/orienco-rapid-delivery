@@ -98,10 +98,10 @@ const Footer = () => {
                 <h4 className="text-gray-900 font-bold text-lg md:text-lg tracking-tight uppercase text-xs opacity-50">Business Offer</h4>
                 <div className="space-y-4 lg:space-y-5">
                   <div className="flex flex-col">
-                    <Link href="tel:8473883747" className="text-gray-900 font-bold text-lg md:text-xl hover:text-[#EB5500] transition-all tracking-tighter opacity-80">(847) 388-3747</Link>
+                    <Link href="tel:+237 6 98 77 19 68" className="text-gray-900 font-bold text-lg md:text-xl hover:text-[#EB5500] transition-all tracking-tighter opacity-80">+237 6 98 77 19 68</Link>
                   </div>
                   <div className="flex flex-col">
-                    <Link href="mailto:example@gmail.com" className="text-gray-900 font-medium text-lg  hover:text-[#EB5500] transition-all tracking-tight opacity-70 underline underline-offset-4">example@gmail.com</Link>
+                    <Link href="mailto:infoorienco@gmail.com" className="text-gray-900 font-medium text-lg  hover:text-[#EB5500] transition-all tracking-tight opacity-70 underline underline-offset-4">infoorienco@gmail.com</Link>
                   </div>
                 </div>
               </div>

@@ -53,7 +53,7 @@ export default function Contact() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!validate()) return;
-        
+
         if (!user) {
             router.push('/login');
             return;
@@ -143,16 +143,16 @@ export default function Contact() {
                         <div className="relative z-10 space-y-8 md:space-y-12 mt-12 md:mt-24 mb-16 md:mb-24 text-gray-800">
                             <div className="flex items-center gap-5 md:gap-6 group/item cursor-pointer">
                                 <Phone className="text-gray-900 group-hover/item:text-[#EB5500] transition-colors" size={20} />
-                                <span className="font-medium text-sm md:text-[15px]">+1012 3456 789</span>
+                                <span className="font-medium text-sm md:text-[15px]">+237 6 98 77 19 68</span>
                             </div>
                             <div className="flex items-center gap-5 md:gap-6 group/item cursor-pointer">
                                 <Mail className="text-gray-900 group-hover/item:text-[#EB5500] transition-colors" size={20} />
-                                <span className="font-medium text-sm md:text-[15px]">demo@gmail.com</span>
+                                <span className="font-medium text-sm md:text-[15px]">support@oriencorapiddelivery.com</span>
                             </div>
                             <div className="flex items-start gap-5 md:gap-6 group/item cursor-pointer">
                                 <MapPin className="text-gray-900 flex-shrink-0 mt-0.5 group-hover/item:text-[#EB5500] transition-colors" size={20} />
                                 <span className="font-medium text-sm md:text-[15px] leading-relaxed max-w-[250px]">
-                                    132 Dartmouth Street Boston, Massachusetts 02156 United States
+                                    Opposite Opium, Mboa Market Shopping Centre Douala, Cameroon
                                 </span>
                             </div>
                         </div>
