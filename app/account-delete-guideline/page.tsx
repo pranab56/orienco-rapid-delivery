@@ -235,10 +235,10 @@ export default function Page() {
                             </div>
 
                             {/* Right Column: Screenshot Image with Red Markings */}
-                            <div className="w-full lg:w-[380px] bg-gradient-to-b from-stone-50 to-stone-100 p-6 sm:p-8 flex flex-col items-center justify-center border-t lg:border-t-0 lg:border-l border-stone-200/80 relative">
+                            <div className="w-full lg:w-[380px] p-6 sm:p-8 flex flex-col items-center justify-center border-t lg:border-t-0 lg:border-l border-stone-200/80 relative">
                                 <div
                                     onClick={() => setZoomedImage(item.image)}
-                                    className="group relative cursor-pointer rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white ring-1 ring-stone-200/80 transition-transform duration-300 hover:scale-[1.02]"
+                                    className="group relative cursor-pointer transition-transform duration-300 hover:scale-[1.02]"
                                 >
                                     <Image
                                         src={item.image}
@@ -251,8 +251,8 @@ export default function Page() {
                                     />
 
                                     {/* Hover Overlay */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                        <div className="bg-white/95 text-stone-900 text-xs font-bold px-3.5 py-2 rounded-full shadow-lg flex items-center gap-1.5 transform translate-y-2 group-hover:translate-y-0 transition-transform">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-3xl">
+                                        <div className="bg-white text-stone-900 text-xs font-bold px-3.5 py-2 rounded-full shadow-lg flex items-center gap-1.5 transform translate-y-2 group-hover:translate-y-0 transition-transform">
                                             <ZoomIn className="w-4 h-4 text-[#FF5500]" />
                                             Click to Enlarge
                                         </div>
@@ -292,10 +292,8 @@ export default function Page() {
                             >
                                 <X className="w-5 h-5" />
                             </button>
-                            <p className="text-xs font-bold text-stone-500 uppercase tracking-wider mb-3">
-                                High Resolution Screenshot with Red Markings
-                            </p>
-                            <div className="rounded-2xl overflow-hidden border border-stone-200">
+
+                            <div className="overflow-hidden">
                                 <Image
                                     src={zoomedImage}
                                     alt="Zoomed screenshot"
