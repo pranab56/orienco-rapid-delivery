@@ -25,6 +25,14 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'www.mamp.one',
       },
+       {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
+       {
+        protocol: 'https',
+        hostname: 'pub-846b1d024b54436b9157325d2a5838f3.r2.dev',
+      },
       {
         protocol: 'https',
         hostname: 'assets.oriencoinc.com',

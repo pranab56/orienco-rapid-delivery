@@ -25,7 +25,7 @@ const FAQ = () => {
         <div className="lg:col-span-5">
           <h2 className="text-[#333333] font-medium text-3xl md:text-5xl tracking-tight leading-tight text-center lg:text-left">
             Frequently Asked
-            <span className="text-[#EB5500]"> Question</span>
+            <span className="text-[#EB5500]"> Questions</span>
           </h2>
         </div>
 

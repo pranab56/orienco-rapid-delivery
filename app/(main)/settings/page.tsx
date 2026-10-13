@@ -14,8 +14,12 @@ import {
 } from '@/components/ui/popover';
 import { useGetMyProfileQuery, useUpdateProfileMutation } from '@/features/profileAndSettings/profileApi';
 import toast from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser } from '@/features/auth/authSlice';
 
 export default function PersonalInformationPage() {
+  const dispatch = useDispatch();
+  const currentUser = useSelector((state: any) => state.auth?.user);
   const { data: profileResponse, isLoading: profileLoading } = useGetMyProfileQuery(undefined);
   const [updateProfile, { isLoading }] = useUpdateProfileMutation();
 
@@ -35,18 +39,18 @@ export default function PersonalInformationPage() {
   React.useEffect(() => {
     if (profileResponse?.data) {
       const profile = profileResponse.data;
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         fullName: profile.fullName || '',
         phone: profile.phone || '',
         address: profile.address || ''
       });
       if (profile.dateOfBirth) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setDate(new Date(profile.dateOfBirth));
+        const parsed = new Date(profile.dateOfBirth);
+        if (!isNaN(parsed.getTime())) {
+          setDate(parsed);
+        }
       }
       if (profile.image) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPreviewImage(profile.image);
       }
     }
@@ -79,7 +83,6 @@ export default function PersonalInformationPage() {
       submitData.append('phone', formData.phone);
       submitData.append('address', formData.address);
       if (date) {
-        // Format to M-D-YY as shown in your Postman image (4-10-26) or standard ISO
         submitData.append('dateOfBirth', date.toISOString());
       }
       if (imageFile) {
@@ -87,8 +90,11 @@ export default function PersonalInformationPage() {
       }
 
       try {
-        await updateProfile(submitData).unwrap();
-        toast.success('Profile updated successfully!');
+        const res = await updateProfile(submitData).unwrap();
+        toast.success(res?.message || 'Profile updated successfully!');
+        if (res?.data) {
+          dispatch(setUser({ ...currentUser, ...res.data }));
+        }
       } catch (err: any) {
         toast.error(err?.data?.message || 'Failed to update profile');
       }

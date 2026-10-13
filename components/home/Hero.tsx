@@ -135,8 +135,7 @@ export default function Hero() {
               transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
               className="text-white/80 text-base md:text-xl max-w-lg font-normal leading-relaxed"
             >
-              Efficient Rail Freight services ensuring fast, safe, and reliable
-              delivery of your product across every destination.
+              Reliable parcel delivery that keeps your packages moving safely, quickly, and seamlessly to every destination.
             </motion.p>
 
             <motion.div

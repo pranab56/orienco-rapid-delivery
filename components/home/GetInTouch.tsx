@@ -40,7 +40,7 @@ const GetInTouch = () => {
           </div>
 
           <div className="space-y-8 md:space-y-10">
-            <button 
+            <button
               onClick={handleGetStarted}
               className="w-full sm:w-auto bg-white hover:bg-gray-50 text-[#EB5500] font-medium px-12 py-3 rounded-sm text-xl shadow-xl transition-all active:scale-[0.98] cursor-pointer"
             >
@@ -50,7 +50,7 @@ const GetInTouch = () => {
             {/* App Store Buttons Container */}
             <div className="flex flex-col sm:flex-row gap-4 p-4 sm:p-2 border border-white/20 rounded-xl sm:rounded-sm w-full sm:w-fit backdrop-blur-xl bg-white/5">
               {/* Google Play */}
-              <Link href="#" className="w-full sm:w-auto flex items-center justify-center sm:justify-start gap-4 bg-black/90 hover:bg-black transition-all border border-white/5 px-7 py-3 rounded-lg sm:rounded-sm group">
+              <Link href="https://play.google.com/store/apps/details?id=com.orienco.orienco_rapid_delivery&pcampaignid=web_share" target='_blank' className="w-full sm:w-auto flex items-center justify-center sm:justify-start gap-4 bg-black/90 hover:bg-black transition-all border border-white/5 px-7 py-3 rounded-lg sm:rounded-sm group">
                 <div className="relative w-7 h-7">
                   <Image src="https://www.vectorlogo.zone/logos/google_play/google_play-icon.svg" alt="Google Play" fill className="object-contain" />
                 </div>
@@ -61,7 +61,7 @@ const GetInTouch = () => {
               </Link>
 
               {/* App Store */}
-              <Link href="#" className="w-full sm:w-auto flex items-center justify-center sm:justify-start gap-4 bg-black/90 hover:bg-black transition-all border border-white/5 px-7 py-3 rounded-lg sm:rounded-sm group">
+              <Link href="https://play.google.com/store/apps/details?id=com.orienco.orienco_rapid_delivery&pcampaignid=web_share" target='_blank' className="w-full sm:w-auto flex items-center justify-center sm:justify-start gap-4 bg-black/90 hover:bg-black transition-all border border-white/5 px-7 py-3 rounded-lg sm:rounded-sm group">
                 <div className="relative w-7 h-7 grayscale invert brightness-0 transition-all group-hover:grayscale-0 ">
                   <Image src="https://www.vectorlogo.zone/logos/apple/apple-icon.svg" alt="App Store" fill className="object-contain" />
                 </div>

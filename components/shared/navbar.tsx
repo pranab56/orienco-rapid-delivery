@@ -24,15 +24,19 @@ export function Navbar() {
   const dispatch = useDispatch();
   const router = useRouter();
   const { token, user } = useSelector((state: any) => state.auth);
+  const [mounted, setMounted] = useState(false);
   const { data: unreadData, refetch: refetchUnreadCount } = useGetUnReadCountQuery(undefined, { skip: !token });
   const unreadCount = unreadData?.data?.unreadCount || 0;
 
   const [currentLangCode, setCurrentLangCode] = useState('en');
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
     const match = document.cookie.match(/googtrans=\/en\/([a-z]{2})/);
     if (match && match[1]) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCurrentLangCode(match[1]);
     }
   }, []);
@@ -234,7 +238,9 @@ export function Navbar() {
             <Menu size={20} />
           </button>
 
-          {token ? (
+          {!mounted ? (
+            <div className="w-11 h-11" />
+          ) : token ? (
             <>
               <Link href="/notifications">
                 <motion.button
@@ -373,7 +379,7 @@ export function Navbar() {
                   </Link>
                 );
               })}
-              {!token && (
+              {mounted && !token && (
                 <Link
                   href="/login"
                   onClick={() => setMobileMenuOpen(false)}
@@ -382,7 +388,7 @@ export function Navbar() {
                   Sign In
                 </Link>
               )}
-              {token && (
+              {mounted && token && (
                 <button
                   onClick={handleLogout}
                   className="text-3xl font-medium text-red-400 mt-4 text-left"

@@ -56,7 +56,6 @@ export default function ChatWindow() {
     // Synchronize local messages state with API query messages
     useEffect(() => {
         if (activeMessages) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             setMessages(activeMessages);
         }
     }, [activeMessages]);

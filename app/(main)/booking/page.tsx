@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { AnimatePresence, motion } from 'framer-motion';
 import {
+  AlertCircle,
   Bike,
   CalendarIcon,
   Car,
@@ -80,7 +81,7 @@ export default function BookDeliveryPage() {
   const priceData = priceResponse?.data;
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [errors, setErrors] = useState<Record<string, boolean>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isStepLoading, setIsStepLoading] = useState(false);
 
   const user = useSelector((state: any) => state.auth?.user);
@@ -226,34 +227,91 @@ export default function BookDeliveryPage() {
 
   const activeStepData = STEPS.find(s => s.id === currentStep) || STEPS[0];
 
+  const validateField = (field: string, value: any): string => {
+    switch (field) {
+      case 'receiverName': {
+        const name = typeof value === 'string' ? value.trim() : '';
+        if (!name) return 'Receiver name is required';
+        if (name.length < 2) return 'Name must be at least 2 characters';
+        if (name.length > 50) return 'Name must not exceed 50 characters';
+        if (!/^[\p{L}\s.'-]+$/u.test(name)) {
+          return 'Please enter a valid name (letters only)';
+        }
+        return '';
+      }
+      case 'receiverPhone': {
+        const phone = typeof value === 'string' ? value.trim() : '';
+        if (!phone) return 'Receiver phone number is required';
+        const phoneDigits = phone.replace(/\D/g, '');
+        const phonePattern = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/;
+        if (!phonePattern.test(phone) || phoneDigits.length < 8 || phoneDigits.length > 15) {
+          return 'Please enter a valid phone number (8-15 digits)';
+        }
+        if (/^(\d)\1+$/.test(phoneDigits)) {
+          return 'Please enter a valid phone number';
+        }
+        return '';
+      }
+      case 'deliveryDate': {
+        if (!value) return 'Please select a delivery date';
+        const selectedDate = new Date(value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const checkDate = new Date(selectedDate);
+        checkDate.setHours(0, 0, 0, 0);
+        if (checkDate < today) return 'Delivery date cannot be in the past';
+        return '';
+      }
+      case 'deliveryTime': {
+        if (bookingState.deliveryDate) {
+          const selectedDate = new Date(bookingState.deliveryDate);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const checkDate = new Date(selectedDate);
+          checkDate.setHours(0, 0, 0, 0);
+          if (checkDate > today && (!value || !value.trim())) {
+            return 'Please select a delivery time for the scheduled date';
+          }
+        }
+        return '';
+      }
+      case 'note': {
+        if (value && value.length > 500) return 'Note must not exceed 500 characters';
+        return '';
+      }
+      default:
+        return '';
+    }
+  };
+
   const validateStep = (step: number) => {
-    const newErrors: Record<string, boolean> = {};
+    const newErrors: Record<string, string> = {};
     if (step === 1) {
-      if (!bookingState.name) newErrors.name = true;
-      if (!bookingState.itemValue) newErrors.itemValue = true;
+      if (!bookingState.name || !bookingState.name.trim()) newErrors.name = 'Package name is required';
+      if (!bookingState.itemValue || Number(bookingState.itemValue) <= 0) newErrors.itemValue = 'Please enter item value';
     }
     if (step === 2) {
-      if (!bookingState.pickupLocation.address) newErrors.pickupLocation = true;
-      if (!bookingState.dropLocation.address) newErrors.dropLocation = true;
+      if (!bookingState.pickupLocation?.address) newErrors.pickupLocation = 'Pickup location is required';
+      if (!bookingState.dropLocation?.address) newErrors.dropLocation = 'Drop-off location is required';
     }
     if (step === 3) {
-      if (!bookingState.vehicleType) newErrors.vehicleType = true;
+      if (!bookingState.vehicleType) newErrors.vehicleType = 'Please select a vehicle option';
     }
     if (step === 4) {
-      if (!bookingState.receiverName) newErrors.receiverName = true;
-      if (!bookingState.receiverPhone) newErrors.receiverPhone = true;
-      if (!bookingState.deliveryDate) newErrors.deliveryDate = true;
+      const nameError = validateField('receiverName', bookingState.receiverName);
+      if (nameError) newErrors.receiverName = nameError;
 
-      // Check if future date has time selected
-      const selectedDate = new Date(bookingState.deliveryDate);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const phoneError = validateField('receiverPhone', bookingState.receiverPhone);
+      if (phoneError) newErrors.receiverPhone = phoneError;
 
-      if (bookingState.deliveryDate && selectedDate > today) {
-        if (!bookingState.deliveryTime) {
-          newErrors.deliveryTime = true;
-        }
-      }
+      const dateError = validateField('deliveryDate', bookingState.deliveryDate);
+      if (dateError) newErrors.deliveryDate = dateError;
+
+      const timeError = validateField('deliveryTime', bookingState.deliveryTime);
+      if (timeError) newErrors.deliveryTime = timeError;
+
+      const noteError = validateField('note', bookingState.note);
+      if (noteError) newErrors.note = noteError;
     }
 
     setErrors(newErrors);
@@ -261,7 +319,10 @@ export default function BookDeliveryPage() {
   };
 
   const handleContinue = () => {
-    if (!validateStep(currentStep)) return;
+    if (!validateStep(currentStep)) {
+      toast.error('Please fill in all required fields correctly');
+      return;
+    }
     setIsStepLoading(true);
     setTimeout(() => {
       if (currentStep < 5) setCurrentStep(prev => prev + 1);
@@ -270,9 +331,43 @@ export default function BookDeliveryPage() {
   };
 
   const handleInputChange = (field: string, value: any) => {
-    dispatch(updateBooking({ [field]: value }));
+    let processedValue = value;
+    if (field === 'receiverPhone' && typeof value === 'string') {
+      // Disallow non-phone characters, only allow digits, +, spaces, hyphens, and ()
+      processedValue = value.replace(/[^0-9+\s\-()]/g, '');
+    }
+    dispatch(updateBooking({ [field]: processedValue }));
+
+    if (field === 'deliveryDate') {
+      const selected = processedValue ? new Date(processedValue) : null;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (selected) {
+        const check = new Date(selected);
+        check.setHours(0, 0, 0, 0);
+        if (check.getTime() === today.getTime()) {
+          setErrors(prev => {
+            const next = { ...prev };
+            delete next.deliveryDate;
+            delete next.deliveryTime;
+            return next;
+          });
+          return;
+        }
+      }
+    }
+
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: false }));
+      const err = validateField(field, processedValue);
+      setErrors(prev => {
+        const next = { ...prev };
+        if (err) {
+          next[field] = err;
+        } else {
+          delete next[field];
+        }
+        return next;
+      });
     }
   };
 
@@ -390,7 +485,11 @@ export default function BookDeliveryPage() {
                     placeholder="Documents / Gadget"
                     className={`w-full bg-[#E5E0DA]/50 border ${errors.name ? 'border-red-500 focus:border-red-500' : 'border-transparent focus:border-[#EB5500]'} rounded-lg px-4 py-3.5 text-sm outline-none focus:bg-white transition-colors placeholder:text-gray-400`}
                   />
-                  {errors.name && <span className="text-red-500 text-[10px] mt-1 ml-1 block">This field is required</span>}
+                  {errors.name && (
+                    <span className="text-red-500 text-[11px] mt-1.5 ml-1 flex items-center gap-1.5 font-medium">
+                      <AlertCircle size={13} className="flex-shrink-0" /> {errors.name}
+                    </span>
+                  )}
                 </div>
                 <div>
                   <label className="text-[12px] font-semibold text-gray-400 mb-2 block">What is the value of your item?</label>
@@ -404,7 +503,11 @@ export default function BookDeliveryPage() {
                       className={`w-full bg-[#E5E0DA]/50 border ${errors.itemValue ? 'border-red-500 focus:border-red-500' : 'border-transparent focus:border-[#EB5500]'} rounded-lg pl-24 pr-4 py-3.5 text-sm outline-none focus:bg-white transition-colors placeholder:text-gray-400`}
                     />
                   </div>
-                  {errors.itemValue && <span className="text-red-500 text-[10px] mt-1 ml-1 block">This field is required</span>}
+                  {errors.itemValue && (
+                    <span className="text-red-500 text-[11px] mt-1.5 ml-1 flex items-center gap-1.5 font-medium">
+                      <AlertCircle size={13} className="flex-shrink-0" /> {errors.itemValue}
+                    </span>
+                  )}
                 </div>
                 <div className="pt-8">
                   <button
@@ -436,7 +539,11 @@ export default function BookDeliveryPage() {
                           className={`w-full bg-[#EBEBEB] border ${errors.pickupLocation ? 'border-red-500' : 'border-transparent focus:border-[#EB5500]'} rounded-lg py-3 pl-10 pr-4 text-sm outline-none focus:bg-white`}
                         />
                       </div>
-                      {errors.pickupLocation && <span className="text-red-500 text-[10px] mt-1 ml-1 block">This field is required</span>}
+                      {errors.pickupLocation && (
+                        <span className="text-red-500 text-[11px] mt-1.5 ml-1 flex items-center gap-1.5 font-medium">
+                          <AlertCircle size={13} className="flex-shrink-0" /> {errors.pickupLocation}
+                        </span>
+                      )}
                     </div>
                     <div>
                       <label className="text-[11px] font-medium text-gray-500 mb-1.5 block ml-1">Drop-off Location</label>
@@ -450,7 +557,11 @@ export default function BookDeliveryPage() {
                           className={`w-full bg-[#EBEBEB] border ${errors.dropLocation ? 'border-red-500' : 'border-transparent focus:border-[#EB5500]'} rounded-lg py-3 pl-10 pr-4 text-sm outline-none focus:bg-white`}
                         />
                       </div>
-                      {errors.dropLocation && <span className="text-red-500 text-[10px] mt-1 ml-1 block">This field is required</span>}
+                      {errors.dropLocation && (
+                        <span className="text-red-500 text-[11px] mt-1.5 ml-1 flex items-center gap-1.5 font-medium">
+                          <AlertCircle size={13} className="flex-shrink-0" /> {errors.dropLocation}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -532,7 +643,11 @@ export default function BookDeliveryPage() {
                   </div>
                 </div>
 
-                {errors.vehicleType && <span className="text-red-500 text-[10px] block mt-2 ml-1 text-center font-medium">Please select a vehicle option</span>}
+                {errors.vehicleType && (
+                  <span className="text-red-500 text-[11px] flex items-center justify-center gap-1.5 mt-2 ml-1 text-center font-medium">
+                    <AlertCircle size={13} className="flex-shrink-0" /> {errors.vehicleType}
+                  </span>
+                )}
 
                 <div className="pt-4">
                   <button
@@ -552,29 +667,48 @@ export default function BookDeliveryPage() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
                 <div>
                   <div className="relative">
-                    <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <User size={16} className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${errors.receiverName ? 'text-red-500' : 'text-gray-400'}`} />
                     <input
                       type="text"
                       value={bookingState.receiverName}
+                      maxLength={50}
                       onChange={(e) => handleInputChange('receiverName', e.target.value)}
+                      onBlur={() => {
+                        const err = validateField('receiverName', bookingState.receiverName);
+                        if (err) setErrors(prev => ({ ...prev, receiverName: err }));
+                      }}
                       placeholder="Receiver Name"
-                      className={`w-full bg-[#E5E0DA]/40 border ${errors.receiverName ? 'border-red-500' : 'border-transparent focus:border-[#EB5500]'} rounded-lg py-3.5 pl-11 pr-4 text-sm outline-none focus:bg-white`}
+                      className={`w-full bg-[#E5E0DA]/40 border ${errors.receiverName ? 'border-red-500 ring-1 ring-red-500' : 'border-transparent focus:border-[#EB5500]'} rounded-lg py-3.5 pl-11 pr-4 text-sm outline-none focus:bg-white transition-all`}
                     />
                   </div>
-                  {errors.receiverName && <span className="text-red-500 text-[10px] mt-1 ml-1 block">Name is required</span>}
+                  {errors.receiverName && (
+                    <span className="text-red-500 text-[11px] mt-1.5 ml-1 flex items-center gap-1.5 font-medium">
+                      <AlertCircle size={13} className="flex-shrink-0" /> {errors.receiverName}
+                    </span>
+                  )}
                 </div>
 
                 <div>
                   <div className="relative">
-                    <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <Phone size={16} className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${errors.receiverPhone ? 'text-red-500' : 'text-gray-400'}`} />
                     <input
-                      type="text"
+                      type="tel"
                       value={bookingState.receiverPhone}
+                      maxLength={18}
                       onChange={(e) => handleInputChange('receiverPhone', e.target.value)}
+                      onBlur={() => {
+                        const err = validateField('receiverPhone', bookingState.receiverPhone);
+                        if (err) setErrors(prev => ({ ...prev, receiverPhone: err }));
+                      }}
                       placeholder="Receiver Phone Number"
-                      className={`w-full bg-[#E5E0DA]/40 border ${errors.receiverPhone ? 'border-red-500' : 'border-transparent focus:border-[#EB5500]'} rounded-lg py-3.5 pl-11 pr-4 text-sm outline-none focus:bg-white`}
+                      className={`w-full bg-[#E5E0DA]/40 border ${errors.receiverPhone ? 'border-red-500 ring-1 ring-red-500' : 'border-transparent focus:border-[#EB5500]'} rounded-lg py-3.5 pl-11 pr-4 text-sm outline-none focus:bg-white transition-all`}
                     />
                   </div>
+                  {errors.receiverPhone && (
+                    <span className="text-red-500 text-[11px] mt-1.5 ml-1 flex items-center gap-1.5 font-medium">
+                      <AlertCircle size={13} className="flex-shrink-0" /> {errors.receiverPhone}
+                    </span>
+                  )}
                 </div>
 
                 <div className="pt-2 w-full">
@@ -587,10 +721,10 @@ export default function BookDeliveryPage() {
                         className={cn(
                           "w-full bg-[#E5E0DA]/40 border rounded-lg py-7 px-4 text-sm justify-start text-left font-normal hover:bg-[#E5E0DA]/60 transition-colors",
                           !bookingState.deliveryDate && "text-gray-400",
-                          errors.deliveryDate ? 'border-red-500' : 'border-transparent'
+                          errors.deliveryDate ? 'border-red-500 ring-1 ring-red-500' : 'border-transparent'
                         )}
                       >
-                        <CalendarIcon className="mr-2 h-4 w-4 text-gray-400 flex-shrink-0" />
+                        <CalendarIcon className={`mr-2 h-4 w-4 flex-shrink-0 ${errors.deliveryDate ? 'text-red-500' : 'text-gray-400'}`} />
                         {bookingState.deliveryDate ? (
                           format(new Date(bookingState.deliveryDate), "PPP")
                         ) : (
@@ -615,6 +749,7 @@ export default function BookDeliveryPage() {
                               const currentDateTime = new Date();
                               currentDateTime.setHours(currentDateTime.getHours() + 1);
                               handleInputChange('deliveryDate', currentDateTime.toISOString());
+                              handleInputChange('deliveryTime', '');
                             }
                             // If selected date is future date, set to 9 AM on that date
                             else if (selectedDate > today) {
@@ -636,7 +771,11 @@ export default function BookDeliveryPage() {
                       />
                     </PopoverContent>
                   </Popover>
-                  {errors.deliveryDate && <span className="text-red-500 text-[10px] mt-1 ml-1 block">Please select date</span>}
+                  {errors.deliveryDate && (
+                    <span className="text-red-500 text-[11px] mt-1.5 ml-1 flex items-center gap-1.5 font-medium">
+                      <AlertCircle size={13} className="flex-shrink-0" /> {errors.deliveryDate}
+                    </span>
+                  )}
                 </div>
 
                 {/* Time Picker - Only show for future dates (not today) */}
@@ -659,21 +798,38 @@ export default function BookDeliveryPage() {
                             handleInputChange('deliveryDate', dateObj.toISOString());
                           }
                         }}
-                        className={`w-full bg-[#E5E0DA]/40 border ${errors.deliveryTime ? 'border-red-500' : 'border-transparent focus:border-[#EB5500]'} rounded-lg py-3.5 px-4 text-sm outline-none focus:bg-white`}
+                        className={`w-full bg-[#E5E0DA]/40 border ${errors.deliveryTime ? 'border-red-500 ring-1 ring-red-500' : 'border-transparent focus:border-[#EB5500]'} rounded-lg py-3.5 px-4 text-sm outline-none focus:bg-white transition-all`}
                       />
                     </div>
-                    {errors.deliveryTime && <span className="text-red-500 text-[10px] mt-1 ml-1 block">Please select time</span>}
+                    {errors.deliveryTime && (
+                      <span className="text-red-500 text-[11px] mt-1.5 ml-1 flex items-center gap-1.5 font-medium">
+                        <AlertCircle size={13} className="flex-shrink-0" /> {errors.deliveryTime}
+                      </span>
+                    )}
                   </div>
                 )}
 
                 <div className="pt-2">
-                  <textarea
-                    value={bookingState.note}
-                    onChange={(e) => handleInputChange('note', e.target.value)}
-                    rows={4}
-                    placeholder="Additional Note (Optional)...."
-                    className="w-full bg-[#E5E0DA]/40 border border-transparent rounded-lg py-4 px-4 text-sm outline-none focus:bg-white focus:border-[#EB5500] resize-none"
-                  ></textarea>
+                  <div className="relative">
+                    <textarea
+                      value={bookingState.note}
+                      onChange={(e) => handleInputChange('note', e.target.value)}
+                      maxLength={500}
+                      rows={4}
+                      placeholder="Additional Note (Optional)...."
+                      className={`w-full bg-[#E5E0DA]/40 border ${errors.note ? 'border-red-500 ring-1 ring-red-500' : 'border-transparent focus:border-[#EB5500]'} rounded-lg py-4 px-4 text-sm outline-none focus:bg-white resize-none transition-all`}
+                    ></textarea>
+                    {bookingState.note && (
+                      <span className="absolute right-3 bottom-3 text-[10px] text-gray-400">
+                        {bookingState.note.length}/500
+                      </span>
+                    )}
+                  </div>
+                  {errors.note && (
+                    <span className="text-red-500 text-[11px] mt-1.5 ml-1 flex items-center gap-1.5 font-medium">
+                      <AlertCircle size={13} className="flex-shrink-0" /> {errors.note}
+                    </span>
+                  )}
                 </div>
 
                 <div className="pt-4">

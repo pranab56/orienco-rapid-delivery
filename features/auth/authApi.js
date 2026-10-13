@@ -12,7 +12,15 @@ export const authApi = baseApi.injectEndpoints({
       }),
     }),
 
-     signUp : builder.mutation({
+    socialLogin: builder.mutation({
+      query: (credentials) => ({
+        url: "/auth/social-login",
+        method: "POST",
+        body: credentials,
+      }),
+    }),
+
+    signUp: builder.mutation({
       query: (data) => ({
         url: "/auth/signup",
         method: "POST",
@@ -43,13 +51,14 @@ export const authApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
-    
+
   }),
 });
 
 // Export hooks
 export const {
   useLoginMutation,
+  useSocialLoginMutation,
   useSignUpMutation,
   useForgotEmailMutation,
   useVerifyOtpMutation,

@@ -44,7 +44,7 @@ export const getUser = () => {
     const user = localStorage.getItem("orienco-user");
     try {
       return user ? JSON.parse(user) : null;
-    } catch (e) {
+    } catch {
       return null;
     }
   }
