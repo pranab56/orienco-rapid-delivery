@@ -2,6 +2,7 @@
 
 import { logout } from '@/features/auth/authSlice';
 import { useGetUnReadCountQuery } from '@/features/notification/notificationApi';
+import { useGetMyProfileQuery } from '@/features/profileAndSettings/profileApi';
 import { cn } from '@/lib/utils';
 import { baseURL } from '@/utils/BaseURL';
 import { baseApi } from '@/utils/apiBaseQuery';
@@ -13,6 +14,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { io } from 'socket.io-client';
+import toast from 'react-hot-toast';
 
 
 const languages = [
@@ -27,6 +29,30 @@ export function Navbar() {
   const [mounted, setMounted] = useState(false);
   const { data: unreadData, refetch: refetchUnreadCount } = useGetUnReadCountQuery(undefined, { skip: !token });
   const unreadCount = unreadData?.data?.unreadCount || 0;
+
+  const { data: profileResponse } = useGetMyProfileQuery(undefined, { skip: !token });
+  const profile = profileResponse?.data || user;
+
+  const displayName = profile?.fullName || profile?.name || user?.fullName || user?.name || "User";
+  const displayRole = profile?.role || user?.role || "Premium Member";
+  const rawImage = profile?.image || profile?.profileImage || profile?.avatar || profile?.photoURL || user?.image || user?.profileImage || user?.avatar || user?.photoURL;
+
+  const [imageError, setImageError] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [rawImage]);
+
+  const fallbackAvatar = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&auto=format";
+
+  const getImageUrl = (img?: string | null) => {
+    if (!img) return fallbackAvatar;
+    if (img.startsWith("http://") || img.startsWith("https://")) return img;
+    return `${baseURL}${img.startsWith("/") ? "" : "/"}${img}`;
+  };
+
+  const avatarUrl = imageError ? fallbackAvatar : getImageUrl(rawImage);
 
   const [currentLangCode, setCurrentLangCode] = useState('en');
 
@@ -45,7 +71,7 @@ export function Navbar() {
   useEffect(() => {
     if (!token || !user) return;
 
-    const myId = user?._id || user?.id;
+    const myId = profile?._id || profile?.id || user?._id || user?.id;
     if (!myId) return;
 
     // Connect to the /notifications socket namespace
@@ -92,7 +118,7 @@ export function Navbar() {
     return () => {
       socketInstance.disconnect();
     };
-  }, [token, user, dispatch, refetchUnreadCount]);
+  }, [token, user, profile, dispatch, refetchUnreadCount]);
 
   const [profileOpen, setProfileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
@@ -101,9 +127,10 @@ export function Navbar() {
   const profileRef = useRef<HTMLDivElement>(null);
   const langRef = useRef<HTMLDivElement>(null);
 
-  const handleLogout = () => {
+  const confirmLogout = () => {
+    setShowLogoutModal(false);
     dispatch(logout());
-    setProfileOpen(false);
+    toast.success('Logged out successfully');
     router.push('/login');
   };
 
@@ -262,13 +289,15 @@ export function Navbar() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setProfileOpen(!profileOpen)}
-                  className="w-11 h-11 rounded-full border-2 border-white/10 overflow-hidden cursor-pointer relative hover:border-primary/50 transition-all shadow-lg ring-offset-2 ring-offset-black"
+                  className="w-11 h-11 rounded-full border-2 border-white/20 overflow-hidden cursor-pointer relative hover:border-primary/50 transition-all shadow-lg ring-offset-2 ring-offset-black bg-black/20"
                 >
                   <Image
-                    src={user?.image || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&auto=format"}
-                    alt="Avatar"
+                    src={avatarUrl}
+                    alt={displayName}
                     fill
+                    sizes="44px"
                     className="object-cover"
+                    onError={() => setImageError(true)}
                   />
                 </motion.button>
 
@@ -279,34 +308,42 @@ export function Navbar() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 15, scale: 0.9 }}
                       transition={{ duration: 0.2, type: "spring", damping: 20, stiffness: 300 }}
-                      className="absolute top-13 right-0 w-64 bg-white backdrop-blur-2xl rounded-xl overflow-hidden shadow-2xl border border-white/10 p-5 z-[101]"
+                      className="absolute top-13 right-0 w-64 bg-white backdrop-blur-2xl rounded-2xl overflow-hidden shadow-2xl border border-gray-100 p-5 z-[101]"
                     >
                       <div className="flex flex-col items-center text-center">
-                        <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border-2 border-primary/30 p-1">
-                          <Image
-                            src={user?.image || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&auto=format"}
-                            alt={user?.name || "User"}
-                            width={80}
-                            height={80}
-                            className="rounded-full object-cover"
-                          />
+                        <div className="relative w-20 h-20 rounded-full p-1 border-2 border-primary/30 shadow-md mb-3 flex items-center justify-center bg-orange-50/20">
+                          <div className="relative w-full h-full rounded-full overflow-hidden">
+                            <Image
+                              src={avatarUrl}
+                              alt={displayName}
+                              fill
+                              sizes="80px"
+                              className="object-cover"
+                              onError={() => setImageError(true)}
+                              priority
+                            />
+                          </div>
                         </div>
-                        <h4 className="text-black font-medium text-lg tracking-tight">{user?.name || "User"}</h4>
-                        <p className="text-black/70 text-[10px] uppercase tracking-widest font-normal mt-1">{user?.role || "Premium Member"}</p>
+                        <h4 className="text-black font-semibold text-base tracking-tight truncate max-w-[200px]">{displayName}</h4>
+                        <p className="text-black/60 text-[10px] uppercase tracking-widest font-medium mt-0.5">{displayRole}</p>
                       </div>
 
-                      <div className="mt-6 flex flex-col gap-2">
-                        <Link href="/settings" onClick={() => setProfileOpen(false)} className="w-full flex items-center gap-3 p-3 rounded-sm cursor-pointer bg-black/5 hover:bg-black/10 text-black/60 hover:text-black font-medium transition-all text-sm group">
-                          <div className="w-8 h-8 rounded-xl bg-black/5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <div className="mt-5 flex flex-col gap-2">
+                        <Link href="/settings" onClick={() => setProfileOpen(false)} className="w-full flex items-center gap-3 p-3 rounded-xl cursor-pointer bg-black/5 hover:bg-black/10 text-black/70 hover:text-black font-medium transition-all text-sm group">
+                          <div className="w-8 h-8 rounded-lg bg-black/5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                             <Settings size={14} />
                           </div>
                           Settings
                         </Link>
                         <button
-                          onClick={handleLogout}
-                          className="w-full flex items-center cursor-pointer gap-3 p-3 rounded-sm bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 font-medium transition-all text-sm group"
+                          type="button"
+                          onClick={() => {
+                            setProfileOpen(false);
+                            setShowLogoutModal(true);
+                          }}
+                          className="w-full flex items-center cursor-pointer gap-3 p-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 hover:text-red-600 font-medium transition-all text-sm group"
                         >
-                          <div className="w-8 h-8 rounded-xl bg-red-500/10 cursor-pointer flex items-center justify-center group-hover:bg-red-500/10 transition-colors">
+                          <div className="w-8 h-8 rounded-lg bg-red-500/10 cursor-pointer flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
                             <LogOut size={14} />
                           </div>
                           Sign Out
@@ -390,14 +427,81 @@ export function Navbar() {
               )}
               {mounted && token && (
                 <button
-                  onClick={handleLogout}
-                  className="text-3xl font-medium text-red-400 mt-4 text-left"
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setShowLogoutModal(true);
+                  }}
+                  className="text-3xl font-medium text-red-400 mt-4 text-left cursor-pointer"
                 >
                   Sign Out
                 </button>
               )}
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Logout Confirmation Modal */}
+      <AnimatePresence>
+        {showLogoutModal && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setShowLogoutModal(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm cursor-pointer"
+            />
+
+            {/* Modal Dialog */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl p-6 overflow-hidden z-10 border border-gray-100 text-center"
+            >
+              <button
+                type="button"
+                onClick={() => setShowLogoutModal(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100 cursor-pointer"
+                aria-label="Close"
+              >
+                <X size={18} />
+              </button>
+
+              <div className="mx-auto w-14 h-14 rounded-full bg-red-50 border border-red-100 flex items-center justify-center text-red-500 mb-4 shadow-sm">
+                <LogOut size={24} className="translate-x-0.5" />
+              </div>
+
+              <h3 className="text-xl font-bold text-gray-900 tracking-tight mb-2">
+                Sign Out
+              </h3>
+              <p className="text-sm text-gray-500 leading-relaxed mb-6">
+                Are you sure you want to sign out? You will need to log in again to access your account.
+              </p>
+
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowLogoutModal(false)}
+                  className="w-full py-2.5 px-4 rounded-xl border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 active:scale-95 transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmLogout}
+                  className="w-full py-2.5 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white font-medium text-sm shadow-md shadow-orange-500/20 active:scale-95 transition-all cursor-pointer"
+                >
+                  Yes, Sign Out
+                </button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </nav>

@@ -9,7 +9,7 @@ import { ArrowLeft, Eye, EyeOff, CheckCircle2, Loader } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { Autoplay, EffectFade, Pagination } from 'swiper/modules';
@@ -50,6 +50,15 @@ export default function LoginPage() {
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (loginStep === 'success') {
+      const timer = setTimeout(() => {
+        router.push('/');
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [loginStep, router]);
+
   const {
     register,
     handleSubmit,
@@ -87,9 +96,6 @@ export default function LoginPage() {
           user,
         }));
         setLoginStep("success");
-        setTimeout(() => {
-          router.push('/');
-        }, 1200);
       }
     } catch (error: any) {
       toast.error(error?.data?.message || "An error occurred while logging in");
@@ -138,14 +144,14 @@ export default function LoginPage() {
           refreshToken: response.data?.refreshToken || null,
           user,
         }));
-        setLoginStep("success");
-        setTimeout(() => {
-          router.push('/');
-        }, 1200);
+        // Redirect directly to website for Google/social login without showing the intermediate success screen
+        router.push('/');
       } else {
+        setSocialLoadingProvider(null);
         toast.error(response.message || "Social login failed");
       }
     } catch (error: any) {
+      setSocialLoadingProvider(null);
       if (
         error?.code === 'auth/popup-closed-by-user' ||
         error?.code === 'auth/cancelled-popup-request' ||
@@ -165,8 +171,6 @@ export default function LoginPage() {
       } else {
         toast.error(error?.data?.message || error?.message || `Failed to sign in with ${provider}`);
       }
-    } finally {
-      setSocialLoadingProvider(null);
     }
   };
 
